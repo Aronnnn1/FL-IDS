@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FL-IDS Results</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #ffffff;
+    --surface-1: #fcfcfb;
+    --surface-2: #f3f2ee;
+    --border: #e3e1da;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #837f76;
+    --series-boost: #2a78d6;
+    --series-boost-soft: #cde2fb;
+    --series-dl: #eb6834;
+    --series-dl-soft: #fbdccb;
+    --good: #0ca30c;
+    --critical: #d03b3b;
+    --warning: #fab219;
+    --seq-100: #cde2fb; --seq-200: #9ec5f4; --seq-300: #6da7ec; --seq-400: #3987e5;
+    --seq-500: #256abf; --seq-600: #184f95; --seq-700: #0d366b;
+    --code-bg: #f3f2ee;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-0: #141413;
+      --surface-1: #1a1a19;
+      --surface-2: #232320;
+      --border: #34332e;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #8f8c80;
+      --series-boost: #3987e5;
+      --series-boost-soft: #1c3350;
+      --series-dl: #d95926;
+      --series-dl-soft: #46281a;
+      --good: #17c317;
+      --critical: #e66767;
+      --warning: #fab219;
+      --code-bg: #1f1f1c;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-0: #141413;
+    --surface-1: #1a1a19;
+    --surface-2: #232320;
+    --border: #34332e;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #8f8c80;
+    --series-boost: #3987e5;
+    --series-boost-soft: #1c3350;
+    --series-dl: #d95926;
+    --series-dl-soft: #46281a;
+    --good: #17c317;
+    --critical: #e66767;
+    --warning: #fab219;
+    --code-bg: #1f1f1c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  a { color: var(--series-boost); }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  code { background: var(--code-bg); padding: 0.1em 0.4em; border-radius: 4px; font-size: 0.9em; }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--surface-1) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 24px;
+    padding: 14px 24px;
+    overflow-x: auto;
+  }
+  .topbar .brand { font-weight: 700; white-space: nowrap; margin-right: 8px; }
+  .topbar nav { display: flex; gap: 18px; }
+  .topbar nav a {
+    color: var(--text-secondary); text-decoration: none; font-size: 13.5px; white-space: nowrap;
+  }
+  .topbar nav a:hover { color: var(--text-primary); }
+
+  main { max-width: 980px; margin: 0 auto; padding: 40px 24px 100px; }
+  section { margin-bottom: 72px; scroll-margin-top: 70px; }
+  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  h2 { font-size: 22px; margin: 0 0 18px; letter-spacing: -0.01em; }
+  h3 { font-size: 16px; margin: 28px 0 10px; }
+  .subtitle { color: var(--text-secondary); font-size: 15px; margin: 0 0 4px; }
+  .meta { color: var(--text-muted); font-size: 13px; }
+  p { color: var(--text-secondary); }
+  .lede { color: var(--text-primary); font-size: 16px; }
+
+  .card {
+    background: var(--surface-0); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 22px;
+  }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 18px 0; }
+  .tile { background: var(--surface-0); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .tile .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .tile .value { font-size: 26px; font-weight: 700; margin-top: 4px; letter-spacing: -0.01em; }
+  .tile .sub { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+  .tile.win .value { color: var(--good); }
+
+  .legend { display: flex; gap: 18px; align-items: center; margin: 4px 0 14px; font-size: 13px; color: var(--text-secondary); }
+  .legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .dot.boost { background: var(--series-boost); }
+  .dot.dl { background: var(--series-dl); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: right; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+  tbody tr:hover { background: var(--surface-2); }
+  .num-pos { color: var(--good); }
+  .num-neg { color: var(--critical); }
+  .table-wrap { overflow-x: auto; }
+
+  .barchart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; margin: 18px 0; }
+  .bar-metric .metric-name { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600; }
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .bar-row .bar-label { width: 42px; font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+  .bar-track { flex: 1; background: var(--surface-2); border-radius: 4px; height: 20px; position: relative; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .bar-fill.boost { background: var(--series-boost); }
+  .bar-fill.dl { background: var(--series-dl); }
+  .bar-val { width: 52px; text-align: right; font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--text-primary); flex-shrink: 0; }
+
+  .cm-wrap { overflow-x: auto; margin: 14px 0; }
+  .cm-table { border-collapse: collapse; font-size: 10.5px; }
+  .cm-table th { font-size: 10px; text-transform: none; letter-spacing: 0; color: var(--text-secondary); font-weight: 600; }
+  .cm-table th.colhead {
+    height: 92px; width: 26px; padding: 0 0 4px; vertical-align: bottom; text-align: left;
+  }
+  .cm-table th.colhead span {
+    display: inline-block; writing-mode: vertical-rl; transform: rotate(180deg);
+    white-space: nowrap;
+  }
+  .cm-table td { padding: 0; border: 1px solid var(--surface-1); width: 26px; height: 26px; text-align: center; font-variant-numeric: tabular-nums; position: relative; }
+  .cm-table td.diag { font-weight: 700; }
+  .cm-table th.rowhead { text-align: right; padding-right: 8px; white-space: nowrap; }
+  .cm-cell-val { font-size: 9px; }
+  .cm-caption { font-size: 12.5px; color: var(--text-muted); margin-top: 6px; }
+
+  .callout {
+    border-left: 3px solid var(--series-boost); background: var(--series-boost-soft);
+    padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 13.5px; color: var(--text-primary);
+  }
+  .callout.warn { border-left-color: var(--warning); background: color-mix(in srgb, var(--warning) 16%, var(--surface-0)); }
+  .callout.crit { border-left-color: var(--critical); background: color-mix(in srgb, var(--critical) 14%, var(--surface-0)); }
+
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600;
+    padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--good) 16%, var(--surface-0)); color: var(--good);
+  }
+  .status-pill::before { content: "●"; font-size: 9px; }
+  .status-pill.crit { background: color-mix(in srgb, var(--critical) 16%, var(--surface-0)); color: var(--critical); }
+
+  .phase-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .phase-list li { display: flex; gap: 12px; align-items: baseline; padding: 10px 14px; background: var(--surface-0); border: 1px solid var(--border); border-radius: 10px; font-size: 13.5px; }
+  .phase-list .phase-name { font-weight: 600; min-width: 190px; flex-shrink: 0; }
+  .phase-list .phase-desc { color: var(--text-secondary); }
+
+  .sparkline-wrap svg { width: 100%; height: auto; display: block; }
+  .caveat-list { padding-left: 20px; }
+  .caveat-list li { margin-bottom: 10px; color: var(--text-secondary); font-size: 13.5px; }
+  .caveat-list li b { color: var(--text-primary); }
+
+  footer { border-top: 1px solid var(--border); padding: 28px 24px; text-align: center; color: var(--text-muted); font-size: 13px; }
+  .toggle-btn {
+    margin-left: auto; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-secondary);
+    border-radius: 999px; padding: 5px 12px; font-size: 12px; cursor: pointer; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">FL-IDS</span>
+  <nav>
+    <a href="#summary">Summary</a>
+    <a href="#comparison">Boosting vs. DL</a>
+    <a href="#confusion">Confusion matrices</a>
+    <a href="#pipeline">Full pipeline</a>
+    <a href="#caveats">Caveats</a>
+  </nav>
+  <button class="toggle-btn" id="theme-toggle" type="button">Dark mode</button>
+</div>
+
+<main>
+
+<section id="summary">
+  <h1>Boosting vs. Deep Learning, and the full FL-IDS pipeline</h1>
+  <p class="subtitle">A federated, cascade-based intrusion detection system for IoT/IIoT traffic — a supervised
+  LightGBM classifier as the first pass, with a client-side autoencoder as a federated, poisoning-resistant
+  backstop for zero-day attacks. This page reports two things: (1) a head-to-head comparison of the boosting
+  classifier against a deep-learning classifier for the same job, and (2) verification that the full five-part
+  pipeline works end to end, with its real limitations stated plainly.</p>
+  <p class="meta">Dataset: Edge-IIoTset (Ferrag et al., 2022). All numbers on this page come from real runs of the
+  code in this repository — see <a href="https://github.com/Aronnnn1/FL-IDS/blob/main/PAPER_NOTES.md">PAPER_NOTES.md</a>
+  for full detail, sources, and every caveat.</p>
+
+  <div class="tiles">
+    <div class="tile win"><div class="label">Boosting macro F1</div><div class="value">0.887</div><div class="sub">vs. 0.621 for a comparable DL classifier</div></div>
+    <div class="tile"><div class="label">Cascade zero-day recall</div><div class="value">0.731</div><div class="sub">vs. 0.518 for boosting alone</div></div>
+    <div class="tile"><div class="label">Real Phase A run</div><div class="value">0.889</div><div class="sub">attack macro-recall, real 10-client FL training</div></div>
+    <div class="tile"><div class="label">Real SDN demo</div><div class="value">Correct</div><div class="sub">Backdoor attack classified &amp; blocked live</div></div>
+  </div>
+</section>
+
+<section id="comparison">
+  <h2>Boosting vs. a supervised DL classifier</h2>
+  <p>This answers a specific question: if you swap LightGBM boosting for a deep-learning classifier as the
+  cascade's first pass — same attack-type labels, same task, comparable effort — which one is actually more
+  accurate? Both were trained and evaluated on the exact same 500,000-row sample (400k train / 100k test,
+  stratified), boosting on raw features, the DL classifier on standardized features (each model gets the input
+  representation it needs).</p>
+
+  <div class="legend"><span><span class="dot boost"></span>Boosting (LightGBM)</span><span><span class="dot dl"></span>DL classifier (dense MLP, 8,271 params)</span></div>
+
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Metric</th><th>Boosting</th><th>DL classifier</th><th>Gap</th></tr></thead>
+    <tbody>
+      <tr><td>Accuracy</td><td>0.8908</td><td>0.6779</td><td class="num-pos">+0.213</td></tr>
+      <tr><td>Macro F1</td><td>0.8872</td><td>0.6218</td><td class="num-pos">+0.266</td></tr>
+      <tr><td>Weighted F1</td><td>0.8924</td><td>0.6681</td><td class="num-pos">+0.224</td></tr>
+      <tr><td>Benign false-positive rate</td><td>0.1599</td><td>0.5341</td><td class="num-pos">&minus;0.374 (lower is better)</td></tr>
+      <tr><td>Train time</td><td>55.5s</td><td>10.2s</td><td>&mdash;</td></tr>
+      <tr><td>Model size</td><td>12.8 MB (300 trees)</td><td>8,271 parameters</td><td>&mdash;</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Per-class recall — where the gap actually is</h3>
+  <p>Boosting doesn't win uniformly. The gap concentrates almost entirely on application-layer attacks that look
+  like legitimate traffic; on the trivially-separable flood attacks, both models are essentially perfect.</p>
+  <div id="recall-chart" class="barchart-grid"></div>
+
+  <div class="callout">
+    <b>Why boosting wins here.</b> Gradient-boosted trees build axis-aligned decision splits directly on the
+    engineered flow features (packet counts, flags, protocol fields) — exactly the kind of thresholded, tabular
+    structure this data has. A small dense network has to learn that same decision surface from scratch through
+    weighted sums and nonlinearities, with far less inductive bias toward tabular data, and with 400k rows and 15
+    epochs it doesn't get there for classes whose boundary with "Normal" is subtle (XSS, SQL_injection,
+    Uploading, DDoS_HTTP — all under 71% recall for the DL model, several under 30%). On the flood attacks
+    (DDoS_TCP/UDP/ICMP), where a couple of features separate the classes almost perfectly, both models hit
+    ~100% — there's no boundary subtlety for either architecture to struggle with.
+  </div>
+  <div class="callout warn">
+    <b>Honest caveat.</b> This DL classifier was deliberately modest — 2 hidden layers, 8,271 parameters, 15
+    epochs — a comparable-effort baseline, not an exhaustively tuned one. A larger or longer-trained network
+    might close some of this gap; that wasn't tested. The right claim is "this DL classifier doesn't beat
+    boosting here," not "DL cannot work on this problem."
+  </div>
+</section>
+
+<section id="confusion">
+  <h2>Confusion matrices</h2>
+  <p>Rows are the true class, columns the predicted class, shaded by the fraction of that row's rows landing in
+  each column (so the diagonal reads as recall). Hover a cell for the exact count.</p>
+
+  <h3>Boosting</h3>
+  <div class="cm-wrap"><div id="cm-boost"></div></div>
+  <p class="cm-caption">Boosting's confusion is almost entirely inside a small application-layer cluster —
+  DDoS_HTTP, Password, SQL_injection — and a Backdoor/Uploading pair, both semantically related traffic types.
+  It essentially never confuses a flood attack with anything.</p>
+
+  <h3>DL classifier</h3>
+  <div class="cm-wrap"><div id="cm-dl"></div></div>
+  <p class="cm-caption">The DL classifier's confusion is much more spread out, and dominated by one column:
+  <b>Password</b> absorbs large fractions of DDoS_HTTP, Normal, SQL_injection, Uploading and Vulnerability_scanner
+  — a strong "when unsure, guess Password" bias that boosting doesn't show, and the concrete mechanism behind its
+  much higher benign false-positive rate (real Normal traffic getting pulled toward Password).</p>
+</section>
+
+<section id="pipeline">
+  <h2>Full pipeline — verified working, with real numbers</h2>
+  <p>Beyond the classifier comparison above, this checks that the complete five-part system — boosting cascade,
+  federated autoencoder, poisoning-resistant aggregation, and SDN mitigation — actually works end to end, not
+  just in isolated unit tests.</p>
+
+  <ul class="phase-list">
+    <li><span class="phase-name">Ablation<br><span class="status-pill">verified</span></span><span class="phase-desc">Full cascade beats boosting-alone and autoencoder-alone under 30% poisoned clients: 0.887 / 0.875 / 0.191 attack macro-recall respectively. The autoencoder backstop nearly doubles zero-day detection (0.731 vs. 0.518 for boosting alone) while barely moving known-attack recall — its value is specifically in catching attacks boosting was never trained on.</span></li>
+    <li><span class="phase-name">Poisoning resistance<br><span class="status-pill">verified</span></span><span class="phase-desc">Attack macro-recall stays in a tight 0.878&ndash;0.887 band from 0% to 40% malicious clients. At 50% the trust filter's median-based defense breaks down as expected (malicious survival jumps to 96%) — a known, documented limit, not a surprise failure.</span></li>
+    <li><span class="phase-name">Zero-day detection<br><span class="status-pill">verified</span></span><span class="phase-desc">All 14 attack classes tested leave-one-out. On classes boosting has zero training signal for, the cascade's detection comes almost entirely from the autoencoder: MITM 0%&rarr;89%, DDoS_UDP 9%&rarr;90%, Vulnerability_scanner 10%&rarr;84%.</span></li>
+    <li><span class="phase-name">Real federated training<br><span class="status-pill">verified</span></span><span class="phase-desc">A real Flower server plus 10 real separate client processes (not a simulation) completed 20 rounds end to end: 0.889 attack macro-recall, 0.0346 benign FPR — closely matching the faster in-process simulation used for the sweeps above, a useful cross-check that the simulation is representative.</span></li>
+    <li><span class="phase-name">Live SDN mitigation<br><span class="status-pill">verified</span></span><span class="phase-desc">A real captured attack (Backdoor_attack.pcap) replayed through a live Mininet/OpenFlow topology was classified <b>Backdoor</b> (99.7% confidence) and a real flow rule was installed to block it — confirmed directly against the switch's own flow table, not a mocked result.</span></li>
+    <li><span class="phase-name">Live dashboard<br><span class="status-pill">verified</span></span><span class="phase-desc">Watched live in a browser during a real training run — round counter, per-client trust scores, reconstruction error, all populated with real, changing data. This check also found and fixed a real bug in the documented launch command that no unit test had caught.</span></li>
+  </ul>
+
+  <h3>Poisoning-resistance sweep</h3>
+  <div id="sweep-chart" class="card"></div>
+
+  <h3>Live SDN demo — what actually happened</h3>
+  <p>This is worth spelling out because it's a genuine before/after: an earlier run of this same demo, using
+  models trained inside the demo script rather than a properly evaluated bundle, misclassified this exact capture
+  as <code>DDoS_HTTP</code>. After fixing two real data-quality bugs upstream (a label-leak artifact and a tshark
+  version-compatibility issue — both documented in PAPER_NOTES.md §5.3) and re-running with a real, fully-trained
+  Phase A bundle, the same capture now classifies correctly:</p>
+  <div class="table-wrap">
+  <table>
+    <tbody>
+      <tr><td>Capture</td><td>Backdoor_attack.pcap (24,914 packets)</td></tr>
+      <tr><td>Classification</td><td><b>Backdoor</b> (confidence 0.997, decided by the boosting stage alone)</td></tr>
+      <tr><td>Mitigation action</td><td>Block</td></tr>
+      <tr><td>Installed flow rule</td><td><code>priority=100,ip,nw_src=10.0.0.1 actions=drop</code></td></tr>
+      <tr><td>Verified against</td><td>The switch's own <code>ovs-ofctl dump-flows</code> output</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout warn">
+    <b>Real limitation, found by this run.</b> The flow table shows 23,586 packets already matched the default
+    "allow" rule before the block rule's own timer starts — meaning classification happens only after the whole
+    capture has been analyzed, not packet-by-packet in real time. For a replayed file, nearly the entire capture
+    passes through before mitigation kicks in. This is an architectural property of the current pipeline
+    (batch classification of a capture), not a bug, and it's stated here rather than glossed over.
+  </div>
+</section>
+
+<section id="caveats">
+  <h2>Caveats and limitations</h2>
+  <p>Stated plainly, matching the standing convention in this project's own notes: every number above is real,
+  but every result has a scope. Full detail and reasoning for each is in
+  <a href="https://github.com/Aronnnn1/FL-IDS/blob/main/PAPER_NOTES.md">PAPER_NOTES.md</a>.</p>
+  <ol class="caveat-list">
+    <li><b>Mitigation is not real-time.</b> As shown above, Phase B classifies a full capture, not a packet
+    stream — real-time inline blocking is not what's built or measured here.</li>
+    <li><b>The DL classifier comparison used a non-default, rebalanced sample.</b> Its absolute benign
+    false-positive numbers (16% boosting, 53% DL) aren't comparable to the pipeline's natural-distribution
+    numbers (0.02% boosting FPR) — the sample deliberately cut the benign class from 71% to ~10% of the data to
+    fix severe class imbalance, which shifts what each model treats as its default prediction. The
+    <i>relative</i> result (boosting beats this DL classifier) is sound regardless.</li>
+    <li><b>Non-IID vs. malicious data is a real confound.</b> The trust filter targets corrupted model
+    <i>updates</i>, not unusual local data — an honest client with a very skewed data shard can look similar to
+    a poisoned one, and is sometimes wrongly excluded for a round.</li>
+    <li><b>The trust filter has a documented breaking point.</b> At 50% malicious clients, its median-based
+    reference direction becomes the attackers' own direction, and the defense inverts. Trimmed-mean aggregation
+    alone also fails once colluding attackers exceed its trim fraction.</li>
+    <li><b>Only one attack model tested</b> — a sign-flip gradient attack with an inflated reported example
+    count. Adaptive attackers designed specifically to evade this filter are untested.</li>
+    <li><b>Mostly single-seed results.</b> A targeted multi-seed check on one flagged anomaly (a 20%-vs-30%
+    ordering in the poisoning sweep) found it does <i>not</i> hold across seeds — confirmed as noise, not a real
+    trend, and documented as such rather than silently repeated. Most other numbers on this page are still
+    single-seed.</li>
+    <li><b>Tiny classes.</b> MITM (358&ndash;406 rows) and Fingerprinting (853 rows) are a small fraction of the
+    full dataset; their per-class numbers rest on few test rows and should be read with that in mind.</li>
+    <li><b>Novelty is not a settled claim.</b> A handful of targeted literature searches found no single
+    published system combining all five components here — that is not a systematic review.</li>
+  </ol>
+</section>
+
+</main>
+
+<footer>
+  Full source, tests, and the complete run log for every number on this page:
+  <a href="https://github.com/Aronnnn1/FL-IDS">github.com/Aronnnn1/FL-IDS</a>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- theme toggle ----------
+  var btn = document.getElementById("theme-toggle");
+  var root = document.documentElement;
+  var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  function effectiveIsDark() {
+    var explicit = root.getAttribute("data-theme");
+    if (explicit) return explicit === "dark";
+    return prefersDark;
+  }
+  function applyTheme(t) {
+    if (t) { root.setAttribute("data-theme", t); } else { root.removeAttribute("data-theme"); }
+    btn.textContent = effectiveIsDark() ? "Light mode" : "Dark mode";
+  }
+  try {
+    var saved = localStorage.getItem("fl-ids-theme");
+    if (saved) { applyTheme(saved); } else { applyTheme(null); }
+  } catch (e) { applyTheme(null); }
+  btn.addEventListener("click", function () {
+    var next = effectiveIsDark() ? "light" : "dark";
+    applyTheme(next);
+    try { localStorage.setItem("fl-ids-theme", next); } catch (e) {}
+  });
+
+  // ---------- data ----------
+  var classNames = ["Backdoor","DDoS_HTTP","DDoS_ICMP","DDoS_TCP","DDoS_UDP","Fingerprinting","MITM","Normal","Password","Port_Scanning","Ransomware","SQL_injection","Uploading","Vulnerability_scanner","XSS"];
+
+  var perClass = [
+    ["XSS", 0.7607, 0.0720],
+    ["Fingerprinting", 0.5789, 0.0000],
+    ["SQL_injection", 0.7669, 0.1833],
+    ["Uploading", 0.6295, 0.1963],
+    ["Port_Scanning", 0.9972, 0.4981],
+    ["Normal", 0.8401, 0.4659],
+    ["DDoS_HTTP", 0.9141, 0.6107],
+    ["Ransomware", 0.8772, 0.6904],
+    ["Vulnerability_scanner", 0.9571, 0.8153],
+    ["MITM", 1.0000, 0.9028],
+    ["Backdoor", 0.9276, 0.9111],
+    ["Password", 0.8310, 0.8598],
+    ["DDoS_TCP", 1.0000, 1.0000],
+    ["DDoS_UDP", 1.0000, 1.0000],
+    ["DDoS_ICMP", 0.9987, 0.9998]
+  ];
+
+  var cmBoost = [[4457,169,0,0,0,1,0,0,1,84,1,0,89,2,1],[0,8875,0,0,0,2,0,12,341,0,0,428,9,12,30],[0,0,9835,0,0,13,0,0,0,0,0,0,0,0,0],[0,0,0,9848,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,9848,0,0,0,0,0,0,0,0,0,0],[0,23,21,0,0,99,0,0,0,28,0,0,0,0,0],[0,0,0,0,0,0,72,0,0,0,0,0,0,0,0],[0,325,0,0,3,0,0,8273,716,0,0,521,5,3,2],[0,930,0,0,0,1,0,42,8184,0,0,676,11,1,3],[0,0,0,0,0,0,0,0,0,3984,3,0,8,0,0],[1,121,0,0,0,0,0,0,0,59,1700,0,56,1,0],[0,1266,0,0,0,1,0,66,943,0,0,7552,8,7,5],[4,1443,0,0,0,0,0,20,400,553,3,303,4634,0,1],[1,179,0,0,0,1,0,5,113,0,0,121,1,9426,1],[0,245,0,0,0,1,0,9,248,0,0,217,0,1,2292]];
+
+  var cmDl = [[4378,213,0,86,0,0,0,0,36,0,3,0,89,0,0],[189,5929,0,0,1,0,0,150,3290,0,48,90,7,0,5],[0,0,9846,0,2,0,0,0,0,0,0,0,0,0,0],[0,0,0,9848,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,9848,0,0,0,0,0,0,0,0,0,0],[0,23,118,28,2,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,7,0,65,0,0,0,0,0,0,0,0],[205,358,1,0,0,0,0,4588,4532,0,62,102,0,0,0],[236,907,0,0,0,0,0,44,8467,0,61,132,1,0,0],[0,12,0,1990,0,0,0,0,0,1990,0,0,3,0,0],[78,159,0,59,0,0,0,0,246,0,1338,0,57,1,0],[221,820,0,0,0,0,0,188,6723,0,88,1805,0,3,0],[111,1512,0,571,0,0,0,150,3447,0,41,82,1445,2,0],[33,149,0,0,0,0,0,57,1288,0,28,215,15,8029,34],[86,339,0,0,0,0,0,122,1981,0,26,43,199,0,217]];
+
+  var sweep = [
+    {f:0.0, recall:0.8837, fpr:0.0296, zeroDay:0.7358, aeAlone:0.4308},
+    {f:0.2, recall:0.8836, fpr:0.0341, zeroDay:0.7355, aeAlone:0.3737},
+    {f:0.3, recall:0.8868, fpr:0.0260, zeroDay:0.7308, aeAlone:0.4209},
+    {f:0.4, recall:0.8853, fpr:0.0285, zeroDay:0.7236, aeAlone:0.4133},
+    {f:0.5, recall:0.8777, fpr:0.0340, zeroDay:0.5943, aeAlone:0.0000}
+  ];
+
+  // ---------- per-class recall grouped bars ----------
+  var recallEl = document.getElementById("recall-chart");
+  perClass.forEach(function (row) {
+    var name = row[0], boost = row[1], dl = row[2];
+    var wrap = document.createElement("div");
+    wrap.className = "bar-metric";
+    wrap.innerHTML =
+      '<div class="metric-name">' + name + '</div>' +
+      '<div class="bar-row"><span class="bar-label">Boost</span><div class="bar-track"><div class="bar-fill boost" style="width:' + (boost*100).toFixed(1) + '%"></div></div><span class="bar-val">' + boost.toFixed(3) + '</span></div>' +
+      '<div class="bar-row"><span class="bar-label">DL</span><div class="bar-track"><div class="bar-fill dl" style="width:' + (dl*100).toFixed(1) + '%"></div></div><span class="bar-val">' + dl.toFixed(3) + '</span></div>';
+    recallEl.appendChild(wrap);
+  });
+
+  // ---------- confusion matrix heatmaps ----------
+  function seqColor(t) {
+    // t in [0,1] -> sequential blue ramp (light -> dark), matched to CSS custom props
+    var stops = [
+      [0.00, [252,252,251]], // surface
+      [0.12, [205,226,251]],
+      [0.30, [157,197,244]],
+      [0.55, [109,167,236]],
+      [0.75, [57,135,229]],
+      [1.00, [13,54,107]]
+    ];
+    for (var i = 0; i < stops.length - 1; i++) {
+      var a = stops[i], b = stops[i+1];
+      if (t >= a[0] && t <= b[0]) {
+        var localT = (t - a[0]) / (b[0] - a[0] || 1);
+        var r = Math.round(a[1][0] + (b[1][0]-a[1][0])*localT);
+        var g = Math.round(a[1][1] + (b[1][1]-a[1][1])*localT);
+        var bl = Math.round(a[1][2] + (b[1][2]-a[1][2])*localT);
+        return "rgb(" + r + "," + g + "," + bl + ")";
+      }
+    }
+    return "rgb(13,54,107)";
+  }
+
+  function renderConfusionMatrix(container, matrix, labels) {
+    var table = document.createElement("table");
+    table.className = "cm-table";
+    var thead = document.createElement("thead");
+    var headRow = document.createElement("tr");
+    headRow.appendChild(document.createElement("th"));
+    labels.forEach(function (l) {
+      var th = document.createElement("th");
+      th.className = "colhead";
+      var span = document.createElement("span");
+      span.textContent = l;
+      th.appendChild(span);
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+    matrix.forEach(function (row, i) {
+      var rowSum = row.reduce(function (a,b) { return a+b; }, 0) || 1;
+      var tr = document.createElement("tr");
+      var rowHead = document.createElement("th");
+      rowHead.className = "rowhead";
+      rowHead.textContent = labels[i];
+      tr.appendChild(rowHead);
+      row.forEach(function (count, j) {
+        var frac = count / rowSum;
+        var td = document.createElement("td");
+        td.style.background = seqColor(Math.pow(frac, 0.55));
+        if (i === j) td.classList.add("diag");
+        var textColor = frac > 0.45 ? "#ffffff" : "var(--text-secondary)";
+        td.innerHTML = '<span class="cm-cell-val" style="color:' + textColor + '">' + (count > 0 ? count : "") + '</span>';
+        td.title = labels[i] + " -> " + labels[j] + ": " + count + " rows (" + (frac*100).toFixed(1) + "% of " + labels[i] + ")";
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    container.appendChild(table);
+  }
+
+  renderConfusionMatrix(document.getElementById("cm-boost"), cmBoost, classNames);
+  renderConfusionMatrix(document.getElementById("cm-dl"), cmDl, classNames);
+
+  // ---------- poisoning sweep line chart (inline SVG) ----------
+  (function () {
+    var el = document.getElementById("sweep-chart");
+    var W = 900, H = 300, padL = 40, padR = 20, padT = 20, padB = 34;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    function x(f) { return padL + (f / 0.5) * plotW; }
+    function y(v) { return padT + (1 - v) * plotH; }
+
+    var series = [
+      {key: "recall", color: "var(--series-boost)", label: "Attack macro-recall"},
+      {key: "zeroDay", color: "var(--series-dl)", label: "Zero-day macro-recall"},
+      {key: "aeAlone", color: "#1baf7a", label: "AE-alone macro-recall"}
+    ];
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit">';
+    // gridlines
+    [0, 0.25, 0.5, 0.75, 1.0].forEach(function (v) {
+      svg += '<line x1="' + padL + '" x2="' + (W-padR) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--border)" stroke-width="1"/>';
+      svg += '<text x="' + (padL-8) + '" y="' + (y(v)+4) + '" text-anchor="end" font-size="11" fill="var(--text-muted)">' + v.toFixed(2) + '</text>';
+    });
+    sweep.forEach(function (p) {
+      svg += '<text x="' + x(p.f) + '" y="' + (H-10) + '" text-anchor="middle" font-size="11" fill="var(--text-muted)">' + (p.f*100).toFixed(0) + '%</text>';
+    });
+
+    series.forEach(function (s) {
+      var pts = sweep.map(function (p) { return x(p.f) + "," + y(p[s.key]); }).join(" ");
+      svg += '<polyline points="' + pts + '" fill="none" stroke="' + s.color + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+      sweep.forEach(function (p) {
+        svg += '<circle cx="' + x(p.f) + '" cy="' + y(p[s.key]) + '" r="4" fill="' + s.color + '"><title>' + s.label + ' @ ' + (p.f*100) + '% malicious: ' + p[s.key].toFixed(3) + '</title></circle>';
+      });
+    });
+    svg += '<text x="' + (W/2) + '" y="' + (H-2) + '" text-anchor="middle" font-size="10" fill="var(--text-muted)"></text>';
+    svg += '</svg>';
+
+    var legend = '<div class="legend" style="margin-top:10px">';
+    series.forEach(function (s) {
+      legend += '<span><span class="dot" style="background:' + s.color + '"></span>' + s.label + '</span>';
+    });
+    legend += '</div>';
+
+    el.innerHTML = '<div class="sparkline-wrap">' + svg + '</div>' + legend +
+      '<p class="meta" style="margin-top:10px">x-axis: fraction of clients running a sign-flip poisoning attack. Note the AE-alone and zero-day metrics collapse together at 50% attackers — the trust filter\'s known breaking point.</p>';
+  })();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+# FL-IDS configuration.
+# All tunable parameters live here — none should be hard-coded as magic
+# numbers elsewhere in fl_ids/. Values below are the defaults called out
+# in the project spec (CLAUDE.md); sweeps (e.g. dirichlet_alpha,
+# poisoning fractions) override these per-run rather than editing this file.
+
+seed: 42
+
+data:
+  dnn_csv_path: "data/raw/DNN-EdgeIIoT-dataset.csv"
+  pcap_dir: "data/raw/pcaps"
+  num_clients: 10
+  dirichlet_alpha: 0.3
+  val_benign_fraction: 0.15
+  test_fraction: 0.15
+  normalize_per_client: true
+  # Clip per-client z-scores to +/- this. A client whose training rows barely
+  # vary on a feature (udp.stream, tcp.seq and other counters under heavy
+  # Dirichlet skew) gets a tiny std for it, and ordinary rows then land
+  # 10^3-10^4 std out: one feature's squared error swamps the other 90 and
+  # the client's reconstruction error means nothing. A row 10 std out is
+  # already far past any benign threshold, so clipping there keeps it
+  # anomalous. null disables.
+  normalized_clip: 10.0
+  # Captures whose rows in the dataset are column-shifted, replaced by rows
+  # re-extracted from the authors' own .pcap (fl_ids.data.repair). MITM's
+  # CSV has e.g. udp.time_delta under tcp.seq. Generate with:
+  #   python -m fl_ids.data.repair --pcap "data/raw/pcaps/MITM (ARP spoofing + DNS) Attack.pcap" \
+  #     --attack-type MITM --output data/processed/MITM_reextracted.csv
+  capture_repairs:
+    MITM: "data/processed/MITM_reextracted.csv"
+
+boosting:
+  # LightGBM first-pass classifier.
+  # Cascade confidence threshold lives only under cascade.confidence_threshold
+  # below -- not duplicated here (see fl_ids.models.boosting's module docstring).
+  label_source: "server_held_calibration_set"  # or "client_local_labels"
+  calibration_fraction: 0.05  # fraction of data held server-side for cold-start bootstrap
+  # Phase 5 raised these to 127 leaves / lr 0.1 believing 31 leaves lacked
+  # capacity for rare classes. The real problem was that training diverged
+  # (held-out logloss minimum ~0.18 at iteration ~16, then 7-14 by the end),
+  # so results depended on which rows landed in training, whatever the
+  # capacity. With leaf regularization (min_sum_hessian_in_leaf, lambda_l2) training
+  # is stable, and 31 leaves / lr 0.05 gave the best held-out logloss
+  # (0.041 vs 0.056 for 127 / 0.1) and a smaller model to broadcast.
+  num_boost_round: 300
+  learning_rate: 0.05
+  num_leaves: 31
+  min_sum_hessian_in_leaf: 1.0
+  lambda_l2: 1.0
+  broadcast_every_n_rounds: 1
+  # Incremental update (component 2): every update_every_n_rounds rounds
+  # (0 = never), clients that survived the trust filter surface up to
+  # alert_budget_per_client rows their autoencoder flagged, with the label an
+  # analyst would confirm (false alarms come back as Normal). The server adds
+  # them to what it has collected and continues training with
+  # update_num_boost_round more trees (LightGBM init_model). This relaxes
+  # "raw traffic never leaves a client" for confirmed alerts only, capped.
+  update_every_n_rounds: 3
+  update_num_boost_round: 50
+  alert_budget_per_client: 50
+  # Share of the server's calibration set held back to score each boosting
+  # version in Phase A (the dashboard's per-version metrics).
+  calibration_eval_fraction: 0.2
+
+autoencoder:
+  bottleneck_dim: 8
+  hidden_dims: [32, 16]
+  learning_rate: 0.001
+  local_epochs: 5
+  batch_size: 64
+  anomaly_percentile: 97  # recalibrated every round on client benign validation slice
+  reconstruction_error_bins: 50
+  reconstruction_error_range: [0.0, 10.0]
+
+cascade:
+  # Shared decision rule used consistently across boosting's filter,
+  # evaluation, dashboard, and SDN bridge. The ONLY home for this
+  # threshold -- fl_ids.models.boosting.BoostingClassifier takes it as an
+  # explicit constructor arg sourced from here, never a separate field.
+  confidence_threshold: 0.7
+  anomaly_confidence_clip: [0.0, 1.0]
+
+dl_classifier:
+  # Supervised MLP -- an alternative attack-type classifier compared
+  # head-to-head against LightGBM boosting (fl_ids.eval.classifier_comparison).
+  # Not part of the cascade or FL; a standalone comparison.
+  hidden_dims: [64, 32]
+  learning_rate: 0.001
+  epochs: 15
+  batch_size: 256
+  dropout: 0.1
+
+classifier_comparison:
+  # fl_ids.eval.classifier_comparison: boosting vs. DL classifier on a
+  # class-imbalance-capped sample (fl_ids.data.sampling), not the full
+  # ~1.9M-row cleaned dataset, so it runs in minutes on constrained hardware.
+  sample_size: 500000
+  test_fraction: 0.2
+
+fl:
+  num_rounds: 20
+  clients_per_round: 10
+  local_epochs: 5
+  strategy: "custom_trust_filtered"  # or "fedavg" for Phase 3 baseline
+
+robustness:
+  trim_fraction: 0.15  # trimmed-mean aggregation
+  norm_clip_multiplier: 2.0  # reject/clip updates beyond this multiple of median norm
+  mad_outlier_threshold: 3.0  # median absolute deviation multiplier for cosine outlier flag
+  trust_ema_alpha: 0.3  # weight on new round's score vs. running trust history
+  # Besides the MAD outlier check, exclude a client whose update points away
+  # from the round's consensus (cosine < min_cosine_similarity) or whose EMA
+  # trust has fallen below min_trust_score (0.5 = similarity averaging below
+  # 0). MAD alone let sign-flip attackers through ~78% of rounds at 20%
+  # poisoning: honest non-IID spread widened its band past them. See
+  # fl_ids.robustness.trust_filter. null disables either check.
+  min_cosine_similarity: 0.0
+  min_trust_score: 0.5
+  # Example count the sign-flip test attacker reports: "honest" or
+  # "max_client" (claims the largest client's count, inflating its FedAvg
+  # weight the way attackers in the literature do; the trust filter and
+  # trimmed mean ignore reported counts).
+  attacker_example_count: "max_client"
+
+sdn:
+  block_confidence_threshold: 0.85
+  rate_limit_confidence_threshold: 0.5
+  controller_host: "127.0.0.1"
+  controller_port: 6653
+  bridge_api_host: "127.0.0.1"
+  bridge_api_port: 8080
+
+evaluation:
+  poisoning_fractions: [0.0, 0.2, 0.3, 0.4, 0.5]
+  # Zero-day (leave-one-attack-class-out) experiment: each listed class is
+  # withheld from boosting's calibration set AND every client's data, then
+  # scored as unseen traffic. Empty list = run every attack class.
+  zero_day_holdout_classes: []
+  zero_day_max_holdout_rows: 5000
+  # A run has converged once validation loss stays within this fraction of
+  # its total improvement (first round -> best) above its best, and ends
+  # there; runs that don't (diverged) report NaN.
+  convergence_tolerance: 0.1
+  output_dir: "results"
+
+orchestration:
+  # Phase A (python -m fl_ids.orchestration.phase_a) writes its model
+  # bundle here; Phase B (python -m fl_ids.orchestration.phase_b) loads it.
+  artifact_dir: "saved_models/phase_a"
+  run_dir: "runs/phase_a"
+  server_address: "127.0.0.1:9091"  # not 8080: that's the SDN bridge
+  live_state_path: "/tmp/fl_ids_training_state.json"  # the dashboard's default
+  pool_subsample_size: 60000
+  malicious_fraction: 0.0
+  fl_timeout_seconds: 3600
+
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  log_file: "fl_ids.log"
