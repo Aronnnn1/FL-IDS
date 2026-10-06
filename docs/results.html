@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FL-IDS Cumulative Results</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">FL-IDS</span>
+  <nav>
+    <a href="index.html">&larr; Overview</a>
+    <a class="on" href="results.html">Cumulative results</a>
+  </nav>
+  <button class="toggle-btn" id="theme-toggle" type="button">Dark mode</button>
+</div>
+
+<main>
+<section>
+  <h1>Cumulative results</h1>
+  <p class="subtitle">Every experiment run for this project, in one place: what was run, on what, with which
+  settings, and what came out. All values are loaded directly from the result files the scripts wrote
+  (<code>results/*.csv</code>, <code>results/*.json</code>) &mdash; nothing is retyped. Best value in a column is
+  highlighted green; clear weaknesses red.</p>
+
+  <div class="toc">
+    <a href="#provenance">Run provenance</a>
+    <a href="#r-compare">1 &middot; Boosting vs. DL</a>
+    <a href="#r-stage">2 &middot; Per-class report</a>
+    <a href="#r-ablation">3 &middot; Ablation</a>
+    <a href="#r-sweep">4 &middot; Poisoning sweep</a>
+    <a href="#r-multiseed">5 &middot; Multi-seed check</a>
+    <a href="#r-zeroday">6 &middot; Zero-day</a>
+    <a href="#r-live">7 &middot; Real Phase A / B</a>
+    <a href="#r-index">Index &amp; scope</a>
+  </div>
+</section>
+
+<section id="provenance">
+  <h2>Run provenance</h2>
+  <div class="table-wrap"><table class="ptable"><tbody>
+    <tr><td>Dataset</td><td style="white-space:normal">Edge-IIoTset <code>DNN-EdgeIIoT-dataset.csv</code>: 2,219,216 rows &rarr; 1,909,719 after cleaning and MITM repair, 91 features, 15 classes (1,909,671 rows in the boosting-vs-DL comparison, which skipped the MITM repair)</td></tr>
+    <tr><td>Seed</td><td style="white-space:normal">42 for everything, except the multi-seed check (43, 44)</td></tr>
+    <tr><td>Federation</td><td style="white-space:normal">10 clients, Dirichlet &alpha; = 0.3, 20 rounds, 60,000-row federated pool, 5% server calibration set</td></tr>
+    <tr><td>Hardware</td><td style="white-space:normal">MacBook Pro (M5, 16 GB) running an Ubuntu 26.04 aarch64 VM under UTM: 4 vCPUs, 7.2 GB RAM (12 GB for the real Phase A run), CPU only</td></tr>
+    <tr><td>Software</td><td style="white-space:normal">Python 3.14.4, LightGBM 4.7.0, PyTorch 2.14.0 (CPU), Flower 1.38.0, scikit-learn 1.9.1; 224 tests pass, 2 skip</td></tr>
+  </tbody></table></div>
+</section>
+
+<section id="r-compare">
+  <h2>1 &middot; Boosting vs. supervised DL classifier</h2>
+  <p class="src">Source: <code>classifier_comparison_summary.json</code>, <code>classifier_comparison_per_class.csv</code>. Class-capped 500,000-row sample, 400k train / 100k test. Scope: non-natural class distribution (Normal &asymp; 10%), single seed, small MLP.</p>
+  <div id="t-compare-head"></div>
+  <h3>Per class</h3>
+  <div id="t-compare-class"></div>
+</section>
+
+<section id="r-stage">
+  <h2>2 &middot; Per-class precision / recall / F1 / AUROC (full federated pipeline)</h2>
+  <p class="src">Source: <code>per_class_stage_report.csv</code>. Full pipeline trained once at 0% attackers, 20 rounds, natural class distribution, evaluated on the 10 clients' held-out slices (9,000 rows). MITM has 1 test row and Fingerprinting 3: read those two as anecdotal.</p>
+  <h3>Boosting alone (15-way)</h3>
+  <div id="t-stage-boost"></div>
+  <h3>Autoencoder alone and full cascade (benign vs. attack framing)</h3>
+  <div id="t-stage-binary"></div>
+</section>
+
+<section id="r-ablation">
+  <h2>3 &middot; Ablation &mdash; what each component contributes</h2>
+  <p class="src">Source: <code>ablation_table.csv</code>, <code>ablation_per_class_recall.csv</code>. 30% sign-flip attackers (clients 0, 6, 9), 20 rounds, seed 42; zero-day columns retrain each variant once per held-out class with 30% attackers.</p>
+  <div id="t-ablation"></div>
+  <h3>Per-attack-type recall by variant</h3>
+  <div id="t-ablation-class"></div>
+</section>
+
+<section id="r-sweep">
+  <h2>4 &middot; Poisoning-resistance sweep</h2>
+  <p class="src">Source: <code>poisoning_resistance_sweep.csv</code>. Full pipeline, 20 rounds, seed 42. &ldquo;Survival&rdquo; = share of attacker-rounds in which an attacker passed the trust filter into aggregation.</p>
+  <div id="t-sweep"></div>
+</section>
+
+<section id="r-multiseed">
+  <h2>5 &middot; Multi-seed check on the 20%-vs-30% anomaly</h2>
+  <p class="src">Source: <code>multiseed_20_30_check.csv</code> plus seed 42 from the sweep. At seed 42 the 20% point had lower AE-alone recall than 30%; the ordering reverses at seed 43, so it is noise, not a trend.</p>
+  <div id="t-multiseed"></div>
+</section>
+
+<section id="r-zeroday">
+  <h2>6 &middot; Zero-day (leave-one-attack-class-out)</h2>
+  <p class="src">Source: <code>zero_day_holdout.csv</code>. 0% attackers, 20 rounds, seed 42. Each class is removed from the calibration set, every client's data and every scaler, then scored as unseen traffic (up to 5,000 rows). MITM has 406 rows and Fingerprinting 853.</p>
+  <div id="t-zeroday"></div>
+</section>
+
+<section id="r-live">
+  <h2>7 &middot; Real federated training and live SDN demo</h2>
+  <div class="table-wrap"><table class="ptable">
+    <thead><tr><th>Run</th><th>Result</th><th>Scope</th></tr></thead>
+    <tbody>
+      <tr><td>Real Phase A (1 Flower server + 10 client processes, 20 rounds)</td><td style="white-space:normal">Attack macro-recall <b>0.889</b>, benign FPR <b>0.0346</b>; bootstrap boosting accuracy 0.963; 5 min 15 s</td><td style="white-space:normal">Matches the in-process simulation (0.884&ndash;0.887) closely; seed 42; client 5 had no benign validation rows</td></tr>
+      <tr><td>Phase B: Backdoor_attack.pcap through Mininet/OpenFlow</td><td style="white-space:normal">Classified <b>Backdoor</b>, confidence 0.997, boosting stage; <code>priority=100,ip,nw_src=10.0.0.1 actions=drop</code> verified in <code>ovs-ofctl dump-flows</code></td><td style="white-space:normal">One capture; 24,914 packets, 23,895 non-benign; capture-level (not streaming) mitigation: 23,586 packets passed before the rule applied</td></tr>
+      <tr><td>Dashboard (training view) during a real run</td><td style="white-space:normal">Round 20, 10/10 clients surviving, boosting model v7, all per-client panels populated</td><td style="white-space:normal">Live Simulation (Phase B) tab not separately observed live</td></tr>
+      <tr><td>Test suite</td><td style="white-space:normal">224 passed, 2 skipped (6 min 14 s)</td><td style="white-space:normal">The 2 skips need raw pcap fixtures not downloaded</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="r-index">
+  <h2>Index: what each result is good for, and its limits</h2>
+  <div class="table-wrap"><table class="ptable">
+    <thead><tr><th>Result</th><th>Supports the claim that&hellip;</th><th>Does <u>not</u> show&hellip;</th></tr></thead>
+    <tbody>
+      <tr><td>Boosting vs. DL</td><td style="white-space:normal">a comparable-effort DL classifier is clearly worse than boosting on this data</td><td style="white-space:normal">that no DL model could match boosting; results on natural class balance; session-held-out performance</td></tr>
+      <tr><td>Ablation</td><td style="white-space:normal">each component pulls weight; the autoencoder backstop mainly helps zero-day detection</td><td style="white-space:normal">robustness across seeds (single seed)</td></tr>
+      <tr><td>Poisoning sweep</td><td style="white-space:normal">the trust filter keeps the system usable up to 40% sign-flip attackers</td><td style="white-space:normal">robustness against adaptive attackers; behaviour above 50%</td></tr>
+      <tr><td>Zero-day</td><td style="white-space:normal">the backstop catches classes boosting never saw</td><td style="white-space:normal">detection of attacks unlike all 14 known classes</td></tr>
+      <tr><td>Real Phase A / B</td><td style="white-space:normal">the pipeline runs end to end on real processes and a real switch</td><td style="white-space:normal">real-time, per-packet enforcement</td></tr>
+    </tbody>
+  </table></div>
+</section>
+</main>
+
+<footer>
+  Source, tests and the complete run log for every number on this site:
+  <a href="https://github.com/Aronnnn1/FL-IDS">github.com/Aronnnn1/FL-IDS</a>
+</footer>
+
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script src="results.js"></script>
+</body>
+</html>
