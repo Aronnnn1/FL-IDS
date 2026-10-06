@@ -4,195 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FL-IDS Results</title>
-<style>
-  :root {
-    color-scheme: light;
-    --surface-0: #ffffff;
-    --surface-1: #fcfcfb;
-    --surface-2: #f3f2ee;
-    --border: #e3e1da;
-    --text-primary: #0b0b0b;
-    --text-secondary: #52514e;
-    --text-muted: #837f76;
-    --series-boost: #2a78d6;
-    --series-boost-soft: #cde2fb;
-    --series-dl: #eb6834;
-    --series-dl-soft: #fbdccb;
-    --good: #0ca30c;
-    --critical: #d03b3b;
-    --warning: #fab219;
-    --seq-100: #cde2fb; --seq-200: #9ec5f4; --seq-300: #6da7ec; --seq-400: #3987e5;
-    --seq-500: #256abf; --seq-600: #184f95; --seq-700: #0d366b;
-    --code-bg: #f3f2ee;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      color-scheme: dark;
-      --surface-0: #141413;
-      --surface-1: #1a1a19;
-      --surface-2: #232320;
-      --border: #34332e;
-      --text-primary: #ffffff;
-      --text-secondary: #c3c2b7;
-      --text-muted: #8f8c80;
-      --series-boost: #3987e5;
-      --series-boost-soft: #1c3350;
-      --series-dl: #d95926;
-      --series-dl-soft: #46281a;
-      --good: #17c317;
-      --critical: #e66767;
-      --warning: #fab219;
-      --code-bg: #1f1f1c;
-    }
-  }
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-    --surface-0: #141413;
-    --surface-1: #1a1a19;
-    --surface-2: #232320;
-    --border: #34332e;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #8f8c80;
-    --series-boost: #3987e5;
-    --series-boost-soft: #1c3350;
-    --series-dl: #d95926;
-    --series-dl-soft: #46281a;
-    --good: #17c317;
-    --critical: #e66767;
-    --warning: #fab219;
-    --code-bg: #1f1f1c;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--surface-1);
-    color: var(--text-primary);
-    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  }
-  a { color: var(--series-boost); }
-  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-  code { background: var(--code-bg); padding: 0.1em 0.4em; border-radius: 4px; font-size: 0.9em; }
-
-  .topbar {
-    position: sticky; top: 0; z-index: 10;
-    background: color-mix(in srgb, var(--surface-1) 88%, transparent);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 24px;
-    padding: 14px 24px;
-    overflow-x: auto;
-  }
-  .topbar .brand { font-weight: 700; white-space: nowrap; margin-right: 8px; }
-  .topbar nav { display: flex; gap: 18px; }
-  .topbar nav a {
-    color: var(--text-secondary); text-decoration: none; font-size: 13.5px; white-space: nowrap;
-  }
-  .topbar nav a:hover { color: var(--text-primary); }
-
-  main { max-width: 980px; margin: 0 auto; padding: 40px 24px 100px; }
-  section { margin-bottom: 72px; scroll-margin-top: 70px; }
-  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.01em; }
-  h2 { font-size: 22px; margin: 0 0 18px; letter-spacing: -0.01em; }
-  h3 { font-size: 16px; margin: 28px 0 10px; }
-  .subtitle { color: var(--text-secondary); font-size: 15px; margin: 0 0 4px; }
-  .meta { color: var(--text-muted); font-size: 13px; }
-  p { color: var(--text-secondary); }
-  .lede { color: var(--text-primary); font-size: 16px; }
-
-  .card {
-    background: var(--surface-0); border: 1px solid var(--border); border-radius: 12px;
-    padding: 20px 22px;
-  }
-
-  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 18px 0; }
-  .tile { background: var(--surface-0); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
-  .tile .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
-  .tile .value { font-size: 26px; font-weight: 700; margin-top: 4px; letter-spacing: -0.01em; }
-  .tile .sub { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
-  .tile.win .value { color: var(--good); }
-
-  .legend { display: flex; gap: 18px; align-items: center; margin: 4px 0 14px; font-size: 13px; color: var(--text-secondary); }
-  .legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
-  .dot.boost { background: var(--series-boost); }
-  .dot.dl { background: var(--series-dl); }
-
-  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
-  th, td { text-align: right; padding: 6px 10px; border-bottom: 1px solid var(--border); }
-  th:first-child, td:first-child { text-align: left; }
-  th { color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
-  tbody tr:hover { background: var(--surface-2); }
-  .num-pos { color: var(--good); }
-  .num-neg { color: var(--critical); }
-  .table-wrap { overflow-x: auto; }
-
-  .barchart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; margin: 18px 0; }
-  .bar-metric .metric-name { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600; }
-  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .bar-row .bar-label { width: 42px; font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
-  .bar-track { flex: 1; background: var(--surface-2); border-radius: 4px; height: 20px; position: relative; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 4px; }
-  .bar-fill.boost { background: var(--series-boost); }
-  .bar-fill.dl { background: var(--series-dl); }
-  .bar-val { width: 52px; text-align: right; font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--text-primary); flex-shrink: 0; }
-
-  .cm-wrap { overflow-x: auto; margin: 14px 0; }
-  .cm-table { border-collapse: collapse; font-size: 10.5px; }
-  .cm-table th { font-size: 10px; text-transform: none; letter-spacing: 0; color: var(--text-secondary); font-weight: 600; }
-  .cm-table th.colhead {
-    height: 92px; width: 26px; padding: 0 0 4px; vertical-align: bottom; text-align: left;
-  }
-  .cm-table th.colhead span {
-    display: inline-block; writing-mode: vertical-rl; transform: rotate(180deg);
-    white-space: nowrap;
-  }
-  .cm-table td { padding: 0; border: 1px solid var(--surface-1); width: 26px; height: 26px; text-align: center; font-variant-numeric: tabular-nums; position: relative; }
-  .cm-table td.diag { font-weight: 700; }
-  .cm-table th.rowhead { text-align: right; padding-right: 8px; white-space: nowrap; }
-  .cm-cell-val { font-size: 9px; }
-  .cm-caption { font-size: 12.5px; color: var(--text-muted); margin-top: 6px; }
-
-  .callout {
-    border-left: 3px solid var(--series-boost); background: var(--series-boost-soft);
-    padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 13.5px; color: var(--text-primary);
-  }
-  .callout.warn { border-left-color: var(--warning); background: color-mix(in srgb, var(--warning) 16%, var(--surface-0)); }
-  .callout.crit { border-left-color: var(--critical); background: color-mix(in srgb, var(--critical) 14%, var(--surface-0)); }
-
-  .status-pill {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600;
-    padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--good) 16%, var(--surface-0)); color: var(--good);
-  }
-  .status-pill::before { content: "●"; font-size: 9px; }
-  .status-pill.crit { background: color-mix(in srgb, var(--critical) 16%, var(--surface-0)); color: var(--critical); }
-
-  .phase-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-  .phase-list li { display: flex; gap: 12px; align-items: baseline; padding: 10px 14px; background: var(--surface-0); border: 1px solid var(--border); border-radius: 10px; font-size: 13.5px; }
-  .phase-list .phase-name { font-weight: 600; min-width: 190px; flex-shrink: 0; }
-  .phase-list .phase-desc { color: var(--text-secondary); }
-
-  .sparkline-wrap svg { width: 100%; height: auto; display: block; }
-  .caveat-list { padding-left: 20px; }
-  .caveat-list li { margin-bottom: 10px; color: var(--text-secondary); font-size: 13.5px; }
-  .caveat-list li b { color: var(--text-primary); }
-
-  footer { border-top: 1px solid var(--border); padding: 28px 24px; text-align: center; color: var(--text-muted); font-size: 13px; }
-  .toggle-btn {
-    margin-left: auto; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-secondary);
-    border-radius: 999px; padding: 5px 12px; font-size: 12px; cursor: pointer; flex-shrink: 0;
-  }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="topbar">
   <span class="brand">FL-IDS</span>
   <nav>
-    <a href="#summary">Summary</a>
+    <a class="on" href="index.html#summary">Summary</a>
     <a href="#comparison">Boosting vs. DL</a>
     <a href="#confusion">Confusion matrices</a>
-    <a href="#pipeline">Full pipeline</a>
+    <a href="#training-time">Training time</a>
+    <a href="#improvements">Improvements</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#steps">Step-by-step</a>
+    <a href="#verification">Verification</a>
     <a href="#caveats">Caveats</a>
+    <a href="results.html">Cumulative results &rarr;</a>
   </nav>
   <button class="toggle-btn" id="theme-toggle" type="button">Dark mode</button>
 </div>
@@ -201,17 +29,19 @@
 
 <section id="summary">
   <h1>Boosting vs. Deep Learning, and the full FL-IDS pipeline</h1>
-  <p class="subtitle">A federated, cascade-based intrusion detection system for IoT/IIoT traffic — a supervised
+  <p class="subtitle">A federated, cascade-based intrusion detection system for IoT/IIoT traffic: a supervised
   LightGBM classifier as the first pass, with a client-side autoencoder as a federated, poisoning-resistant
-  backstop for zero-day attacks. This page reports two things: (1) a head-to-head comparison of the boosting
-  classifier against a deep-learning classifier for the same job, and (2) verification that the full five-part
-  pipeline works end to end, with its real limitations stated plainly.</p>
-  <p class="meta">Dataset: Edge-IIoTset (Ferrag et al., 2022). All numbers on this page come from real runs of the
-  code in this repository — see <a href="https://github.com/Aronnnn1/FL-IDS/blob/main/PAPER_NOTES.md">PAPER_NOTES.md</a>
-  for full detail, sources, and every caveat.</p>
+  backstop for zero-day attacks. This site reports (1) a head-to-head comparison of boosting against a
+  deep-learning classifier, (2) how long things take and why, (3) concrete ideas for pushing macro F1 past 0.95,
+  (4) a visual and step-by-step explanation of the whole pipeline, and (5) verification that it works end to end,
+  with its limitations stated plainly. Every table of numbers is collected on the
+  <a href="results.html">cumulative results page</a>.</p>
+  <p class="meta">Dataset: Edge-IIoTset (Ferrag et al., 2022). All numbers come from real runs of the code in this
+  repository. Full notes and sources:
+  <a href="https://github.com/Aronnnn1/FL-IDS/blob/main/PAPER_NOTES.md">PAPER_NOTES.md</a>.</p>
 
   <div class="tiles">
-    <div class="tile win"><div class="label">Boosting macro F1</div><div class="value">0.887</div><div class="sub">vs. 0.621 for a comparable DL classifier</div></div>
+    <div class="tile win"><div class="label">Boosting macro F1</div><div class="value" data-bind="boosting.macro_f1" data-d="3">0.887</div><div class="sub">vs. <span data-bind="dl_classifier.macro_f1" data-d="3">0.622</span> for a comparable DL classifier</div></div>
     <div class="tile"><div class="label">Cascade zero-day recall</div><div class="value">0.731</div><div class="sub">vs. 0.518 for boosting alone</div></div>
     <div class="tile"><div class="label">Real Phase A run</div><div class="value">0.889</div><div class="sub">attack macro-recall, real 10-client FL training</div></div>
     <div class="tile"><div class="label">Real SDN demo</div><div class="value">Correct</div><div class="sub">Backdoor attack classified &amp; blocked live</div></div>
@@ -220,340 +50,427 @@
 
 <section id="comparison">
   <h2>Boosting vs. a supervised DL classifier</h2>
-  <p>This answers a specific question: if you swap LightGBM boosting for a deep-learning classifier as the
-  cascade's first pass — same attack-type labels, same task, comparable effort — which one is actually more
-  accurate? Both were trained and evaluated on the exact same 500,000-row sample (400k train / 100k test,
-  stratified), boosting on raw features, the DL classifier on standardized features (each model gets the input
-  representation it needs).</p>
+  <p>If you swap LightGBM boosting for a deep-learning classifier as the cascade's first pass &mdash; same
+  attack-type labels, same task, comparable effort &mdash; which is more accurate? Both were trained and evaluated
+  on the exact same 500,000-row sample (400k train / 100k test, stratified); boosting on raw features, the DL
+  classifier on standardized features (each model gets the input representation it needs).</p>
 
   <div class="legend"><span><span class="dot boost"></span>Boosting (LightGBM)</span><span><span class="dot dl"></span>DL classifier (dense MLP, 8,271 params)</span></div>
+  <div id="compare-table"></div>
 
-  <div class="table-wrap">
-  <table>
-    <thead><tr><th>Metric</th><th>Boosting</th><th>DL classifier</th><th>Gap</th></tr></thead>
-    <tbody>
-      <tr><td>Accuracy</td><td>0.8908</td><td>0.6779</td><td class="num-pos">+0.213</td></tr>
-      <tr><td>Macro F1</td><td>0.8872</td><td>0.6218</td><td class="num-pos">+0.266</td></tr>
-      <tr><td>Weighted F1</td><td>0.8924</td><td>0.6681</td><td class="num-pos">+0.224</td></tr>
-      <tr><td>Benign false-positive rate</td><td>0.1599</td><td>0.5341</td><td class="num-pos">&minus;0.374 (lower is better)</td></tr>
-      <tr><td>Train time</td><td>55.5s</td><td>10.2s</td><td>&mdash;</td></tr>
-      <tr><td>Model size</td><td>12.8 MB (300 trees)</td><td>8,271 parameters</td><td>&mdash;</td></tr>
-    </tbody>
-  </table>
-  </div>
-
-  <h3>Per-class recall — where the gap actually is</h3>
-  <p>Boosting doesn't win uniformly. The gap concentrates almost entirely on application-layer attacks that look
-  like legitimate traffic; on the trivially-separable flood attacks, both models are essentially perfect.</p>
+  <h3>Per-class recall &mdash; where the gap actually is</h3>
+  <p>Boosting doesn't win uniformly. The gap concentrates on application-layer attacks that look like legitimate
+  traffic; on the flood attacks both models are essentially perfect.</p>
   <div id="recall-chart" class="barchart-grid"></div>
 
   <div class="callout">
     <b>Why boosting wins here.</b> Gradient-boosted trees build axis-aligned decision splits directly on the
-    engineered flow features (packet counts, flags, protocol fields) — exactly the kind of thresholded, tabular
-    structure this data has. A small dense network has to learn that same decision surface from scratch through
-    weighted sums and nonlinearities, with far less inductive bias toward tabular data, and with 400k rows and 15
-    epochs it doesn't get there for classes whose boundary with "Normal" is subtle (XSS, SQL_injection,
-    Uploading, DDoS_HTTP — all under 71% recall for the DL model, several under 30%). On the flood attacks
-    (DDoS_TCP/UDP/ICMP), where a couple of features separate the classes almost perfectly, both models hit
-    ~100% — there's no boundary subtlety for either architecture to struggle with.
+    engineered flow features (packet counts, flags, protocol fields) &mdash; exactly the thresholded, tabular
+    structure this data has. A small dense network has to learn the same decision surface through weighted sums and
+    nonlinearities, with far less inductive bias toward tabular data, and with 400k rows and 15 epochs it doesn't get
+    there for classes whose boundary with &ldquo;Normal&rdquo; is subtle (XSS, SQL_injection, Uploading, DDoS_HTTP).
+    On the flood attacks, where a couple of features separate the classes almost perfectly, both models hit ~100%.
   </div>
   <div class="callout warn">
-    <b>Honest caveat.</b> This DL classifier was deliberately modest — 2 hidden layers, 8,271 parameters, 15
-    epochs — a comparable-effort baseline, not an exhaustively tuned one. A larger or longer-trained network
-    might close some of this gap; that wasn't tested. The right claim is "this DL classifier doesn't beat
-    boosting here," not "DL cannot work on this problem."
+    <b>Honest caveat.</b> This DL classifier was deliberately modest &mdash; 2 hidden layers, 8,271 parameters, 15
+    epochs &mdash; a comparable-effort baseline, not an exhaustively tuned one. A larger or longer-trained network
+    might close some of the gap; that wasn't tested. The right claim is &ldquo;this DL classifier doesn't beat
+    boosting here,&rdquo; not &ldquo;DL cannot work on this problem.&rdquo;
   </div>
 </section>
 
 <section id="confusion">
   <h2>Confusion matrices</h2>
-  <p>Rows are the true class, columns the predicted class, shaded by the fraction of that row's rows landing in
-  each column (so the diagonal reads as recall). Hover a cell for the exact count.</p>
+  <p>Rows are the <b>true</b> class, columns the <b>predicted</b> class. Cell colour is the fraction of that true
+  class landing in that column, so the outlined diagonal reads as recall. Text colour flips automatically so every
+  cell is legible. Hover a cell for the exact count.</p>
+  <div class="seg" id="cm-mode"><button type="button" data-mode="count" class="on">Counts</button><button type="button" data-mode="pct">% of true class</button></div>
+  <div class="cm-scale"><span>0%</span><span class="bar" id="cm-bar"></span><span>100% of the row</span></div>
 
   <h3>Boosting</h3>
   <div class="cm-wrap"><div id="cm-boost"></div></div>
-  <p class="cm-caption">Boosting's confusion is almost entirely inside a small application-layer cluster —
-  DDoS_HTTP, Password, SQL_injection — and a Backdoor/Uploading pair, both semantically related traffic types.
-  It essentially never confuses a flood attack with anything.</p>
+  <p class="cm-caption">Boosting's errors sit mostly inside one application-layer cluster &mdash;
+  <b>DDoS_HTTP, Password, SQL_injection, Uploading, XSS and Normal</b> &mdash; which together account for
+  <b><span id="err-share-boost">&hellip;</span></b> of all its mistakes. Flood attacks (DDoS_TCP/UDP/ICMP) are
+  almost never confused with anything.</p>
 
   <h3>DL classifier</h3>
   <div class="cm-wrap"><div id="cm-dl"></div></div>
-  <p class="cm-caption">The DL classifier's confusion is much more spread out, and dominated by one column:
+  <p class="cm-caption">The DL classifier's confusion is much more spread out and dominated by one column:
   <b>Password</b> absorbs large fractions of DDoS_HTTP, Normal, SQL_injection, Uploading and Vulnerability_scanner
-  — a strong "when unsure, guess Password" bias that boosting doesn't show, and the concrete mechanism behind its
-  much higher benign false-positive rate (real Normal traffic getting pulled toward Password).</p>
+  &mdash; a strong &ldquo;when unsure, guess Password&rdquo; bias boosting doesn't show, and the concrete mechanism
+  behind its much higher benign false-positive rate (real Normal traffic pulled toward Password). The same cluster
+  holds <b><span id="err-share-dl">&hellip;</span></b> of its mistakes, but it also fails on Port_Scanning &harr;
+  DDoS_TCP and Fingerprinting, which boosting handles.</p>
+</section>
+
+<section id="training-time">
+  <h2>Training time &mdash; how long, and why</h2>
+  <p>Short answer: <b>training either classifier is quick</b> (boosting ~1 minute, DL ~10 seconds). What is slow is the
+  <i>evaluation methodology</i> &mdash; the poisoning sweep and zero-day experiments retrain the whole federated
+  pipeline 75 and 14 times &mdash; and within each of those runs, one component dominates.</p>
+
+  <h3>Single-model training (same 400k-row training set)</h3>
+  <div id="train-bars" class="barchart-grid" style="grid-template-columns:1fr"></div>
+
+  <h3>Measured wall-clock times in this project</h3>
+  <div class="table-wrap">
+  <table class="ptable">
+    <thead><tr><th>Run</th><th>Time</th><th>What dominates it</th></tr></thead>
+    <tbody>
+      <tr><td>Boosting classifier (comparison)</td><td>55.5 s</td><td style="white-space:normal">300 rounds &times; 15 classes = 4,500 trees on 400k rows, forced to a single thread (see below)</td></tr>
+      <tr><td>DL classifier (comparison)</td><td>10.2 s</td><td style="white-space:normal">15 epochs &times; 1,563 minibatches of 256; the network has only 8,271 weights</td></tr>
+      <tr><td>One in-process federated run, 20 rounds (no boosting updates)</td><td>&asymp; 2 min</td><td style="white-space:normal">&asymp; 3 s per round, plus ~20&ndash;25 s to parse the 1.16 GB CSV</td></tr>
+      <tr><td>Real Phase A (1 server + 10 client processes, 20 rounds)</td><td>5 min 15 s (+ ~30 s data prep)</td><td style="white-space:normal">20 rounds including 6 boosting updates; start-up of 11 separate Python processes</td></tr>
+      <tr><td>Standalone zero-day (14 held-out classes)</td><td>&asymp; 61 min (VM time)</td><td style="white-space:normal">14 full retrains, &asymp; 4.4 min each</td></tr>
+      <tr><td>Poisoning sweep (5 fractions + 70 per-fraction zero-day retrains)</td><td>&asymp; 5 h (VM time)</td><td style="white-space:normal">75 full retrains, &asymp; 4 min each</td></tr>
+      <tr><td>Full test suite</td><td>6 min 14 s</td><td style="white-space:normal">224 tests; several integration tests train real models</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="src">VM time = time on the Linux VM's own clock; the VM pauses whenever the Mac sleeps, so wall-clock on the Mac was longer. Times are from this run's logs, single measurements, not averaged.</p>
+
+  <h3>Why a full federated run takes ~4 minutes when a round takes seconds</h3>
+  <ul class="caveat-list">
+    <li><b>Boosting updates are the bottleneck.</b> In the sweep logs a normal round takes ~5&ndash;7 s, but a round that includes a boosting update takes ~43 s: clients spend ~10 s filtering their traffic through a now-larger model, then the server spends ~33 s continuing LightGBM training (+50 trees &times; 15 classes) on the calibration set plus alerts. With an update every 3 rounds there are 6 per run, which by the log timestamps accounts for roughly three-quarters of a run's time (an estimate, not a profiler measurement).</li>
+    <li><b>Deterministic, single-threaded LightGBM, on purpose.</b> Multi-threaded histogram building is not bit-reproducible: with identical inputs and seed one class's recall swung between 0.0 and 0.88 across runs (PAPER_NOTES &sect;6). The code forces <code>deterministic=True</code>, <code>force_row_wise</code> and <code>num_threads=1</code>, trading speed on a 4-vCPU VM for reproducible science.</li>
+    <li><b>The model grows during training.</b> Each update adds 50 trees per class (300 &rarr; 600 trees over a run), so every later round's client-side filtering and every later update is slower than the last.</li>
+    <li><b>The evaluation multiplies everything.</b> Every sweep point, ablation variant and held-out class is a complete retraining from scratch (75 + 14 + the 5-variant ablation), so minutes per run become hours.</li>
+    <li><b>CPU-only, virtualised, memory-constrained hardware.</b> No GPU (irrelevant here &mdash; the networks are tiny), 4 vCPUs, and a real multi-process run is memory-bound: 11 Python processes each importing PyTorch/LightGBM nearly exhausted the VM until thread pools were capped.</li>
+    <li><b>Data loading is paid on every script start.</b> Parsing and cleaning the 1.16 GB CSV takes 15&ndash;25 s each time.</li>
+  </ul>
+  <div class="callout">
+    <b>How to speed it up (none applied yet):</b> cache the cleaned matrix as Parquet/NPZ instead of re-parsing the CSV;
+    update boosting every 6 rounds or add fewer trees per update; allow multi-threaded LightGBM for exploratory runs
+    (keeping the deterministic setting for reported numbers); and run evaluation sweeps on a machine with enough RAM
+    to run two in parallel.
+  </div>
+</section>
+
+<section id="improvements">
+  <h2>How to push macro F1 past 0.95</h2>
+  <p>Current boosting macro F1 on the 100k test rows is <b data-bind="boosting.macro_f1" data-d="3">0.887</b>. Everything
+  below is a <b>hypothesis grounded in the confusion matrix and per-class numbers above &mdash; none of it has been
+  run</b>, and no gain is promised. They are ordered by how directly the evidence supports them.</p>
+
+  <h3>The F1 budget: where the missing points are</h3>
+  <p>Macro F1 is the plain average of 15 per-class F1 scores, so reaching 0.95 needs the per-class F1 sum to rise
+  from <span id="f1-sum">&hellip;</span> to 14.25 &mdash; a gain of <b><span id="f1-need">&hellip;</span></b> F1 points spread
+  over the weak classes. Bars show each class's current F1; the red part is its shortfall to 0.95.</p>
+  <div id="f1-budget" class="card"></div>
+
+  <div class="imp">
+    <div class="imp-item">
+      <h4><span class="tag high">strongest evidence</span>1. Move from per-packet to behaviour features</h4>
+      <p><b>Why:</b> the dataset rows are individual packets, and the pipeline treats each as independent. But the confused classes (DDoS_HTTP, Password brute-forcing, SQL_injection, Uploading, XSS) differ from normal HTTP mostly in <i>behaviour over time</i> &mdash; request rate, repeated login URIs, burst structure &mdash; not in any single packet's header fields.</p>
+      <p><b>What to change:</b> add windowed features per source host (packets/s, distinct URIs, mean inter-arrival time, method mix, response-code mix) and join them back onto each packet. <code>frame.time</code> and <code>ip.src_host</code> exist in the CSV but are dropped at load by the authors' recipe, so this is possible.</p>
+      <p><b>Risk:</b> Phase B must compute identical windows from a live capture; windows must not straddle the train/test split.</p>
+    </div>
+    <div class="imp-item">
+      <h4><span class="tag high">strong evidence</span>2. Restore content signals the recipe drops &mdash; as numbers, not text</h4>
+      <p><b>Why:</b> SQL injection, XSS and file upload differ from normal HTTP in <i>what is sent</i>, and the authors' recipe drops exactly those columns (<code>http.request.uri.query</code>, <code>http.request.full_uri</code>, <code>http.file_data</code>, <code>tcp.payload</code>) because they are high-cardinality text.</p>
+      <p><b>What to change:</b> keep the text out but derive scalars: URI/query/payload length, byte entropy, counts of special characters (<code>' % ; &lt; &gt; --</code>), keyword flags (<code>select</code>, <code>union</code>, <code>script</code>), multipart/upload markers.</p>
+      <p><b>Risk:</b> this dataset already had a label leak from an export artifact, so every new feature must pass the existing single-feature AUROC guard (&lt; 0.9) before it is trusted.</p>
+    </div>
+    <div class="imp-item">
+      <h4><span class="tag high">cheap</span>3. Per-class decision thresholds instead of plain argmax</h4>
+      <p><b>Why:</b> the per-class table shows clear precision/recall asymmetry: DDoS_HTTP is over-predicted (precision 0.654, recall 0.914), while Uploading (precision 0.961, recall 0.630) and Fingerprinting (0.832 / 0.579) are under-predicted.</p>
+      <p><b>What to change:</b> on a held-out validation split, fit one multiplicative weight per class on the predicted probabilities (or per-class thresholds) to maximise macro F1, then freeze them. Post-hoc, no retraining.</p>
+      <p><b>Risk:</b> must be tuned on validation data, never on the test rows, or the 0.95 is fitted to the test set.</p>
+    </div>
+    <div class="imp-item">
+      <h4><span class="tag high">targeted</span>4. A specialist second-level model for the confusable cluster</h4>
+      <p><b>Why:</b> a single 15-way softmax spreads its trees across all classes, but <span id="err-share-boost-2">&hellip;</span> of boosting's errors are inside one six-class cluster (see the matrix).</p>
+      <p><b>What to change:</b> stage 1 routes a packet to &ldquo;flood/scan/other&rdquo; or &ldquo;Normal + HTTP family&rdquo;; stage 2 is a separate LightGBM trained only on Normal, DDoS_HTTP, Password, SQL_injection, Uploading and XSS, with its own tuning and the new features from items 1&ndash;2.</p>
+      <p><b>Risk:</b> a stage-1 mistake can't be recovered; evaluate end to end, not stage by stage.</p>
+    </div>
+    <div class="imp-item">
+      <h4><span class="tag">medium</span>5. Tune hyperparameters for macro F1, with early stopping</h4>
+      <p><b>Why:</b> the booster is fixed at 300 rounds, learning rate 0.05, 31 leaves, with no validation set, no early stopping, no row/column subsampling and default <code>min_data_in_leaf</code>. Those values were picked by held-out <i>log-loss</i> (0.041 vs 0.056 for 127 leaves / lr 0.1), not by macro F1.</p>
+      <p><b>What to change:</b> random/Bayesian search over <code>num_leaves</code> (31&ndash;255), <code>min_data_in_leaf</code>, <code>feature_fraction</code> and <code>bagging_fraction</code> (0.6&ndash;0.9), <code>lambda_l1/l2</code>, <code>max_bin</code>, <code>min_gain_to_split</code>, up to ~2,000 rounds with early stopping on macro F1. Keep <code>min_sum_hessian_in_leaf</code> and <code>lambda_l2</code>: without leaf regularisation this data made training diverge.</p>
+    </div>
+    <div class="imp-item">
+      <h4><span class="tag">medium</span>6. Other boosters, or an ensemble</h4>
+      <p>Boosting is trained on the server, so any library can slot in; nothing in the federation depends on LightGBM.</p>
+      <div class="table-wrap"><table class="ptable">
+        <thead><tr><th>Option</th><th>Why it might help</th><th>Cost / caveat</th></tr></thead>
+        <tbody>
+          <tr><td style="white-space:normal">XGBoost</td><td style="white-space:normal">Different tree growth (level-wise) makes different errors than LightGBM's leaf-wise</td><td>Slower on CPU for 15 classes</td></tr>
+          <tr><td style="white-space:normal">CatBoost</td><td style="white-space:normal">Ordered boosting and symmetric trees are strong on small classes (Fingerprinting, MITM)</td><td>Slowest to train; model format differs</td></tr>
+          <tr><td style="white-space:normal">LightGBM <code>dart</code> / <code>extra_trees</code></td><td style="white-space:normal">Dropout/randomised splits reduce over-fitting to near-duplicate packets</td><td>Needs more rounds; dart is slow</td></tr>
+          <tr><td style="white-space:normal">Soft-voting / stacking of the above</td><td style="white-space:normal">Averages out each model's mistakes; usually the most reliable modest gain</td><td>3&times; the model size to broadcast to clients (already ~11&ndash;22 MB)</td></tr>
+        </tbody></table></div>
+    </div>
+    <div class="imp-item">
+      <h4><span class="tag">medium</span>7. More labelled data for the boosting stage, or class weights</h4>
+      <p>In the real pipeline boosting trains on only the 5% server-held calibration set (&asymp; 76k rows), a deliberate privacy design choice; this comparison gave it 400k. A larger calibration set, or sample weights for the rare classes (Fingerprinting has 853 rows in the whole dataset), may help. Fingerprinting alone costs about 0.018 macro F1 at its current score.</p>
+      <p><b>Trade-off:</b> a bigger server-held labelled set weakens the &ldquo;labels never leave clients&rdquo; story.</p>
+    </div>
+    <div class="imp-item">
+      <h4><span class="tag risk">validate first</span>8. Check the target is real before chasing it</h4>
+      <p>Train and test rows are a random split of individual packets, so near-identical packets from the <i>same capture session</i> land on both sides &mdash; that flatters every number here. Add a split that holds out whole capture sessions and re-measure the baseline: it will likely read lower than 0.887, and a gain from the ideas above only counts if it survives that split.</p>
+      <p>Also look at the confidently-wrong rows (e.g. 716 Normal packets predicted Password). If the testbed's &ldquo;Normal&rdquo; HTTP and the attack HTTP genuinely overlap at packet level, the ceiling at 0.95 may not be reachable without items 1&ndash;2.</p>
+    </div>
+  </div>
+
+  <h3>Assumptions behind the current number</h3>
+  <ul class="caveat-list">
+    <li>Each row is an independent packet (no temporal context).</li>
+    <li>A random row split is representative of unseen traffic (it likely is not &mdash; see item 8).</li>
+    <li>The class-capped 500k sample is a fair test distribution (it cuts Normal from 71% to ~10%, so precision for attack classes is better than it would be on natural traffic).</li>
+    <li>Single seed (42). Seed-to-seed spread was not measured for this comparison.</li>
+    <li>Plain argmax decides the class, with no per-class thresholds.</li>
+  </ul>
 </section>
 
 <section id="pipeline">
-  <h2>Full pipeline — verified working, with real numbers</h2>
-  <p>Beyond the classifier comparison above, this checks that the complete five-part system — boosting cascade,
-  federated autoencoder, poisoning-resistant aggregation, and SDN mitigation — actually works end to end, not
-  just in isolated unit tests.</p>
+  <h2>The pipeline at a glance</h2>
+  <p>Two phases, kept deliberately separate: <b>Phase A</b> trains the models offline (federated), and <b>Phase B</b>
+  loads the saved bundle and enforces decisions on live traffic.</p>
+
+  <h3>Phase A &mdash; data to trained bundle</h3>
+  <div id="diagram-a"></div>
+  <div class="dg-legend">
+    <span><span class="swatch data"></span>Data</span>
+    <span><span class="swatch model"></span>Boosting (supervised)</span>
+    <span><span class="swatch fed"></span>Federated clients / autoencoder</span>
+    <span><span class="swatch robust"></span>Server-side robustness</span>
+    <span><span class="swatch net"></span>Network / SDN</span>
+    <span><span class="swatch out"></span>Output artefact</span>
+  </div>
+
+  <h3>Phase B &mdash; traffic to enforcement</h3>
+  <div id="diagram-b"></div>
+
+  <h3>The cascade decision rule (one implementation, used by evaluation, dashboard and SDN)</h3>
+  <div class="card">
+    <ol class="caveat-list" style="margin:0">
+      <li><b>Boosting</b> predicts a class and its probability.</li>
+      <li>If the class is a known <b>attack</b> and probability &ge; <b>0.7</b> &rarr; final label is that attack type. The autoencoder is not consulted.</li>
+      <li>Otherwise (predicted Normal, or an attack without enough confidence) the row goes to the <b>autoencoder</b>: reconstruction error &gt; the client's threshold &rarr; <b>&ldquo;anomalous&rdquo;</b> (a zero-day signal), confidence = min(1, error/threshold &minus; 1); else <b>benign</b>.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="steps">
+  <h2>Every step explained</h2>
+  <p>What each stage does, how it works, and the parameters that control it. Values are the ones used in this
+  project's runs (<code>configs/config.yaml</code>); module paths are relative to <code>fl_ids/</code>.</p>
+
+  <details class="step" open><summary><span class="n">1</span>Load, clean and encode the data<span class="mod">data/pipeline.py &middot; data/repair.py</span></summary><div class="body">
+    <h4>Function</h4><p>Turn the authors' CSV into a clean numeric matrix <b>X</b> (1,909,719 rows &times; 91 features) and integer labels <b>y</b> (15 classes).</p>
+    <h4>How it works</h4>
+    <ul>
+      <li>Read 47 of 63 columns: 15 ID/timestamp/payload columns are dropped per the dataset authors' own recipe, plus <code>Attack_label</code> (derivable from the target, so keeping it would leak the answer).</li>
+      <li><b>Canonicalise the placeholder.</b> &ldquo;Field doesn't apply&rdquo; is written <code>0</code> in some captures and <code>0.0</code> in others, and the spelling follows the label &mdash; so <code>mqtt.topic_0.0</code> alone separated benign from attack at AUROC 1.0. Both spellings become <code>0</code>; the strongest single feature is now ~0.71.</li>
+      <li>Drop NaN and duplicate rows (309,497 duplicates).</li>
+      <li><b>Repair MITM.</b> The authors' MITM CSV has values under the wrong column names; its 1,214 rows are replaced by 1,229 rows re-extracted from their own pcap with tshark.</li>
+      <li>One-hot encode 7 categorical columns &rarr; 91 features.</li>
+    </ul>
+    <h4>Parameters</h4>
+    <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
+      <tr><td>rows</td><td>2,219,216 &rarr; 1,909,719</td><td>after NaN/duplicate removal and MITM repair</td></tr>
+      <tr><td>columns loaded</td><td>47 of 63</td><td>identity/payload columns never enter memory</td></tr>
+      <tr><td>categorical columns</td><td>7</td><td>http.request.method, http.referer, http.request.version, dns.qry.name.len, mqtt.conack.flags, mqtt.protoname, mqtt.topic</td></tr>
+      <tr><td>data.capture_repairs</td><td>MITM</td><td>path to the re-extracted CSV; loading fails loudly if it is missing</td></tr>
+    </tbody></table>
+  </div></details>
+
+  <details class="step"><summary><span class="n">2</span>Split: server calibration set and federated pool<span class="mod">data/pipeline.py</span></summary><div class="body">
+    <h4>Function</h4><p>Carve out a small, labelled, server-held set to train the boosting model, and keep the rest for federated clients.</p>
+    <h4>How it works</h4><p>5% of all rows (stratified by class) become the calibration set; 20% of that is held back to score each boosting version, leaving 76,388 rows to train on. The remainder is stratified-subsampled to 60,000 rows for the federated pool, to keep ~150 evaluation runs affordable. Labels live only on the server &mdash; clients never reveal local attack labels.</p>
+    <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
+      <tr><td>boosting.calibration_fraction</td><td>0.05</td><td>size of the server-held labelled set</td></tr>
+      <tr><td>boosting.calibration_eval_fraction</td><td>0.2</td><td>share of it held back to score boosting versions</td></tr>
+      <tr><td>orchestration.pool_subsample_size</td><td>60,000</td><td>federated pool size (runtime bound)</td></tr>
+      <tr><td>seed</td><td>42</td><td>fixes every random split</td></tr>
+    </tbody></table>
+  </div></details>
+
+  <details class="step"><summary><span class="n">3</span>Non-IID partition and per-client normalisation<span class="mod">data/pipeline.py</span></summary><div class="body">
+    <h4>Function</h4><p>Simulate realistic clients whose traffic differs wildly from each other, and prepare each client's private train/validation/test data.</p>
+    <h4>How it works</h4>
+    <ul>
+      <li>For each class, draw per-client proportions from a Dirichlet(&alpha;) distribution &mdash; small &alpha; gives strongly skewed clients (one may be 94% benign).</li>
+      <li>Each client splits its rows: 15% test, 15% of the benign remainder as a <b>benign validation</b> slice (to calibrate its anomaly threshold), the rest train.</li>
+      <li>Each client z-scores its features with a scaler fit <b>only on its own training rows</b> (never globally &mdash; a global scaler leaks cross-client statistics), clipped to &plusmn;10 so a counter-like feature with tiny local variance can't swamp the reconstruction error.</li>
+      <li>A raw (un-normalised) copy is kept for the boosting model, which must always see raw features: a per-client scaler can shift a feature by orders of magnitude and break shared tree thresholds.</li>
+    </ul>
+    <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
+      <tr><td>data.num_clients</td><td>10</td><td>simulated clients</td></tr>
+      <tr><td>data.dirichlet_alpha</td><td>0.3</td><td>skew; lower = more non-IID</td></tr>
+      <tr><td>data.test_fraction / val_benign_fraction</td><td>0.15 / 0.15</td><td>per-client held-out slices</td></tr>
+      <tr><td>data.normalized_clip</td><td>10.0</td><td>z-score clip</td></tr>
+    </tbody></table>
+    <p><b>Observed consequence:</b> client 5 receives no benign validation rows, so its threshold is infinite and its autoencoder never flags anything &mdash; reported, not hidden.</p>
+  </div></details>
+
+  <details class="step"><summary><span class="n">4</span>Boosting bootstrap (cold start)<span class="mod">models/boosting.py</span></summary><div class="body">
+    <h4>Function</h4><p>The first-pass supervised classifier: names known attack types cheaply and decisively. Trained <b>before round 1</b> so clients never filter with an untrained model.</p>
+    <h4>How it works</h4><p>LightGBM multiclass on raw features; each boosting iteration adds one tree per class (15). The model is serialised to text so it can be broadcast to clients rather than weight-averaged. Held-out accuracy on the calibration hold-out: 0.963.</p>
+    <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
+      <tr><td>boosting.num_boost_round</td><td>300</td><td>iterations (&times;15 trees)</td></tr>
+      <tr><td>boosting.learning_rate</td><td>0.05</td><td>step size per tree</td></tr>
+      <tr><td>boosting.num_leaves</td><td>31</td><td>tree complexity</td></tr>
+      <tr><td>min_sum_hessian_in_leaf / lambda_l2</td><td>1.0 / 1.0</td><td>leaf regularisation &mdash; without it, training diverged (held-out log-loss bottomed at ~0.18 by iteration 16, then climbed to 7&ndash;14) and benign FPR swung 0.1%&harr;16% when 1% of rows changed</td></tr>
+      <tr><td>deterministic, force_row_wise, num_threads</td><td>true, true, 1</td><td>bit-reproducible training (slower)</td></tr>
+    </tbody></table>
+  </div></details>
+
+  <details class="step"><summary><span class="n">5</span>Client round: boosting filter, then autoencoder training<span class="mod">fl/client.py &middot; models/autoencoder.py</span></summary><div class="body">
+    <h4>Function</h4><p>Each client trains an unsupervised autoencoder on its own &ldquo;normal-looking&rdquo; traffic, so it can later flag traffic unlike anything benign &mdash; the zero-day backstop.</p>
+    <h4>How it works</h4>
+    <ul>
+      <li>The client runs the broadcast boosting model on its local rows and discards the ones boosting confidently calls an attack (probability &ge; 0.7). The autoencoder trains only on what is left, so it never learns attacks as &ldquo;normal.&rdquo;</li>
+      <li>Dense autoencoder 91 &rarr; 32 &rarr; 16 &rarr; <b>8</b> &rarr; 16 &rarr; 32 &rarr; 91 (7,299 parameters), MSE reconstruction loss.</li>
+      <li>The client returns updated weights, a 50-bin histogram of reconstruction errors, and (every 3rd round) up to 50 flagged rows with analyst-confirmed labels. Raw traffic otherwise never leaves the client.</li>
+      <li>Anomaly threshold = 97th percentile of reconstruction error on the client's benign validation slice, recomputed every round &mdash; so about 3% of benign traffic is flagged by construction.</li>
+    </ul>
+    <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
+      <tr><td>autoencoder.hidden_dims / bottleneck_dim</td><td>[32, 16] / 8</td><td>capacity of the learned &ldquo;benign&rdquo; model</td></tr>
+      <tr><td>learning_rate / local_epochs / batch_size</td><td>0.001 / 5 / 64</td><td>local training</td></tr>
+      <tr><td>autoencoder.anomaly_percentile</td><td>97</td><td>threshold; lower = more detections, more false alarms</td></tr>
+      <tr><td>cascade.confidence_threshold</td><td>0.7</td><td>boosting confidence above which the client skips a row</td></tr>
+    </tbody></table>
+  </div></details>
+
+  <details class="step"><summary><span class="n">6</span>Server aggregation: trust filter + trimmed mean<span class="mod">robustness/ &middot; fl/strategy.py</span></summary><div class="body">
+    <h4>Function</h4><p>Combine client updates into a new global autoencoder while screening out poisoned (Byzantine) updates.</p>
+    <h4>How it works</h4>
+    <ul>
+      <li>Work on <b>deltas</b> (new &minus; old weights), never raw weights &mdash; raw weights are dominated by the shared global model, so every pair looks ~0.99 similar.</li>
+      <li>Reference direction = coordinate-wise <b>median</b> of the round's deltas; per client compute cosine similarity to it and the L2 norm.</li>
+      <li><b>Exclude</b> a client if (a) its similarity is a per-round MAD outlier, (b) its update points away from the consensus (cosine &lt; 0), or (c) its running trust score has fallen below 0.5.</li>
+      <li>Norm-clip survivors to 2&times; the median norm, aggregate with a <b>trimmed mean</b>, and add the result to the round's starting weights. If nobody survives, the round is skipped.</li>
+    </ul>
+    <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
+      <tr><td>robustness.mad_outlier_threshold</td><td>3.0</td><td>relative, per-round outlier band</td></tr>
+      <tr><td>min_cosine_similarity / min_trust_score</td><td>0.0 / 0.5</td><td>sign check and history gate</td></tr>
+      <tr><td>trust_ema_alpha</td><td>0.3</td><td>30% new round, 70% history</td></tr>
+      <tr><td>norm_clip_multiplier / trim_fraction</td><td>2.0 / 0.15</td><td>bound large updates; trim 15% per side</td></tr>
+    </tbody></table>
+    <p><b>Known limits:</b> at 50% attackers the median becomes the attackers' direction and the filter inverts; late-round attackers look like honest noise.</p>
+  </div></details>
+
+  <details class="step"><summary><span class="n">7</span>Incremental boosting update<span class="mod">models/boosting_update.py</span></summary><div class="body">
+    <h4>Function</h4><p>Let the supervised model learn from what the autoencoders catch, without clients sharing raw traffic.</p>
+    <h4>How it works</h4><p>Every 3 rounds, clients that survived the trust filter surface up to 50 autoencoder-flagged rows with the label an analyst would confirm (false alarms come back as &ldquo;Normal&rdquo;). The server continues LightGBM training for 50 more trees on the calibration set plus the accumulated alerts. If an alert contains a class the model has never seen, it <b>retrains from scratch</b> &mdash; continued training can't learn a new class, because that class's softmax hessian is ~0 and the leaf-regularisation setting blocks every split. The new model is broadcast with the next round.</p>
+    <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
+      <tr><td>boosting.update_every_n_rounds</td><td>3</td><td>update cadence (0 = never)</td></tr>
+      <tr><td>update_num_boost_round</td><td>50</td><td>trees added per update</td></tr>
+      <tr><td>alert_budget_per_client</td><td>50</td><td>cap on rows leaving a client</td></tr>
+      <tr><td>broadcast_every_n_rounds</td><td>1</td><td>model (~11&ndash;22 MB) is sent to every client every round</td></tr>
+    </tbody></table>
+    <p><b>Privacy trade-off:</b> this relaxes &ldquo;raw traffic never leaves a client&rdquo; for capped, confirmed alerts. It is also the most expensive step in time (see Training time).</p>
+  </div></details>
+
+  <details class="step"><summary><span class="n">8</span>The Phase A bundle<span class="mod">orchestration/artifacts.py &middot; orchestration/phase_a.py</span></summary><div class="body">
+    <h4>Function</h4><p>Package everything Phase B needs into a self-describing folder, so enforcement never depends on whatever the current config happens to say.</p>
+    <h4>How it works</h4><p>Phase A runs a <b>real</b> Flower server and one OS process per client for 20 rounds, then saves <code>boosting_model.txt</code>, <code>autoencoder_weights.npz</code>, <code>client_normalization.npz</code> (each client's scaler) and <code>manifest.json</code> (per-client thresholds, cascade settings, held-out metrics, seed, git commit). Before saving it re-derives each client's threshold from the saved weights and checks it matches what the clients reported in the final round &mdash; an inconsistent bundle is rejected.</p>
+    <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
+      <tr><td>fl.num_rounds</td><td>20</td><td>federated rounds</td></tr>
+      <tr><td>orchestration.server_address</td><td>127.0.0.1:9091</td><td>Flower server (not 8080: that's the SDN bridge)</td></tr>
+      <tr><td>orchestration.malicious_fraction</td><td>0.0</td><td>&gt; 0 runs sign-flip attackers to demo the filter</td></tr>
+    </tbody></table>
+  </div></details>
+
+  <details class="step"><summary><span class="n">9</span>Replay and feature extraction (Phase B)<span class="mod">sdn/topology.py &middot; sdn/feature_extraction.py</span></summary><div class="body">
+    <h4>Function</h4><p>Turn a real captured attack into the same 91-feature rows the models were trained on.</p>
+    <h4>How it works</h4><p>Mininet builds 10 hosts on one Open vSwitch switch pointed at an os-ken OpenFlow&nbsp;1.3 controller; host <code>h(i+1)</code> is FL client <code>i</code>. <code>tcpreplay</code> replays the real <code>.pcap</code> from a host while <code>tshark</code> extracts 46 fields per packet, mapped to the authors' spelling (tshark 4.x prints booleans as True/False and shortens hex, which silently zeroed <code>tcp.flags.ack</code> before it was fixed). Rows are one-hot encoded with the training vocabulary and scored with <b>that client's</b> scaler and threshold. Mininet needs root, granted by one narrow sudoers rule for the argument-less topology script.</p>
+  </div></details>
+
+  <details class="step"><summary><span class="n">10</span>Verdict, mitigation bridge and flow rule<span class="mod">sdn/live_inference.py &middot; sdn/bridge.py &middot; sdn/controller.py</span></summary><div class="body">
+    <h4>Function</h4><p>Reduce thousands of per-packet cascade outputs to one decision per device and turn it into a real flow-table change.</p>
+    <h4>How it works</h4><p>The device verdict is the <b>most frequent non-benign label</b> across its packets (mean confidence of those packets, and the cascade stage that made most of the calls), or &ldquo;benign&rdquo; if none. It is posted to a small REST bridge, which asks the controller to install a rule: a high-priority <b>drop</b> on the source IP, or an OpenFlow <b>meter</b> for rate-limiting. The result is verified against the switch's own <code>ovs-ofctl dump-flows</code>, not the bridge's say-so.</p>
+    <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
+      <tr><td>sdn.block_confidence_threshold</td><td>0.85</td><td>&ge; this &rarr; drop rule</td></tr>
+      <tr><td>sdn.rate_limit_confidence_threshold</td><td>0.5</td><td>&ge; this (and &lt; block) &rarr; rate-limit meter; below &rarr; allow/monitor</td></tr>
+      <tr><td>controller_port / bridge_api_port</td><td>6653 / 8080</td><td>OpenFlow and REST endpoints</td></tr>
+    </tbody></table>
+    <p><b>Limitation:</b> the verdict needs the whole capture, so this is capture-level mitigation, not per-packet blocking of a live stream.</p>
+  </div></details>
+
+  <details class="step"><summary><span class="n">11</span>Evaluation harness and live dashboard<span class="mod">eval/ &middot; dashboard/</span></summary><div class="body">
+    <h4>Function</h4><p>Measure what each part contributes, and watch a run as it happens.</p>
+    <h4>How it works</h4>
+    <ul>
+      <li><b>Variants</b> (same data, same seed): full pipeline, plain FedAvg, trimmed-mean-only (no cosine filter), autoencoder-only, boosting-only.</li>
+      <li><b>Headline metrics are not accuracy</b> &mdash; ~71% of traffic is benign, so accuracy rises when a broken autoencoder stops flagging anything. Use attack macro-recall, benign FPR, detection F1, zero-day macro-recall.</li>
+      <li><b>Poisoning sweep</b>: 0/20/30/40/50% sign-flip attackers. <b>Zero-day</b>: each of 14 attack classes is removed from every training set (and scaler) then scored as unseen traffic.</li>
+      <li>The evaluation scripts run clients in-process (not over gRPC) so dozens of runs are practical; the real multi-process path is covered by Phase A.</li>
+      <li>The Streamlit dashboard reads the live per-round state file (training view) or the bridge's REST API (live simulation view); it keeps no state of its own.</li>
+    </ul>
+  </div></details>
+</section>
+
+<section id="verification">
+  <h2>Does the pipeline work as intended?</h2>
+  <p>Yes &mdash; each part was verified on real data and real processes, not just unit tests. The complete tables are on the
+  <a href="results.html">cumulative results page</a>.</p>
 
   <ul class="phase-list">
-    <li><span class="phase-name">Ablation<br><span class="status-pill">verified</span></span><span class="phase-desc">Full cascade beats boosting-alone and autoencoder-alone under 30% poisoned clients: 0.887 / 0.875 / 0.191 attack macro-recall respectively. The autoencoder backstop nearly doubles zero-day detection (0.731 vs. 0.518 for boosting alone) while barely moving known-attack recall — its value is specifically in catching attacks boosting was never trained on.</span></li>
-    <li><span class="phase-name">Poisoning resistance<br><span class="status-pill">verified</span></span><span class="phase-desc">Attack macro-recall stays in a tight 0.878&ndash;0.887 band from 0% to 40% malicious clients. At 50% the trust filter's median-based defense breaks down as expected (malicious survival jumps to 96%) — a known, documented limit, not a surprise failure.</span></li>
-    <li><span class="phase-name">Zero-day detection<br><span class="status-pill">verified</span></span><span class="phase-desc">All 14 attack classes tested leave-one-out. On classes boosting has zero training signal for, the cascade's detection comes almost entirely from the autoencoder: MITM 0%&rarr;89%, DDoS_UDP 9%&rarr;90%, Vulnerability_scanner 10%&rarr;84%.</span></li>
-    <li><span class="phase-name">Real federated training<br><span class="status-pill">verified</span></span><span class="phase-desc">A real Flower server plus 10 real separate client processes (not a simulation) completed 20 rounds end to end: 0.889 attack macro-recall, 0.0346 benign FPR — closely matching the faster in-process simulation used for the sweeps above, a useful cross-check that the simulation is representative.</span></li>
-    <li><span class="phase-name">Live SDN mitigation<br><span class="status-pill">verified</span></span><span class="phase-desc">A real captured attack (Backdoor_attack.pcap) replayed through a live Mininet/OpenFlow topology was classified <b>Backdoor</b> (99.7% confidence) and a real flow rule was installed to block it — confirmed directly against the switch's own flow table, not a mocked result.</span></li>
-    <li><span class="phase-name">Live dashboard<br><span class="status-pill">verified</span></span><span class="phase-desc">Watched live in a browser during a real training run — round counter, per-client trust scores, reconstruction error, all populated with real, changing data. This check also found and fixed a real bug in the documented launch command that no unit test had caught.</span></li>
+    <li><span class="phase-name">Ablation<br><span class="status-pill">verified</span></span><span class="phase-desc">With 30% poisoned clients, the full cascade, boosting-only and autoencoder-only reach 0.887 / 0.875 / 0.191 attack macro-recall. The backstop nearly doubles zero-day detection (0.731 vs. 0.518) while barely moving known-attack recall &mdash; its value is catching attacks boosting never saw.</span></li>
+    <li><span class="phase-name">Poisoning resistance<br><span class="status-pill">verified</span></span><span class="phase-desc">Attack macro-recall stays in a tight 0.878&ndash;0.887 band from 0% to 40% malicious clients. At 50% the median-based trust filter breaks down as expected (malicious survival 96%).</span></li>
+    <li><span class="phase-name">Zero-day detection<br><span class="status-pill">verified</span></span><span class="phase-desc">All 14 classes tested leave-one-out. For classes boosting has no signal for, the autoencoder supplies the detection: MITM 0%&rarr;89%, DDoS_UDP 9%&rarr;90%, Vulnerability_scanner 10%&rarr;84%.</span></li>
+    <li><span class="phase-name">Real federated training<br><span class="status-pill">verified</span></span><span class="phase-desc">A real Flower server plus 10 separate client processes completed 20 rounds: 0.889 attack macro-recall, 0.0346 benign FPR &mdash; closely matching the in-process simulation, so the simulation is representative.</span></li>
+    <li><span class="phase-name">Live SDN mitigation<br><span class="status-pill">verified</span></span><span class="phase-desc">A real captured attack replayed through a live Mininet/OpenFlow topology was classified <b>Backdoor</b> (99.7% confidence) and a real drop rule was installed &mdash; confirmed against the switch's own flow table.</span></li>
+    <li><span class="phase-name">Live dashboard<br><span class="status-pill">verified</span></span><span class="phase-desc">Watched in a browser during a real training run with real, changing data. The check also found and fixed a launch-command bug no unit test had caught.</span></li>
   </ul>
 
   <h3>Poisoning-resistance sweep</h3>
   <div id="sweep-chart" class="card"></div>
 
-  <h3>Live SDN demo — what actually happened</h3>
-  <p>This is worth spelling out because it's a genuine before/after: an earlier run of this same demo, using
-  models trained inside the demo script rather than a properly evaluated bundle, misclassified this exact capture
-  as <code>DDoS_HTTP</code>. After fixing two real data-quality bugs upstream (a label-leak artifact and a tshark
-  version-compatibility issue — both documented in PAPER_NOTES.md §5.3) and re-running with a real, fully-trained
-  Phase A bundle, the same capture now classifies correctly:</p>
+  <h3>Live SDN demo &mdash; what actually happened</h3>
+  <p>An earlier run of this demo, using models trained inside the demo script, misclassified this exact capture as
+  <code>DDoS_HTTP</code>. After fixing two upstream data-quality bugs (a label-leak artifact and a tshark
+  version issue) and re-running with a fully trained Phase A bundle, the same capture classifies correctly:</p>
   <div class="table-wrap">
-  <table>
+  <table class="ptable">
     <tbody>
-      <tr><td>Capture</td><td>Backdoor_attack.pcap (24,914 packets)</td></tr>
-      <tr><td>Classification</td><td><b>Backdoor</b> (confidence 0.997, decided by the boosting stage alone)</td></tr>
-      <tr><td>Mitigation action</td><td>Block</td></tr>
-      <tr><td>Installed flow rule</td><td><code>priority=100,ip,nw_src=10.0.0.1 actions=drop</code></td></tr>
-      <tr><td>Verified against</td><td>The switch's own <code>ovs-ofctl dump-flows</code> output</td></tr>
+      <tr><td>Capture</td><td style="white-space:normal">Backdoor_attack.pcap (24,914 packets; 23,895 classified non-benign)</td></tr>
+      <tr><td>Classification</td><td style="white-space:normal"><b>Backdoor</b>, confidence 0.997, decided by the boosting stage alone</td></tr>
+      <tr><td>Mitigation action</td><td style="white-space:normal">Block</td></tr>
+      <tr><td>Installed flow rule</td><td style="white-space:normal"><code>priority=100,ip,nw_src=10.0.0.1 actions=drop</code></td></tr>
+      <tr><td>Verified against</td><td style="white-space:normal">The switch's own <code>ovs-ofctl dump-flows</code> output</td></tr>
     </tbody>
   </table>
   </div>
-
   <div class="callout warn">
     <b>Real limitation, found by this run.</b> The flow table shows 23,586 packets already matched the default
-    "allow" rule before the block rule's own timer starts — meaning classification happens only after the whole
-    capture has been analyzed, not packet-by-packet in real time. For a replayed file, nearly the entire capture
-    passes through before mitigation kicks in. This is an architectural property of the current pipeline
-    (batch classification of a capture), not a bug, and it's stated here rather than glossed over.
+    &ldquo;allow&rdquo; rule before the block rule's own timer starts &mdash; classification happens only after the whole
+    capture has been analysed, not packet by packet. This is an architectural property of the current pipeline
+    (batch classification of a capture), not a bug, and it is stated here rather than glossed over.
   </div>
 </section>
 
 <section id="caveats">
   <h2>Caveats and limitations</h2>
-  <p>Stated plainly, matching the standing convention in this project's own notes: every number above is real,
-  but every result has a scope. Full detail and reasoning for each is in
+  <p>Every number above is real, but every result has a scope. Full reasoning for each is in
   <a href="https://github.com/Aronnnn1/FL-IDS/blob/main/PAPER_NOTES.md">PAPER_NOTES.md</a>.</p>
   <ol class="caveat-list">
-    <li><b>Mitigation is not real-time.</b> As shown above, Phase B classifies a full capture, not a packet
-    stream — real-time inline blocking is not what's built or measured here.</li>
-    <li><b>The DL classifier comparison used a non-default, rebalanced sample.</b> Its absolute benign
-    false-positive numbers (16% boosting, 53% DL) aren't comparable to the pipeline's natural-distribution
-    numbers (0.02% boosting FPR) — the sample deliberately cut the benign class from 71% to ~10% of the data to
-    fix severe class imbalance, which shifts what each model treats as its default prediction. The
-    <i>relative</i> result (boosting beats this DL classifier) is sound regardless.</li>
-    <li><b>Non-IID vs. malicious data is a real confound.</b> The trust filter targets corrupted model
-    <i>updates</i>, not unusual local data — an honest client with a very skewed data shard can look similar to
-    a poisoned one, and is sometimes wrongly excluded for a round.</li>
-    <li><b>The trust filter has a documented breaking point.</b> At 50% malicious clients, its median-based
-    reference direction becomes the attackers' own direction, and the defense inverts. Trimmed-mean aggregation
-    alone also fails once colluding attackers exceed its trim fraction.</li>
-    <li><b>Only one attack model tested</b> — a sign-flip gradient attack with an inflated reported example
-    count. Adaptive attackers designed specifically to evade this filter are untested.</li>
-    <li><b>Mostly single-seed results.</b> A targeted multi-seed check on one flagged anomaly (a 20%-vs-30%
-    ordering in the poisoning sweep) found it does <i>not</i> hold across seeds — confirmed as noise, not a real
-    trend, and documented as such rather than silently repeated. Most other numbers on this page are still
-    single-seed.</li>
-    <li><b>Tiny classes.</b> MITM (358&ndash;406 rows) and Fingerprinting (853 rows) are a small fraction of the
-    full dataset; their per-class numbers rest on few test rows and should be read with that in mind.</li>
-    <li><b>Novelty is not a settled claim.</b> A handful of targeted literature searches found no single
-    published system combining all five components here — that is not a systematic review.</li>
+    <li><b>Mitigation is not real-time.</b> Phase B classifies a full capture, not a packet stream.</li>
+    <li><b>The DL comparison used a non-default, rebalanced sample.</b> Its benign false-positive rates (16% boosting, 53% DL) aren't comparable to the pipeline's natural-distribution numbers (0.02% boosting FPR): the sample cut the benign class from 71% to ~10%. The <i>relative</i> result is sound regardless.</li>
+    <li><b>Macro-F1 figures from different experiments are not interchangeable.</b> Boosting scores 0.887 on the balanced 500k test and 0.910 on the natural-distribution test slices of the federated run, where MITM and Fingerprinting have only 1 and 3 test rows. The 0.887 is the more trustworthy figure.</li>
+    <li><b>Random-split optimism.</b> Rows are split at random, so near-duplicate packets from one capture session appear in both train and test. A session-held-out split has not been run; all accuracy-type numbers here are probably optimistic.</li>
+    <li><b>The improvement ideas are untested hypotheses.</b> No claim is made that any of them reaches 0.95, or that 0.95 is attainable at packet level.</li>
+    <li><b>Non-IID vs. malicious data is a real confound.</b> The trust filter targets corrupted <i>updates</i>; an honest client with a very skewed shard can look like a poisoned one and is sometimes excluded for a round.</li>
+    <li><b>The trust filter has a documented breaking point.</b> At 50% malicious clients its median reference becomes the attackers' direction. Trimmed-mean alone also fails once colluding attackers exceed its trim fraction.</li>
+    <li><b>Only one attack model tested</b> &mdash; sign-flip with an inflated example count. Adaptive attackers are untested.</li>
+    <li><b>Mostly single-seed results.</b> A multi-seed check on one flagged anomaly (20% vs. 30% in the sweep) showed it does <i>not</i> hold across seeds &mdash; noise, not a trend. Most other numbers are still single-seed.</li>
+    <li><b>Tiny classes.</b> MITM (358&ndash;406 rows) and Fingerprinting (853 rows) rest on few test rows.</li>
+    <li><b>Novelty is not a settled claim.</b> A few targeted searches found no published system combining all five parts; that is not a systematic review.</li>
   </ol>
 </section>
 
 </main>
 
 <footer>
-  Full source, tests, and the complete run log for every number on this page:
+  Source, tests and the complete run log for every number on this site:
   <a href="https://github.com/Aronnnn1/FL-IDS">github.com/Aronnnn1/FL-IDS</a>
 </footer>
 
-<script>
-(function () {
-  "use strict";
-
-  // ---------- theme toggle ----------
-  var btn = document.getElementById("theme-toggle");
-  var root = document.documentElement;
-  var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  function effectiveIsDark() {
-    var explicit = root.getAttribute("data-theme");
-    if (explicit) return explicit === "dark";
-    return prefersDark;
-  }
-  function applyTheme(t) {
-    if (t) { root.setAttribute("data-theme", t); } else { root.removeAttribute("data-theme"); }
-    btn.textContent = effectiveIsDark() ? "Light mode" : "Dark mode";
-  }
-  try {
-    var saved = localStorage.getItem("fl-ids-theme");
-    if (saved) { applyTheme(saved); } else { applyTheme(null); }
-  } catch (e) { applyTheme(null); }
-  btn.addEventListener("click", function () {
-    var next = effectiveIsDark() ? "light" : "dark";
-    applyTheme(next);
-    try { localStorage.setItem("fl-ids-theme", next); } catch (e) {}
-  });
-
-  // ---------- data ----------
-  var classNames = ["Backdoor","DDoS_HTTP","DDoS_ICMP","DDoS_TCP","DDoS_UDP","Fingerprinting","MITM","Normal","Password","Port_Scanning","Ransomware","SQL_injection","Uploading","Vulnerability_scanner","XSS"];
-
-  var perClass = [
-    ["XSS", 0.7607, 0.0720],
-    ["Fingerprinting", 0.5789, 0.0000],
-    ["SQL_injection", 0.7669, 0.1833],
-    ["Uploading", 0.6295, 0.1963],
-    ["Port_Scanning", 0.9972, 0.4981],
-    ["Normal", 0.8401, 0.4659],
-    ["DDoS_HTTP", 0.9141, 0.6107],
-    ["Ransomware", 0.8772, 0.6904],
-    ["Vulnerability_scanner", 0.9571, 0.8153],
-    ["MITM", 1.0000, 0.9028],
-    ["Backdoor", 0.9276, 0.9111],
-    ["Password", 0.8310, 0.8598],
-    ["DDoS_TCP", 1.0000, 1.0000],
-    ["DDoS_UDP", 1.0000, 1.0000],
-    ["DDoS_ICMP", 0.9987, 0.9998]
-  ];
-
-  var cmBoost = [[4457,169,0,0,0,1,0,0,1,84,1,0,89,2,1],[0,8875,0,0,0,2,0,12,341,0,0,428,9,12,30],[0,0,9835,0,0,13,0,0,0,0,0,0,0,0,0],[0,0,0,9848,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,9848,0,0,0,0,0,0,0,0,0,0],[0,23,21,0,0,99,0,0,0,28,0,0,0,0,0],[0,0,0,0,0,0,72,0,0,0,0,0,0,0,0],[0,325,0,0,3,0,0,8273,716,0,0,521,5,3,2],[0,930,0,0,0,1,0,42,8184,0,0,676,11,1,3],[0,0,0,0,0,0,0,0,0,3984,3,0,8,0,0],[1,121,0,0,0,0,0,0,0,59,1700,0,56,1,0],[0,1266,0,0,0,1,0,66,943,0,0,7552,8,7,5],[4,1443,0,0,0,0,0,20,400,553,3,303,4634,0,1],[1,179,0,0,0,1,0,5,113,0,0,121,1,9426,1],[0,245,0,0,0,1,0,9,248,0,0,217,0,1,2292]];
-
-  var cmDl = [[4378,213,0,86,0,0,0,0,36,0,3,0,89,0,0],[189,5929,0,0,1,0,0,150,3290,0,48,90,7,0,5],[0,0,9846,0,2,0,0,0,0,0,0,0,0,0,0],[0,0,0,9848,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,9848,0,0,0,0,0,0,0,0,0,0],[0,23,118,28,2,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,7,0,65,0,0,0,0,0,0,0,0],[205,358,1,0,0,0,0,4588,4532,0,62,102,0,0,0],[236,907,0,0,0,0,0,44,8467,0,61,132,1,0,0],[0,12,0,1990,0,0,0,0,0,1990,0,0,3,0,0],[78,159,0,59,0,0,0,0,246,0,1338,0,57,1,0],[221,820,0,0,0,0,0,188,6723,0,88,1805,0,3,0],[111,1512,0,571,0,0,0,150,3447,0,41,82,1445,2,0],[33,149,0,0,0,0,0,57,1288,0,28,215,15,8029,34],[86,339,0,0,0,0,0,122,1981,0,26,43,199,0,217]];
-
-  var sweep = [
-    {f:0.0, recall:0.8837, fpr:0.0296, zeroDay:0.7358, aeAlone:0.4308},
-    {f:0.2, recall:0.8836, fpr:0.0341, zeroDay:0.7355, aeAlone:0.3737},
-    {f:0.3, recall:0.8868, fpr:0.0260, zeroDay:0.7308, aeAlone:0.4209},
-    {f:0.4, recall:0.8853, fpr:0.0285, zeroDay:0.7236, aeAlone:0.4133},
-    {f:0.5, recall:0.8777, fpr:0.0340, zeroDay:0.5943, aeAlone:0.0000}
-  ];
-
-  // ---------- per-class recall grouped bars ----------
-  var recallEl = document.getElementById("recall-chart");
-  perClass.forEach(function (row) {
-    var name = row[0], boost = row[1], dl = row[2];
-    var wrap = document.createElement("div");
-    wrap.className = "bar-metric";
-    wrap.innerHTML =
-      '<div class="metric-name">' + name + '</div>' +
-      '<div class="bar-row"><span class="bar-label">Boost</span><div class="bar-track"><div class="bar-fill boost" style="width:' + (boost*100).toFixed(1) + '%"></div></div><span class="bar-val">' + boost.toFixed(3) + '</span></div>' +
-      '<div class="bar-row"><span class="bar-label">DL</span><div class="bar-track"><div class="bar-fill dl" style="width:' + (dl*100).toFixed(1) + '%"></div></div><span class="bar-val">' + dl.toFixed(3) + '</span></div>';
-    recallEl.appendChild(wrap);
-  });
-
-  // ---------- confusion matrix heatmaps ----------
-  function seqColor(t) {
-    // t in [0,1] -> sequential blue ramp (light -> dark), matched to CSS custom props
-    var stops = [
-      [0.00, [252,252,251]], // surface
-      [0.12, [205,226,251]],
-      [0.30, [157,197,244]],
-      [0.55, [109,167,236]],
-      [0.75, [57,135,229]],
-      [1.00, [13,54,107]]
-    ];
-    for (var i = 0; i < stops.length - 1; i++) {
-      var a = stops[i], b = stops[i+1];
-      if (t >= a[0] && t <= b[0]) {
-        var localT = (t - a[0]) / (b[0] - a[0] || 1);
-        var r = Math.round(a[1][0] + (b[1][0]-a[1][0])*localT);
-        var g = Math.round(a[1][1] + (b[1][1]-a[1][1])*localT);
-        var bl = Math.round(a[1][2] + (b[1][2]-a[1][2])*localT);
-        return "rgb(" + r + "," + g + "," + bl + ")";
-      }
-    }
-    return "rgb(13,54,107)";
-  }
-
-  function renderConfusionMatrix(container, matrix, labels) {
-    var table = document.createElement("table");
-    table.className = "cm-table";
-    var thead = document.createElement("thead");
-    var headRow = document.createElement("tr");
-    headRow.appendChild(document.createElement("th"));
-    labels.forEach(function (l) {
-      var th = document.createElement("th");
-      th.className = "colhead";
-      var span = document.createElement("span");
-      span.textContent = l;
-      th.appendChild(span);
-      headRow.appendChild(th);
-    });
-    thead.appendChild(headRow);
-    table.appendChild(thead);
-
-    var tbody = document.createElement("tbody");
-    matrix.forEach(function (row, i) {
-      var rowSum = row.reduce(function (a,b) { return a+b; }, 0) || 1;
-      var tr = document.createElement("tr");
-      var rowHead = document.createElement("th");
-      rowHead.className = "rowhead";
-      rowHead.textContent = labels[i];
-      tr.appendChild(rowHead);
-      row.forEach(function (count, j) {
-        var frac = count / rowSum;
-        var td = document.createElement("td");
-        td.style.background = seqColor(Math.pow(frac, 0.55));
-        if (i === j) td.classList.add("diag");
-        var textColor = frac > 0.45 ? "#ffffff" : "var(--text-secondary)";
-        td.innerHTML = '<span class="cm-cell-val" style="color:' + textColor + '">' + (count > 0 ? count : "") + '</span>';
-        td.title = labels[i] + " -> " + labels[j] + ": " + count + " rows (" + (frac*100).toFixed(1) + "% of " + labels[i] + ")";
-        tr.appendChild(td);
-      });
-      tbody.appendChild(tr);
-    });
-    table.appendChild(tbody);
-    container.appendChild(table);
-  }
-
-  renderConfusionMatrix(document.getElementById("cm-boost"), cmBoost, classNames);
-  renderConfusionMatrix(document.getElementById("cm-dl"), cmDl, classNames);
-
-  // ---------- poisoning sweep line chart (inline SVG) ----------
-  (function () {
-    var el = document.getElementById("sweep-chart");
-    var W = 900, H = 300, padL = 40, padR = 20, padT = 20, padB = 34;
-    var plotW = W - padL - padR, plotH = H - padT - padB;
-    function x(f) { return padL + (f / 0.5) * plotW; }
-    function y(v) { return padT + (1 - v) * plotH; }
-
-    var series = [
-      {key: "recall", color: "var(--series-boost)", label: "Attack macro-recall"},
-      {key: "zeroDay", color: "var(--series-dl)", label: "Zero-day macro-recall"},
-      {key: "aeAlone", color: "#1baf7a", label: "AE-alone macro-recall"}
-    ];
-
-    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit">';
-    // gridlines
-    [0, 0.25, 0.5, 0.75, 1.0].forEach(function (v) {
-      svg += '<line x1="' + padL + '" x2="' + (W-padR) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--border)" stroke-width="1"/>';
-      svg += '<text x="' + (padL-8) + '" y="' + (y(v)+4) + '" text-anchor="end" font-size="11" fill="var(--text-muted)">' + v.toFixed(2) + '</text>';
-    });
-    sweep.forEach(function (p) {
-      svg += '<text x="' + x(p.f) + '" y="' + (H-10) + '" text-anchor="middle" font-size="11" fill="var(--text-muted)">' + (p.f*100).toFixed(0) + '%</text>';
-    });
-
-    series.forEach(function (s) {
-      var pts = sweep.map(function (p) { return x(p.f) + "," + y(p[s.key]); }).join(" ");
-      svg += '<polyline points="' + pts + '" fill="none" stroke="' + s.color + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
-      sweep.forEach(function (p) {
-        svg += '<circle cx="' + x(p.f) + '" cy="' + y(p[s.key]) + '" r="4" fill="' + s.color + '"><title>' + s.label + ' @ ' + (p.f*100) + '% malicious: ' + p[s.key].toFixed(3) + '</title></circle>';
-      });
-    });
-    svg += '<text x="' + (W/2) + '" y="' + (H-2) + '" text-anchor="middle" font-size="10" fill="var(--text-muted)"></text>';
-    svg += '</svg>';
-
-    var legend = '<div class="legend" style="margin-top:10px">';
-    series.forEach(function (s) {
-      legend += '<span><span class="dot" style="background:' + s.color + '"></span>' + s.label + '</span>';
-    });
-    legend += '</div>';
-
-    el.innerHTML = '<div class="sparkline-wrap">' + svg + '</div>' + legend +
-      '<p class="meta" style="margin-top:10px">x-axis: fraction of clients running a sign-flip poisoning attack. Note the AE-alone and zero-day metrics collapse together at 50% attackers — the trust filter\'s known breaking point.</p>';
-  })();
-
-})();
-</script>
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
