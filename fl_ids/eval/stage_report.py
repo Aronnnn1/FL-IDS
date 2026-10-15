@@ -36,7 +36,9 @@ def run_stage_report(config, real_csv_path: str, num_rounds: int, seed: int):
     Returns:
         (combined per-class DataFrame, dict of headline stage_report_summary per stage).
     """
-    X, y, label_encoder, _feature_names, benign_class = load_and_encode(real_csv_path, config.data.capture_repairs)
+    X, y, label_encoder, _feature_names, benign_class = load_and_encode(
+        real_csv_path, config.data.capture_repairs, config.data.extended_features, config.data.feature_cache
+    )
     class_names = list(label_encoder.classes_)
     setup = build_evaluation_setup_from_arrays(X, y, class_names, benign_class, config, seed)
 

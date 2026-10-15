@@ -29,6 +29,14 @@ data:
   #     --attack-type MITM --output data/processed/MITM_reextracted.csv
   capture_repairs:
     MITM: "data/processed/MITM_reextracted.csv"
+  # Service-port, content and flow features (fl_ids.data.features) on top of
+  # the 91 base features: 130 features, 1,985,768 rows after de-duplication.
+  # Phase B derives the same features from the live capture. false reproduces
+  # the original 91-feature pipeline (PAPER_NOTES.md sections 8.1-8.9).
+  extended_features: true
+  # Encoded extended matrix, reused across runs (rebuilt automatically when
+  # the CSV, a repair file or the feature code version changes).
+  feature_cache: "data/processed/encoded_extended.npz"
 
 boosting:
   # LightGBM first-pass classifier.
@@ -62,6 +70,10 @@ boosting:
   # Share of the server's calibration set held back to score each boosting
   # version in Phase A (the dashboard's per-version metrics).
   calibration_eval_fraction: 0.2
+  # sqrt(largest class / this class) sample weights, recomputed on every
+  # training set (bootstrap and incremental updates): stabilises rare classes
+  # such as Fingerprinting (PAPER_NOTES.md section 8.10). "none" disables.
+  class_weighting: "sqrt"
 
 autoencoder:
   bottleneck_dim: 8

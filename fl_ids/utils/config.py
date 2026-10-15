@@ -30,6 +30,12 @@ class DataConfig:
     # Per-client z-scores are clipped to [-normalized_clip, normalized_clip]
     # (fl_ids.data.pipeline.normalize_with_scaler). None disables clipping.
     normalized_clip: float | None = None
+    # Add the service-port, content and flow features (fl_ids.data.features)
+    # to the 91 base features. Off reproduces the original pipeline exactly.
+    extended_features: bool = False
+    # .npz cache for the extended encoded matrix (fl_ids.data.pipeline
+    # load_and_encode); None rebuilds it on every load (~1.5 min).
+    feature_cache: str | None = None
 
 
 @dataclass
@@ -62,6 +68,11 @@ class BoostingConfig:
     # Share of the server's calibration set held back to score each
     # boosting version (Phase A), so versions are compared on the same data.
     calibration_eval_fraction: float = 0.2
+    # Per-class sample weights: "none", or "sqrt" = sqrt(largest class size /
+    # this class size) computed on each training set, so rare classes
+    # (Fingerprinting, MITM) count more without full inverse-frequency's
+    # instability. PAPER_NOTES.md section 8.10.
+    class_weighting: str = "none"
 
 
 @dataclass

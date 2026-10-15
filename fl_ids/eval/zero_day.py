@@ -396,7 +396,9 @@ if __name__ == "__main__":
         output_dir / "zero_day_holdout.checkpoint.csv",
         run_fingerprint(run_config, args.num_rounds, args.seed), ("holdout_class",),
     )
-    X_all, y_all, label_encoder, _feature_names, benign = load_and_encode(args.real_csv_path, run_config.data.capture_repairs)
+    X_all, y_all, label_encoder, _feature_names, benign = load_and_encode(
+        args.real_csv_path, run_config.data.capture_repairs, run_config.data.extended_features, run_config.data.feature_cache
+    )
     results_df = run_zero_day_experiment(
         X_all, y_all, list(label_encoder.classes_), benign, run_config,
         num_rounds=args.num_rounds, seed=args.seed, checkpoint=checkpoint,

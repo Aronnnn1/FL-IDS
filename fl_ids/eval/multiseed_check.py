@@ -29,7 +29,9 @@ def run_multiseed_check(config, real_csv_path: str, num_rounds: int, seeds: list
     config.evaluation.poisoning_fractions = [0.2, 0.3]
     rows = []
     for seed in seeds:
-        X, y, label_encoder, _feature_names, benign_class = load_and_encode(real_csv_path, config.data.capture_repairs)
+        X, y, label_encoder, _feature_names, benign_class = load_and_encode(
+            real_csv_path, config.data.capture_repairs, config.data.extended_features, config.data.feature_cache
+        )
         class_names = list(label_encoder.classes_)
         setup = build_evaluation_setup_from_arrays(X, y, class_names, benign_class, config, seed)
         sweep_df = run_poisoning_sweep(setup, config, num_rounds=num_rounds, seed=seed)

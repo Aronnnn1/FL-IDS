@@ -84,12 +84,14 @@ def _stage_in_tmp(pcap_path: str | Path) -> Path:
     return staged
 
 
-def extract_raw_fields(pcap_path: str | Path) -> pd.DataFrame:
-    """Run tshark to extract `FEATURE_FIELDS` from a `.pcap` capture.
+def extract_raw_fields(pcap_path: str | Path, fields: list[str] | None = None) -> pd.DataFrame:
+    """Run tshark to extract `FEATURE_FIELDS` (or `fields`) from a `.pcap` capture.
 
     Args:
         pcap_path: Path to a `.pcap` file (e.g. one of Edge-IIoTset's raw
             per-device captures, or a live-captured replay).
+        fields: Fields to extract; defaults to `FEATURE_FIELDS`. Extended
+            features need `ALL_WIRESHARK_FIELDS` (payload, ports, addresses, time).
 
     Returns:
         A DataFrame with one row per packet, columns = `FEATURE_FIELDS`
@@ -98,7 +100,7 @@ def extract_raw_fields(pcap_path: str | Path) -> pd.DataFrame:
     staged_path = _stage_in_tmp(pcap_path)
     try:
         cmd = ["tshark", "-r", str(staged_path), "-T", "fields"]
-        for field in FEATURE_FIELDS:
+        for field in (fields or FEATURE_FIELDS):
             cmd += ["-e", field]
         cmd += ["-E", "header=y", "-E", "separator=,", "-E", "quote=d", "-E", "occurrence=f"]
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
@@ -230,6 +232,20 @@ def extract_features_for_inference(pcap_path: str | Path, feature_names: list[st
     Returns:
         A float32 array ready for `BoostingClassifier`/`Autoencoder` input.
     """
-    raw_df = extract_raw_fields(pcap_path)
-    encoded_df = clean_and_encode_live(raw_df)
-    return align_to_feature_schema(encoded_df, feature_names)
+    if not uses_extended_features(feature_names):
+        raw_df = extract_raw_fields(pcap_path)
+        encoded_df = clean_and_encode_live(raw_df)
+        return align_to_feature_schema(encoded_df, feature_names)
+
+    # Same derivation as training (fl_ids.data.features), on the capture in packet order.
+    from fl_ids.data.features import derive_features
+
+    raw_df = extract_raw_fields(pcap_path, ALL_WIRESHARK_FIELDS).reset_index(drop=True)
+    derived = derive_features(raw_df)
+    encoded_df = clean_and_encode_live(raw_df[[c for c in FEATURE_FIELDS if c in raw_df.columns]])
+    return align_to_feature_schema(pd.concat([encoded_df, derived], axis=1), feature_names)
+
+
+def uses_extended_features(feature_names: list[str]) -> bool:
+    """Whether a trained model's schema includes `fl_ids.data.features`' service-port/content/flow columns."""
+    return "svc_port" in feature_names

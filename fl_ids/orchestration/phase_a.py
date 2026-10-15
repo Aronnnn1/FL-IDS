@@ -358,7 +358,9 @@ def run_phase_a(
     artifact_dir = Path(artifact_dir or config.orchestration.artifact_dir)
     run_dir = Path(run_dir or config.orchestration.run_dir)
 
-    X, y, label_encoder, feature_names, benign_class = load_and_encode(csv_path, config.data.capture_repairs)
+    X, y, label_encoder, feature_names, benign_class = load_and_encode(
+        csv_path, config.data.capture_repairs, config.data.extended_features, config.data.feature_cache
+    )
     prepared = prepare_data(X, y, list(label_encoder.classes_), benign_class, feature_names, config)
     # Everything later uses `prepared`. The full matrix (1.9M x 91 float64,
     # ~1.4 GB) held through training pushed the 11-process run into swap on

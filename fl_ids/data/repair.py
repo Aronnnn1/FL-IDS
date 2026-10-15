@@ -83,7 +83,7 @@ def apply_capture_repairs(df: pd.DataFrame, capture_repairs: dict[str, str]) -> 
     Raises:
         FileNotFoundError: If a configured repair file hasn't been generated.
     """
-    from fl_ids.data.pipeline import load_raw_csv
+    from fl_ids.data.pipeline import DEFAULT_DROP_COLUMNS, load_raw_csv
 
     for attack_type, path in capture_repairs.items():
         if not Path(path).exists():
@@ -92,7 +92,8 @@ def apply_capture_repairs(df: pd.DataFrame, capture_repairs: dict[str, str]) -> 
                 f"`python -m fl_ids.data.repair --pcap <the {attack_type} .pcap> --attack-type {attack_type} "
                 f"--output {path}`"
             )
-        replacement = load_raw_csv(path)
+        # Same columns as df: with extended features df also keeps the raw columns the recipe drops.
+        replacement = load_raw_csv(path, drop_columns=[c for c in DEFAULT_DROP_COLUMNS if c not in df.columns])
         removed = int((df[TARGET_COLUMN] == attack_type).sum())
         df = pd.concat([df[df[TARGET_COLUMN] != attack_type], replacement[df.columns]], ignore_index=True)
         logger.info("Repaired %s: replaced %d dataset rows with %d re-extracted rows", attack_type, removed, len(replacement))

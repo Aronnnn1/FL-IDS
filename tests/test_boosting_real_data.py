@@ -51,6 +51,10 @@ def test_cold_start_bootstrap_metrics_on_real_data():
         val_benign_fraction=0.15,
         test_fraction=0.15,
         normalize_per_client=True,
+        # The production feature set: the boosting config below is tuned for it
+        # (class weighting on the 91 base features alone gives weighted F1 0.946).
+        extended_features=PRODUCTION_CONFIG.data.extended_features,
+        feature_cache=PRODUCTION_CONFIG.data.feature_cache,
     )
     boosting_config = PRODUCTION_CONFIG.boosting
 
@@ -109,6 +113,10 @@ def test_boosting_distribution_mechanism_on_real_data():
         val_benign_fraction=0.15,
         test_fraction=0.15,
         normalize_per_client=True,
+        # The production feature set: the boosting config below is tuned for it
+        # (class weighting on the 91 base features alone gives weighted F1 0.946).
+        extended_features=PRODUCTION_CONFIG.data.extended_features,
+        feature_cache=PRODUCTION_CONFIG.data.feature_cache,
     )
     boosting_config = PRODUCTION_CONFIG.boosting
 

@@ -99,8 +99,10 @@ def phase_a_run(tmp_path_factory):
     config = load_config()
     config = dataclasses.replace(
         config,
-        # The production MITM repair targets the real dataset's rows, not this synthetic CSV.
-        data=dataclasses.replace(config.data, num_clients=3, dirichlet_alpha=1.0, capture_repairs={}),
+        # The production MITM repair targets the real dataset's rows, not this synthetic CSV, and the
+        # synthetic CSV has none of the raw columns the extended features are derived from.
+        data=dataclasses.replace(config.data, num_clients=3, dirichlet_alpha=1.0, capture_repairs={},
+                                 extended_features=False, feature_cache=None),
         boosting=dataclasses.replace(config.boosting, calibration_fraction=0.3, num_boost_round=30),
         autoencoder=dataclasses.replace(config.autoencoder, local_epochs=2),
         logging=dataclasses.replace(config.logging, level="WARNING"),
