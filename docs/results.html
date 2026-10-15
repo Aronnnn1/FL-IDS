@@ -34,6 +34,7 @@
     <a href="#r-multiseed">5 &middot; Multi-seed check</a>
     <a href="#r-zeroday">6 &middot; Zero-day</a>
     <a href="#r-live">7 &middot; Real Phase A / B</a>
+    <a href="#r-accuracy">8 &middot; Classifier accuracy (final)</a>
     <a href="#r-index">Index &amp; scope</a>
   </div>
 </section>
@@ -42,6 +43,7 @@
   <h2>Run provenance</h2>
   <div class="table-wrap"><table class="ptable"><tbody>
     <tr><td>Dataset</td><td style="white-space:normal">Edge-IIoTset <code>DNN-EdgeIIoT-dataset.csv</code>: 2,219,216 rows &rarr; 1,909,719 after cleaning and MITM repair, 91 features, 15 classes (1,909,671 rows in the boosting-vs-DL comparison, which skipped the MITM repair)</td></tr>
+    <tr><td>Classifier-accuracy runs</td><td style="white-space:normal">Section 8 only: 130 features (91 original + service port + 18 content + 20 flow), 2,219,216 rows &rarr; 1,985,768 after de-duplication on that feature set; all rows, natural class distribution, 80/20 random and flow-grouped splits</td></tr>
     <tr><td>Seed</td><td style="white-space:normal">42 for everything, except the multi-seed check (43, 44)</td></tr>
     <tr><td>Federation</td><td style="white-space:normal">10 clients, Dirichlet &alpha; = 0.3, 20 rounds, 60,000-row federated pool, 5% server calibration set</td></tr>
     <tr><td>Hardware</td><td style="white-space:normal">MacBook Pro (M5, 16 GB) running an Ubuntu 26.04 aarch64 VM under UTM: 4 vCPUs, 7.2 GB RAM (12 GB for the real Phase A run), CPU only</td></tr>
@@ -105,6 +107,14 @@
   </table></div>
 </section>
 
+<section id="r-accuracy">
+  <h2>8 &middot; Classifier accuracy &mdash; reaching &ge; 95% accuracy and macro F1</h2>
+  <p class="src">Source: <code>experiments/accuracy/results/*.json</code> (one file per run). LightGBM, 63 leaves, lr 0.1, early stopping on 10% of the training rows. &ldquo;Flow-grouped&rdquo; = stratified group k-fold on the connection id, so no connection is in both train and test. MITM is a single connection, so it has no test rows on the flow-grouped split and is left out of that split's macro F1. Ceiling = best possible score of any per-row classifier on that feature set.</p>
+  <div id="t-acc-runs"></div>
+  <h3>Final classifier, per class (flow-grouped split, seed 42)</h3>
+  <div id="t-acc-final"></div>
+</section>
+
 <section id="r-index">
   <h2>Index: what each result is good for, and its limits</h2>
   <div class="table-wrap"><table class="ptable">
@@ -114,6 +124,7 @@
       <tr><td>Ablation</td><td style="white-space:normal">each component pulls weight; the autoencoder backstop mainly helps zero-day detection</td><td style="white-space:normal">robustness across seeds (single seed)</td></tr>
       <tr><td>Poisoning sweep</td><td style="white-space:normal">the trust filter keeps the system usable up to 40% sign-flip attackers</td><td style="white-space:normal">robustness against adaptive attackers; behaviour above 50%</td></tr>
       <tr><td>Zero-day</td><td style="white-space:normal">the backstop catches classes boosting never saw</td><td style="white-space:normal">detection of attacks unlike all 14 known classes</td></tr>
+      <tr><td>Classifier accuracy</td><td style="white-space:normal">the stage-1 classifier reaches &ge; 95% accuracy and &ge; 0.95 macro F1 on connections it never saw, stably across seeds</td><td style="white-space:normal">performance inside the federated pipeline or live Phase B (not yet integrated); performance on networks with benign web traffic</td></tr>
       <tr><td>Real Phase A / B</td><td style="white-space:normal">the pipeline runs end to end on real processes and a real switch</td><td style="white-space:normal">real-time, per-packet enforcement</td></tr>
     </tbody>
   </table></div>

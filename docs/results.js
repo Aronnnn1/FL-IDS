@@ -110,6 +110,40 @@
       ], rows, { cls: "dense" });
     })();
 
+    // 8 · classifier accuracy
+    (function () {
+      var R = D.accuracy.runs;
+      var label = { base: "Original 91", base_svc: "+ service port", base_content: "+ content", full: "+ flow (130)" };
+      var rows = Object.keys(R).map(function (k) {
+        var r = R[k], extra = [];
+        if (r.balanced_weights) extra.push("class weights");
+        if (r.sample) extra.push(FL.int(r.sample) + "-row sample");
+        if (r.train_fraction) extra.push("trained on " + (r.train_fraction * 100) + "% of rows");
+        return { name: k, fs: label[r.feature_set] + (extra.length ? " · " + extra.join(", ") : ""), split: r.split === "flow_grouped" ? "flow-grouped" : "random",
+                 seed: r.seed, nf: r.n_features, test: r.test_rows, acc: r.accuracy, f1: r.macro_f1, amb: r.ambiguous_share, ceil: r.ceiling_macro_recall };
+      });
+      var order = ["base", "base_svc", "base_content", "full"];
+      rows.sort(function (a, b) { return order.indexOf(R[a.name].feature_set) - order.indexOf(R[b.name].feature_set) || a.fs.localeCompare(b.fs) || a.split.localeCompare(b.split) || a.seed - b.seed; });
+      var tgt = function (v) { return v >= 0.95 ? "hl" : (v < 0.9 ? "lo" : ""); };
+      FL.table($("t-acc-runs"), [
+        { key: "fs", label: "Features / setting" }, { key: "split", label: "Split" }, { key: "seed", label: "Seed" },
+        { key: "nf", label: "Features" }, { key: "test", label: "Test rows", fmt: FL.int },
+        { key: "acc", label: "Accuracy", fmt: FL.f4, cls: tgt }, { key: "f1", label: "Macro F1", fmt: FL.f4, cls: tgt },
+        { key: "amb", label: "Ambiguous rows", fmt: function (v) { return (v * 100).toFixed(2) + "%"; } },
+        { key: "ceil", label: "Ceiling macro recall", fmt: FL.f4 }
+      ], rows, { cls: "dense" });
+
+      var f = D.accuracy.final, b = D.accuracy.base;
+      var cr = f.classes.filter(function (c) { return f.perClass[c].support > 0; }).map(function (c) {
+        var p = f.perClass[c]; return { c: c, n: p.support, p: p.precision, r: p.recall, f1: p["f1-score"], b: b.perClass[c]["f1-score"] };
+      });
+      FL.table($("t-acc-final"), [
+        { key: "c", label: "Class" }, { key: "n", label: "Test rows", fmt: FL.int },
+        { key: "p", label: "Precision", fmt: FL.f3 }, { key: "r", label: "Recall", fmt: FL.f3 }, { key: "f1", label: "F1", fmt: FL.f3, cls: tgt },
+        { key: "b", label: "F1 with original features", fmt: FL.f3, cls: function (v) { return v < 0.9 ? "lo" : ""; } }
+      ], cr, { cls: "dense" });
+    })();
+
     // 6 · zero-day
     (function () {
       var rows = D.zeroDay;
