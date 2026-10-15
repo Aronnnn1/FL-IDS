@@ -13,7 +13,9 @@
 >
 > This is notes, not prose. The paper gets written from this.
 
-Last updated: 2026-09-27, on a new machine (MacBook Pro M5, UTM Ubuntu
+Last updated: 2026-10-16 -- the service-port/content/flow features (§8.10)
+are integrated into the federated pipeline and Phase B, and every federated
+experiment was re-run with them (§8.11). Previous update: 2026-09-27, on a new machine (MacBook Pro M5, UTM Ubuntu
 26.04 VM; see setup notes below). Not yet committed to git as of this
 update -- numbers below are tagged "this session" rather than a commit
 hash where that's the case; update with the real commit hash once
@@ -1060,12 +1062,133 @@ base 0.9624 / 0.8807 -> full+weights 0.9968 / 0.9791.
 
 Caveats: svc_port benefits from the testbed (benign = MQTT 1883 / VNC 5900, never HTTP);
 flow features are whole-record (<=120 s), so this is flow-record classification, not
-first-packet. NOT yet integrated into the federated pipeline or Phase B live extraction;
-§8.2-8.5 numbers still use the 91 base features.
+first-packet. Integrated into the federated pipeline and Phase B in `a06711e`;
+federated results with these features are in §8.11 (§8.1-8.7 remain the
+91-feature results, kept as the comparison).
 
 Correction to §8.9: `results/classifier_comparison_summary.json` (current) gives DL
 macro F1 0.6218 (not 0.6214), accuracy 0.6779, benign FPR 0.5341, boosting train 55.5 s;
 DL SQL_injection recall 0.183 (not 0.213). Cite the JSON.
+
+### 8.11 Federated pipeline with the extended features (2026-10-15/16) — COMPLETE
+Code: `a06711e` (`fl_ids/data/features.py`; `data.extended_features: true`,
+`data.feature_cache`, `boosting.class_weighting: "sqrt"`). Results:
+`results/extended/` (same scripts, `--num-rounds 20`, seed 42, written to a
+separate directory so §8.1-8.7's 91-feature results stay intact as the
+comparison). Logs: `logs/extended/` on the VM. Everything else (10 clients,
+Dirichlet 0.3, 60k pool, 5% calibration, trust filter, attacker) unchanged.
+Numbers in brackets are the 91-feature results from §8.1-8.5.
+
+**Integration checks.** The pipeline reproduces §8.10's dataset exactly:
+2,219,216 rows -> 392,782 flows -> 1,985,768 rows x 130 features after
+de-duplication. Phase B live extraction (all 61 tshark fields + the same
+`derive_features`) on `Backdoor_attack.pcap`: 99.8% of the 24,914 live rows
+are byte-identical to that capture's training rows across all 130 features
+(base 99.8%, svc+content 99.9%, flow 99.9%). Tests: 233 passed, 2 skipped (224
+before + 9 new in `tests/test_features.py`). The autoencoder is 130 -> 32 -> 16
+-> 8 -> 16 -> 32 -> 130 = 9,834 parameters (was 7,299): 786,720 bytes/round,
+15,734,400 over 20 rounds (was 11,678,400).
+
+**Real Phase A** (1 Flower server + 10 client processes, 20 rounds, ~4 min,
+`saved_models/phase_a/manifest.json`; the 91-feature bundle is kept in
+`saved_models/phase_a_base91`): bootstrap boosting accuracy 0.997 (0.963) on
+79,430 calibration rows. On the clients' held-out slices: cascade attack
+macro-recall **0.9986** (0.889), benign FPR 0.0350 (0.0346), detection F1
+0.9556; boosting-only 0.9963 / FPR 0.0003 / detection F1 0.9984;
+autoencoder-only 0.7414.
+
+**Stage report** (`per_class_stage_report.csv`, 0% attackers): boosting alone
+accuracy 0.9974, macro F1 0.9783, benign FPR 0.0002 (0.9629 / 0.9095 /
+0.0006); autoencoder alone accuracy 0.9006, macro F1 0.8679, **AUROC 0.982
+(0.805)**; cascade accuracy 0.9759, macro F1 0.9706 (0.9438 / 0.9305), benign
+FPR 0.0332. Fingerprinting (3 test rows) boosting F1 0.857: anecdotal.
+
+**Ablation, 30% sign-flip attackers** (`ablation_table.csv`):
+
+| Variant | Attack MR | Benign FPR | Detection F1 | Zero-day MR | AE-alone MR | Final val loss | Rounds to conv. |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| full_pipeline | 1.0000 (0.8868) | 0.0309 | 0.9612 | 0.9298 (0.7308) | 0.7120 (0.4209) | 0.0282 | 5.0 |
+| plain_fedavg | 0.9977 (0.8791) | 0.0347 | 0.9554 | 0.7948 (0.5946) | 0.0019 (0.0000) | 4.987e+20 | NaN (diverged) |
+| trimmed_mean_only | 0.9971 (0.8785) | 0.0334 | 0.9567 | 0.7986 (0.5394) | 0.0000 (0.0000) | 1.316e+04 | NaN (diverged) |
+| autoencoder_only | 0.3723 (0.1912) | 0.0301 | 0.4646 | 0.5770 (0.3250) | 0.3723 (0.1912) | 0.0498 | 4.0 |
+| boosting_only | 0.9962 (0.8750) | 0.0002 | 0.9982 | 0.7950 (0.5178) | n/a (n/a) | n/a | NaN (diverged) |
+
+- The trust filter is still what keeps the AE usable: AE-alone 0.712 vs
+  ~0 for plain FedAvg and trimmed-mean-only, whose losses diverge (4.99e20, 1.32e4).
+- Zero-day: full pipeline **0.930** vs 0.795 boosting-only and ~0.80 for the
+  poisoned variants (which fall back to boosting). The backstop adds ~0.13.
+- **Trade-off to report:** on known attacks boosting-only now has the best
+  detection F1 (0.998 vs 0.961): the AE's ~3% by-construction FPR costs more
+  than the little it adds when boosting already catches ~99.6%. The cascade's
+  value is zero-day detection, more clearly than in §8.2.
+
+**Poisoning sweep** (`poisoning_resistance_sweep.csv`):
+
+| Malicious | Attack MR | Benign FPR | Detection F1 | Zero-day MR | AE-alone MR | Attacker survival | Final val loss | Rounds to conv. |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0.00 | 0.9997 | 0.0327 | 0.9588 | 0.9435 (0.7358) | 0.7366 (0.4308) | n/a (n/a) | 0.0308 | 4.0 |
+| 0.20 | 0.9993 | 0.0318 | 0.9597 | 0.9388 (0.7355) | 0.7360 (0.3737) | 0.100 (0.275) | 0.0312 | 5.0 |
+| 0.30 | 1.0000 | 0.0309 | 0.9612 | 0.9298 (0.7308) | 0.7120 (0.4209) | 0.117 (0.317) | 0.0282 | 5.0 |
+| 0.40 | 0.9997 | 0.0332 | 0.9582 | 0.9011 (0.7236) | 0.6913 (0.4133) | 0.362 (0.237) | 0.0218 | 20.0 |
+| 0.50 | 0.9974 | 0.0340 | 0.9561 | 0.8025 (0.5943) | 0.0000 (0.0000) | 1.000 (0.960) | 3.819e+18 | NaN (diverged) |
+
+- Attack macro-recall 0.997-1.000 at every fraction; zero-day 0.901-0.943 up to 40%.
+- Attacker survival fell at 20% / 30% (0.100 / 0.117, was 0.275 / 0.317) but
+  **rose at 40% (0.362, was 0.238)**; the AE still held (0.691) and the
+  loss stayed healthy (0.0218). Single seed: don't read a trend into it.
+- 50%: the same documented breakdown (survival 1.000, AE-alone 0, loss 3.8e18);
+  zero-day falls back to boosting (0.803).
+
+**Multi-seed check** (`multiseed_20_30_check.csv`; seed 42 from the sweep):
+attack macro-recall 0.996-0.999 for all seeds and both fractions; AE-alone
+varies by seed, as before:
+
+| Seed | Malicious | Attack MR | Benign FPR | AE-alone MR |
+|---:|---:|---:|---:|---:|
+| 43 | 20% | 0.9986 | 0.0312 | 0.738 |
+| 43 | 30% | 0.9983 | 0.0311 | 0.734 |
+| 44 | 20% | 0.9962 | 0.0328 | 0.623 |
+| 44 | 30% | 0.9971 | 0.0319 | 0.565 |
+
+**Zero-day, standalone** (`zero_day_holdout.csv`, 0% attackers): cascade
+macro **0.943** (0.736), boosting-only 0.801 (0.533), AE-alone 0.757 (0.493),
+benign FPR 0.032 (0.033). AE AUROC vs benign is 0.968-1.000 for every class
+(was 0.59-0.70 for the HTTP family).
+
+| Held-out class | Boosting-only | AE-alone | Cascade | Cascade (91 features) | Boosting's top misattribution | AE AUROC | Cascade FPR |
+|---|---:|---:|---:|---:|---|---:|---:|
+| Backdoor | 0.9934 | 0.4850 | 0.9970 | 0.8552 | Ransomware (99.3%) | 0.985 | 0.0374 |
+| DDoS_HTTP | 0.6992 | 0.5786 | 0.8784 | 0.3602 | Vulnerability_scanner (28.8%) | 0.975 | 0.0306 |
+| DDoS_ICMP | 1.0000 | 0.9052 | 1.0000 | 1.0000 | Fingerprinting (100.0%) | 1.000 | 0.0275 |
+| DDoS_TCP | 0.9686 | 0.6906 | 0.9888 | 0.9988 | DDoS_HTTP (54.1%) | 0.988 | 0.0318 |
+| DDoS_UDP | 0.7184 | 0.9488 | 0.9834 | 0.9028 | MITM (53.5%) | 0.998 | 0.0305 |
+| Fingerprinting | 0.9931 | 0.7557 | 0.9989 | 0.8300 | DDoS_ICMP (66.6%) | 0.995 | 0.0310 |
+| MITM | 0.0025 | 0.6946 | 0.6946 | 0.8941 | Port_Scanning (0.2%) | 1.000 | 0.0390 |
+| Password | 0.8602 | 0.6930 | 0.9672 | 0.4428 | DDoS_HTTP (62.5%) | 0.994 | 0.0302 |
+| Port_Scanning | 0.9888 | 0.8610 | 0.9992 | 0.9924 | Fingerprinting (98.8%) | 0.988 | 0.0338 |
+| Ransomware | 0.9946 | 0.7694 | 0.9990 | 0.5372 | Backdoor (99.3%) | 0.994 | 0.0310 |
+| SQL_injection | 0.9992 | 0.7848 | 0.9996 | 0.6138 | Vulnerability_scanner (99.9%) | 0.997 | 0.0341 |
+| Uploading | 0.0796 | 0.7034 | 0.7156 | 0.5172 | Backdoor (5.8%) | 0.968 | 0.0364 |
+| Vulnerability_scanner | 0.9584 | 0.9862 | 0.9966 | 0.8364 | SQL_injection (77.2%) | 0.999 | 0.0283 |
+| XSS | 0.9596 | 0.7470 | 0.9902 | 0.5206 | Vulnerability_scanner (94.7%) | 0.983 | 0.0270 |
+
+- **Regressions, report them:** MITM 0.894 -> 0.695 (its single ARP
+  connection gets ordinary-looking flow features, so the AE finds it less
+  unusual); Uploading boosting-only 0.487 -> 0.080 (unseen Uploading now
+  looks Normal to boosting; the AE catches 0.703, and the cascade still goes
+  0.517 -> 0.716); DDoS_TCP AE-alone 0.990 -> 0.691 (cascade 0.989).
+
+**Phase B** (`runs/phase_b/phase_b_result.json`, new bundle): Backdoor,
+confidence 0.997, boosting stage, **24,669 / 24,914** packets non-benign
+(23,895 before), block, `priority=100,ip,nw_src=10.0.0.1 actions=drop`
+verified in `ovs-ofctl dump-flows`. Still capture-level: 23,161 packets
+matched the default NORMAL rule before the drop rule appeared. Running it
+from this checkout needed a sudoers rule for its `topology.py` path and a
+`venv` symlink (the topology script finds packages via `<repo>/venv`).
+
+**Classifier-only note:** sqrt class weighting on the 91 base features alone
+gives weighted F1 0.946 in `tests/test_boosting_real_data.py`, below its 0.95
+bar; the test now uses the production (extended) feature set.
 
 ---
 
@@ -1150,6 +1273,11 @@ DL SQL_injection recall 0.183 (not 0.213). Cite the JSON.
     the natural distribution. The comparison's *relative* result (boosting
     beats a comparable DL classifier) is sound; its *absolute* FPR
     numbers are sample-specific.
+18. **Extended-feature trade-offs (§8.11).** Known-attack detection F1 is now
+    higher for boosting alone (0.998) than for the cascade (0.961); MITM
+    zero-day detection fell (0.894 -> 0.695); attacker survival at 40% rose
+    (0.238 -> 0.362, single seed). svc_port is partly a testbed effect, and
+    flow features summarise whole (<=120 s) records.
 
 ---
 
