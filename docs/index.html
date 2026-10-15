@@ -40,6 +40,8 @@
   <p class="meta">Dataset: Edge-IIoTset (Ferrag et al., 2022). All numbers come from real runs of the code in this
   repository. Full notes and sources:
   <a href="https://github.com/Aronnnn1/FL-IDS/blob/main/PAPER_NOTES.md">PAPER_NOTES.md</a>.</p>
+  <p class="meta"><b>Project status: complete</b> (16 October 2026). Every phase is implemented, run on the real data and
+  verified end to end; the research paper is being written.</p>
 
   <div class="tiles">
     <div class="tile win"><div class="label">Final classifier macro F1</div><div class="value"><span data-acc="full_grouped_bal_s42.macro_f1" data-d="3">0.983</span></div><div class="sub"><span data-acc="full_grouped_bal_s42.accuracy" data-pct="1">99.7%</span> accuracy on held-out connections (was <span data-acc="base_grouped_s42.macro_f1" data-d="3">0.889</span> / <span data-acc="base_grouped_s42.accuracy" data-pct="1">96.4%</span>)</div></div>
@@ -108,8 +110,8 @@
   <h3>Final classifier (after the improvements below)</h3>
   <div class="cm-wrap"><div id="cm-final"></div></div>
   <p class="cm-caption">Boosting with the new service-port, content and flow features and class weights, on all
-  <span data-acc="full_grouped_bal_s42.rows" data-int="1">1,985,768</span> rows, tested on whole connections it never
-  saw during training (flow-grouped 80/20 split, seed 42). The application-layer cluster that held most of the errors
+  <span data-acc="full_grouped_bal_s42.rows" data-int="1">1,985,768</span> rows: trained on 1,429,825 and tested on
+  397,073 rows from whole connections it never saw during training (flow-grouped 80/20 split, seed 42). The application-layer cluster that held most of the errors
   above is now almost clean: the HTTP-family cluster holds <b><span id="err-share-final">&hellip;</span></b> of the
   remaining mistakes. What is left is mostly Password &harr; DDoS_HTTP (both are HTTP requests to the same web server)
   and Ransomware &rarr; Backdoor (same port). MITM has no row here: it is a single ARP connection, so it lands wholly
@@ -339,7 +341,7 @@
 
   <details class="step"><summary><span class="n">3</span>Split: server calibration set and federated pool<span class="mod">data/pipeline.py</span></summary><div class="body">
     <h4>Function</h4><p>Carve out a small, labelled, server-held set to train the boosting model, and keep the rest for federated clients.</p>
-    <h4>How it works</h4><p>5% of all rows (stratified by class) become the calibration set; 20% of that is held back to score each boosting version, leaving 76,388 rows to train on. The remainder is stratified-subsampled to 60,000 rows for the federated pool, to keep ~150 evaluation runs affordable. Labels live only on the server &mdash; clients never reveal local attack labels.</p>
+    <h4>How it works</h4><p>5% of all rows (stratified by class) become the calibration set; 20% of that is held back to score each boosting version, leaving 79,430 rows to train on [76,388 with the original features]. The remainder is stratified-subsampled to 60,000 rows for the federated pool, to keep ~150 evaluation runs affordable; after each client's test and threshold slices, 45,474 rows are left for training. So the federated system trains on about 125,000 rows; only the standalone classifier above was trained on 1.43 million. Labels live only on the server &mdash; clients never reveal local attack labels.</p>
     <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
       <tr><td>boosting.calibration_fraction</td><td>0.05</td><td>size of the server-held labelled set</td></tr>
       <tr><td>boosting.calibration_eval_fraction</td><td>0.2</td><td>share of it held back to score boosting versions</td></tr>
@@ -524,6 +526,7 @@
     <li><b>The trust filter has a documented breaking point.</b> At 50% malicious clients its median reference becomes the attackers' direction. Trimmed-mean alone also fails once colluding attackers exceed its trim fraction.</li>
     <li><b>Only one attack model tested</b> &mdash; sign-flip with an inflated example count. Adaptive attackers are untested.</li>
     <li><b>Mostly single-seed federated results.</b> A multi-seed check on one flagged anomaly (20% vs. 30% in the sweep) showed it does <i>not</i> hold across seeds &mdash; noise, not a trend. The final classifier was run on three seeds; most federated numbers are still single-seed.</li>
+    <li><b>The federated system uses a sample of the data.</b> The classifier that meets the accuracy target was trained on 1.43M rows; the federated system trains on about 125k (a 79,430-row calibration set and a 60,000-row client pool), to keep the ~150 evaluation runs affordable. Trained on only the 5% share, the classifier still reaches 99.7% / 0.979 on the same test set, but the autoencoder has not been tested at full scale.</li>
     <li><b>Tiny classes.</b> MITM (358&ndash;406 rows) and Fingerprinting (853 rows) rest on few test rows.</li>
     <li><b>Novelty is not a settled claim.</b> A few targeted searches found no published system combining all five parts; that is not a systematic review.</li>
   </ol>

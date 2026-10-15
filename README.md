@@ -1,5 +1,8 @@
 # FL-IDS: Federated Learning-Based Intrusion Detection System
 
+**Status: complete (2026-10-16).** Every phase is implemented, run on the
+real data and verified end to end; the paper is being written.
+
 A federated intrusion detection system for IoT/IIoT traffic (Edge-IIoTset).
 Five parts, each doing real work:
 
@@ -228,8 +231,12 @@ service-port, content and flow features of `fl_ids/data/features.py`);
 numbers in brackets are the original 91-feature results (`results/`), kept
 for comparison. New results are in `results/extended/`.
 
-- **Classifier** (LightGBM, all 1.99M rows, connections held out of
-  training, 3 seeds): 99.7% accuracy, 0.983–0.985 macro F1 [96.4%, 0.889].
+- **Classifier** (LightGBM on all 1.99M rows: 1.43M train, 397k test,
+  connections held out of training, 3 seeds): 99.7% accuracy, 0.983–0.985
+  macro F1 [96.4%, 0.889].
+- **Data scale:** the federated system trains on ~125k rows (79,430-row
+  server calibration set + 45,474 client training rows from the 60k pool),
+  not the full dataset; see PAPER_NOTES §5.5.
 - **Real Phase A run** (real Flower server + 10 client processes):
   0.999 attack macro-recall [0.889], 0.035 benign FPR [0.035];
   bootstrap boosting accuracy 0.997 [0.963].

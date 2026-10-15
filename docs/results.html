@@ -47,7 +47,7 @@
     <tr><td>Feature set</td><td style="white-space:normal">Sections 2&ndash;7 use the current pipeline: 130 features (<code>data.extended_features</code>), 1,985,768 rows, LightGBM with square-root class weights, results in <code>results/extended/</code>. Section 9 keeps the same experiments with the original 91 features (<code>results/</code>) for comparison. Section 1 (boosting vs. DL) used the 91 features.</td></tr>
     <tr><td>Classifier-accuracy runs</td><td style="white-space:normal">Section 8 only: 130 features (91 original + service port + 18 content + 20 flow), 2,219,216 rows &rarr; 1,985,768 after de-duplication on that feature set; all rows, natural class distribution, 80/20 random and flow-grouped splits</td></tr>
     <tr><td>Seed</td><td style="white-space:normal">42 for everything, except the multi-seed check (43, 44)</td></tr>
-    <tr><td>Federation</td><td style="white-space:normal">10 clients, Dirichlet &alpha; = 0.3, 20 rounds, 60,000-row federated pool, 5% server calibration set</td></tr>
+    <tr><td>Federation</td><td style="white-space:normal">10 clients, Dirichlet &alpha; = 0.3, 20 rounds, 60,000-row federated pool, 5% server calibration set. Rows trained on: server bootstrap 79,430; client autoencoders 45,474 in total (736&ndash;11,549 per client). The section 8 classifier: 1,429,825 train, 397,073 test</td></tr>
     <tr><td>Hardware</td><td style="white-space:normal">MacBook Pro (M5, 16 GB) running an Ubuntu 26.04 aarch64 VM under UTM: 4 vCPUs, 7.2 GB RAM (12 GB for the real Phase A run), CPU only</td></tr>
     <tr><td>Software</td><td style="white-space:normal">Python 3.14.4, LightGBM 4.7.0, PyTorch 2.14.0 (CPU), Flower 1.38.0, scikit-learn 1.9.1; 233 tests pass, 2 skip</td></tr>
   </tbody></table></div>
