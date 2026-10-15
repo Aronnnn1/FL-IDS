@@ -12,6 +12,24 @@
       if (typeof v === "number") el.textContent = v.toFixed(parseInt(el.getAttribute("data-d") || "3", 10));
     });
 
+    // ---- data-bound numbers (classifier-accuracy runs) ----
+    var ACC = D.accuracy;
+    Array.prototype.forEach.call(document.querySelectorAll("[data-acc]"), function (el) {
+      var v = get(ACC.runs, el.getAttribute("data-acc"));
+      if (typeof v !== "number") return;
+      if (el.hasAttribute("data-pct")) el.textContent = (v * 100).toFixed(parseInt(el.getAttribute("data-pct"), 10)) + "%";
+      else if (el.hasAttribute("data-int")) el.textContent = FL.int(Math.round(v));
+      else el.textContent = v.toFixed(parseInt(el.getAttribute("data-d") || "3", 10));
+    });
+    var mitmF1 = ACC.finalRandom.perClass.MITM["f1-score"].toFixed(3);
+    Array.prototype.forEach.call(document.querySelectorAll("#mitm-random, .mitm-random-2"), function (el) { el.textContent = mitmF1; });
+
+    // final confusion matrix without classes that have no test rows (MITM is one connection)
+    var fin = ACC.final, keep = [];
+    fin.cm.forEach(function (row, i) { if (row.reduce(function (a, b) { return a + b; }, 0) > 0) keep.push(i); });
+    var cmFinal = keep.map(function (i) { return keep.map(function (j) { return fin.cm[i][j]; }); });
+    var finalNames = keep.map(function (i) { return fin.classes[i]; });
+
     // ---- comparison table ----
     (function () {
       var b = D.summary.boosting, d = D.summary.dl_classifier;
@@ -55,6 +73,7 @@
     function drawCm() {
       FL.heatmap($("cm-boost"), D.cmBoost, D.classNames, mode);
       FL.heatmap($("cm-dl"), D.cmDl, D.classNames, mode);
+      FL.heatmap($("cm-final"), cmFinal, finalNames, mode);
       $("cm-bar").style.background = FL.heatScaleCss();
     }
     drawCm();
@@ -81,6 +100,14 @@
     $("err-share-boost").textContent = sb.pct.toFixed(0) + "% (" + FL.int(sb.inC) + " of " + FL.int(sb.tot) + ")";
     $("err-share-boost-2").textContent = sb.pct.toFixed(0) + "%";
     $("err-share-dl").textContent = sd.pct.toFixed(0) + "% (" + FL.int(sd.inC) + " of " + FL.int(sd.tot) + ")";
+    (function () {
+      var cl = ["DDoS_HTTP", "Normal", "Password", "SQL_injection", "Uploading", "XSS"].map(function (n) { return finalNames.indexOf(n); });
+      var tot = 0, inC = 0;
+      cmFinal.forEach(function (row, i) { row.forEach(function (v, j) {
+        if (i === j) return; tot += v; if (cl.indexOf(i) >= 0 && cl.indexOf(j) >= 0) inC += v;
+      }); });
+      $("err-share-final").textContent = (100 * inC / tot).toFixed(0) + "% (" + FL.int(inC) + " of " + FL.int(tot) + " remaining errors)";
+    })();
 
     // ---- training-time bars ----
     (function () {
@@ -106,6 +133,45 @@
           '</div><span class="budget-val">F1 ' + r.f1.toFixed(3) + (gap > 0 ? " &middot; &minus;" + gap.toFixed(3) : " &middot; ok") + "</span></div>";
       });
       $("f1-budget").innerHTML = h;
+    })();
+
+    // ---- accuracy: before / after table ----
+    (function () {
+      var steps = [
+        ["Original 91 features", "base"], ["+ service port (92)", "base_svc"], ["+ content (110)", "base_content"],
+        ["+ flow (130)", "full"], ["+ class weights (final)", "full_bal"]
+      ];
+      var R = ACC.runs;
+      function cell(name, k) { var r = R[name]; return r ? (k === "accuracy" ? (r[k] * 100).toFixed(2) + "%" : r[k].toFixed(4)) : "&mdash;"; }
+      var h = '<div class="table-wrap"><table class="ptable"><thead><tr><th>Features</th><th>Random: accuracy</th><th>Random: macro F1</th><th>Flow-grouped: accuracy</th><th>Flow-grouped: macro F1</th></tr></thead><tbody>';
+      steps.forEach(function (st, i) {
+        var g = st[1].replace("_bal", "") + "_grouped" + (st[1].indexOf("_bal") > 0 ? "_bal" : "") + "_s42";
+        var last = i === steps.length - 1;
+        var tdo = last ? "<td><b>" : "<td>", tdc = last ? "</b></td>" : "</td>";
+        h += "<tr>" + tdo + st[0] + tdc + tdo + cell(st[1] + "_s42", "accuracy") + tdc + tdo + cell(st[1] + "_s42", "macro_f1") + tdc +
+          tdo + cell(g, "accuracy") + tdc + tdo + cell(g, "macro_f1") + tdc + "</tr>";
+      });
+      h += "</tbody></table></div>";
+      h += '<p class="src">All rows after de-duplication (1,909,719 with the original features; 1,985,768 with all 130), natural class distribution, seed 42. Final configuration across seeds 42/43/44 &mdash; flow-grouped macro F1 ' +
+        ["42", "43", "44"].map(function (sd) { return R["full_grouped_bal_s" + sd].macro_f1.toFixed(3); }).join(" / ") +
+        "; random " + ["42", "43", "44"].map(function (sd) { return R["full_bal_s" + sd].macro_f1.toFixed(3); }).join(" / ") + ".</p>";
+      $("acc-progress").innerHTML = h;
+    })();
+
+    // ---- accuracy: per-class F1 before / after (flow-grouped) ----
+    (function () {
+      var b = ACC.base.perClass, f = ACC.final.perClass;
+      var classes = ACC.final.classes.filter(function (c) { return f[c].support > 0 && b[c] && b[c].support > 0; });
+      classes.sort(function (x, y) { return (f[y]["f1-score"] - b[y]["f1-score"]) - (f[x]["f1-score"] - b[x]["f1-score"]); });
+      var el = $("acc-perclass");
+      classes.forEach(function (c) {
+        var bo = b[c]["f1-score"], fo = f[c]["f1-score"];
+        var w = document.createElement("div"); w.className = "bar-metric";
+        w.innerHTML = '<div class="metric-name">' + c + '</div>' +
+          '<div class="bar-row"><span class="bar-label">Before</span><div class="bar-track"><div class="bar-fill boost" style="width:' + (bo * 100).toFixed(1) + '%"></div></div><span class="bar-val">' + bo.toFixed(3) + '</span></div>' +
+          '<div class="bar-row"><span class="bar-label">Final</span><div class="bar-track"><div class="bar-fill dl" style="width:' + (fo * 100).toFixed(1) + '%"></div></div><span class="bar-val">' + fo.toFixed(3) + '</span></div>';
+        el.appendChild(w);
+      });
     })();
 
     // ---- sweep chart ----

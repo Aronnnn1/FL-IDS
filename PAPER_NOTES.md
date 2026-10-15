@@ -1008,6 +1008,65 @@ Readings:
   per-class recall (1.000 boosting / 0.903 DL) should be read with that
   caveat, consistent with §5.2's general tiny-class caution.
 
+### 8.10 Classifier accuracy: service-port, content and flow features (2026-10-15)
+Source: `experiments/accuracy/`: `build_features.py`,
+`train_eval.py`, results JSON per run in `experiments/accuracy/results/`. Standalone
+LightGBM on **all** cleaned rows (not the 60k pool, not the 500k sample), natural class
+distribution, 80/20, early stopping on 10% of train. Params: 63 leaves, lr 0.1,
+feature/bagging fraction 0.8, lambda_l2 1, min_sum_hessian 1. Target set by the
+project owner: >=95% accuracy AND >=0.95 macro F1.
+
+Why the base features stall: in SQL_injection/XSS/Uploading/Password only 5-17% of
+packets carry any HTTP content (full_uri / payload); the rest are content-free TCP
+handshake/ACK packets to port 80 on the same DVWA server. Ambiguity ceiling (oracle
+giving each distinct feature vector its majority label), base 91 features: 2.31% of rows
+ambiguous, ceiling accuracy 0.9875, ceiling macro recall 0.9692.
+
+New feature groups (never IPs, absolute time, ephemeral ports or row order as features):
+- `svc_port` (1): min(port < 32768) over tcp src/dst + udp port, else -1.
+- `c_*` (18): decoded payload length/entropy/printable share, HTTP request flag, status
+  code, header and X-header counts, URI length/params/%-count, file_data length,
+  special chars, six generic keyword-group counts (sql, xss, upload, auth, trav, tool).
+- `f_*` (20): per-flow aggregates; flow = (IP pair, proto, port pair) in capture order,
+  new flow after 60 s idle OR 120 s active (CICFlowMeter's default active timeout).
+  Without the active timeout one 264,094-packet VNC session (the only benign VNC in the
+  dataset) was a single flow; under the grouped split it landed wholly in test and 16%
+  of Normal test rows went to Backdoor/Ransomware (run superseded, not cited).
+- Optional sqrt inverse-frequency class weights (`--balance`).
+
+Dedup rows: base 1,909,719 (matches §5.2); +svc 1,909,980; full (130 features) 1,985,768.
+
+| Features | Random acc | Random macro F1 | Flow-grouped acc | Flow-grouped macro F1 |
+|---|---:|---:|---:|---:|
+| base (91) | 0.9638 | 0.8868 | 0.9637 | 0.8892 |
+| + svc_port (92) | 0.9802 | 0.9245 | 0.9803 | 0.9236 |
+| + content (110) | 0.9802 | 0.9268 | 0.9802 | 0.9232 |
+| + flow (130) | 0.9977 | 0.9879 | 0.9975 | 0.9808 |
+| + class weights (final) | 0.9976 | 0.9867 | 0.9972 | 0.9828 |
+
+Flow-grouped = StratifiedGroupKFold(5) first fold, groups = flow_id (no flow on both
+sides). MITM is one ARP flow, so it has no test rows there and is excluded from that
+split's macro F1; on the random split final MITM F1 = 0.994.
+
+Seeds (final config): random acc 0.9976/0.9977/0.9976, macro F1 0.9867/0.9868/0.9866;
+grouped acc 0.9972/0.9971/0.9970, macro F1 0.9828/0.9835/0.9851 (seeds 42/43/44).
+Unweighted grouped macro F1 was seed-sensitive (0.9808/0.9560/0.9521) because
+Fingerprinting (156 flows) swung 0.49-0.88 F1; weights fix it (~0.93).
+Ceiling with all features: 0.01% ambiguous, 0.9999 / 0.9997.
+
+Extra checks: (a) 500k capped sample, same training settings: base 0.8902 / 0.8827 ->
+full 0.9919 / 0.9900. (b) Train on only 5% of rows (calibration-set size), grouped test:
+base 0.9624 / 0.8807 -> full+weights 0.9968 / 0.9791.
+
+Caveats: svc_port benefits from the testbed (benign = MQTT 1883 / VNC 5900, never HTTP);
+flow features are whole-record (<=120 s), so this is flow-record classification, not
+first-packet. NOT yet integrated into the federated pipeline or Phase B live extraction;
+§8.2-8.5 numbers still use the 91 base features.
+
+Correction to §8.9: `results/classifier_comparison_summary.json` (current) gives DL
+macro F1 0.6218 (not 0.6214), accuracy 0.6779, benign FPR 0.5341, boosting train 55.5 s;
+DL SQL_injection recall 0.183 (not 0.213). Cite the JSON.
+
 ---
 
 ## 9. Do not cite (superseded numbers, with reason)

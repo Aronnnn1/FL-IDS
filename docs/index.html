@@ -15,7 +15,7 @@
     <a href="#comparison">Boosting vs. DL</a>
     <a href="#confusion">Confusion matrices</a>
     <a href="#training-time">Training time</a>
-    <a href="#improvements">Improvements</a>
+    <a href="#improvements">Accuracy &ge; 95%</a>
     <a href="#pipeline">Pipeline</a>
     <a href="#steps">Step-by-step</a>
     <a href="#verification">Verification</a>
@@ -32,16 +32,18 @@
   <p class="subtitle">A federated, cascade-based intrusion detection system for IoT/IIoT traffic: a supervised
   LightGBM classifier as the first pass, with a client-side autoencoder as a federated, poisoning-resistant
   backstop for zero-day attacks. This site reports (1) a head-to-head comparison of boosting against a
-  deep-learning classifier, (2) how long things take and why, (3) concrete ideas for pushing macro F1 past 0.95,
-  (4) a visual and step-by-step explanation of the whole pipeline, and (5) verification that it works end to end,
-  with its limitations stated plainly. Every table of numbers is collected on the
+  deep-learning classifier, (2) how long things take and why, (3) how the classifier was pushed past 0.95 macro F1
+  and 95% accuracy &mdash; and checked on a stricter, connection-held-out test, (4) a visual and step-by-step
+  explanation of the whole pipeline, and (5) verification that it works end to end, with its limitations stated
+  plainly. Every table of numbers is collected on the
   <a href="results.html">cumulative results page</a>.</p>
   <p class="meta">Dataset: Edge-IIoTset (Ferrag et al., 2022). All numbers come from real runs of the code in this
   repository. Full notes and sources:
   <a href="https://github.com/Aronnnn1/FL-IDS/blob/main/PAPER_NOTES.md">PAPER_NOTES.md</a>.</p>
 
   <div class="tiles">
-    <div class="tile win"><div class="label">Boosting macro F1</div><div class="value" data-bind="boosting.macro_f1" data-d="3">0.887</div><div class="sub">vs. <span data-bind="dl_classifier.macro_f1" data-d="3">0.622</span> for a comparable DL classifier</div></div>
+    <div class="tile win"><div class="label">Final classifier macro F1</div><div class="value"><span data-acc="full_grouped_bal_s42.macro_f1" data-d="3">0.983</span></div><div class="sub"><span data-acc="full_grouped_bal_s42.accuracy" data-pct="1">99.7%</span> accuracy on held-out connections (was <span data-acc="base_grouped_s42.macro_f1" data-d="3">0.889</span> / <span data-acc="base_grouped_s42.accuracy" data-pct="1">96.4%</span>)</div></div>
+    <div class="tile"><div class="label">Boosting vs. DL</div><div class="value" data-bind="boosting.macro_f1" data-d="3">0.887</div><div class="sub">macro F1 vs. <span data-bind="dl_classifier.macro_f1" data-d="3">0.622</span> for a comparable DL classifier (base features)</div></div>
     <div class="tile"><div class="label">Cascade zero-day recall</div><div class="value">0.731</div><div class="sub">vs. 0.518 for boosting alone</div></div>
     <div class="tile"><div class="label">Real Phase A run</div><div class="value">0.889</div><div class="sub">attack macro-recall, real 10-client FL training</div></div>
     <div class="tile"><div class="label">Real SDN demo</div><div class="value">Correct</div><div class="sub">Backdoor attack classified &amp; blocked live</div></div>
@@ -102,6 +104,17 @@
   behind its much higher benign false-positive rate (real Normal traffic pulled toward Password). The same cluster
   holds <b><span id="err-share-dl">&hellip;</span></b> of its mistakes, but it also fails on Port_Scanning &harr;
   DDoS_TCP and Fingerprinting, which boosting handles.</p>
+
+  <h3>Final classifier (after the improvements below)</h3>
+  <div class="cm-wrap"><div id="cm-final"></div></div>
+  <p class="cm-caption">Boosting with the new service-port, content and flow features and class weights, on all
+  <span data-acc="full_grouped_bal_s42.rows" data-int="1">1,985,768</span> rows, tested on whole connections it never
+  saw during training (flow-grouped 80/20 split, seed 42). The application-layer cluster that held most of the errors
+  above is now almost clean: the HTTP-family cluster holds <b><span id="err-share-final">&hellip;</span></b> of the
+  remaining mistakes. What is left is mostly Password &harr; DDoS_HTTP (both are HTTP requests to the same web server)
+  and Ransomware &rarr; Backdoor (same port). MITM has no row here: it is a single ARP connection, so it lands wholly
+  on one side of a connection-level split (on the random split its F1 is
+  <span id="mitm-random">&hellip;</span>).</p>
 </section>
 
 <section id="training-time">
@@ -119,6 +132,8 @@
     <thead><tr><th>Run</th><th>Time</th><th>What dominates it</th></tr></thead>
     <tbody>
       <tr><td>Boosting classifier (comparison)</td><td>55.5 s</td><td style="white-space:normal">300 rounds &times; 15 classes = 4,500 trees on 400k rows, forced to a single thread (see below)</td></tr>
+      <tr><td>Final classifier (130 features, 1.43M training rows)</td><td><span data-acc="full_grouped_bal_s42.train_seconds" data-d="0">24</span> s</td><td style="white-space:normal">early stopping after <span data-acc="full_grouped_bal_s42.best_iteration" data-int="1">54</span> rounds (lr 0.1, 63 leaves), 4 threads &mdash; an exploratory setting, not the bit-reproducible single-thread mode the pipeline uses</td></tr>
+      <tr><td>Building the new features (all 2.2M rows)</td><td>&asymp; 1.5 min</td><td style="white-space:normal">decoding payloads and grouping 2.2M packets into &asymp; 393k flows; written once to Parquet and reused by every run</td></tr>
       <tr><td>DL classifier (comparison)</td><td>10.2 s</td><td style="white-space:normal">15 epochs &times; 1,563 minibatches of 256; the network has only 8,271 weights</td></tr>
       <tr><td>One in-process federated run, 20 rounds (no boosting updates)</td><td>&asymp; 2 min</td><td style="white-space:normal">&asymp; 3 s per round, plus ~20&ndash;25 s to parse the 1.16 GB CSV</td></tr>
       <tr><td>Real Phase A (1 server + 10 client processes, 20 rounds)</td><td>5 min 15 s (+ ~30 s data prep)</td><td style="white-space:normal">20 rounds including 6 boosting updates; start-up of 11 separate Python processes</td></tr>
@@ -148,78 +163,104 @@
 </section>
 
 <section id="improvements">
-  <h2>How to push macro F1 past 0.95</h2>
-  <p>Current boosting macro F1 on the 100k test rows is <b data-bind="boosting.macro_f1" data-d="3">0.887</b>. Everything
-  below is a <b>hypothesis grounded in the confusion matrix and per-class numbers above &mdash; none of it has been
-  run</b>, and no gain is promised. They are ordered by how directly the evidence supports them.</p>
+  <h2>How macro F1 was pushed past 0.95</h2>
+  <p>The target was <b>&ge; 95% accuracy and &ge; 0.95 macro F1</b>. With the original 91 features, boosting reached
+  <b data-bind="boosting.macro_f1" data-d="3">0.887</b> macro F1 on the 500k comparison sample, and
+  <b><span data-acc="base_grouped_s42.macro_f1" data-d="3">0.889</span></b> macro F1 /
+  <b><span data-acc="base_grouped_s42.accuracy" data-pct="1">96.4%</span></b> accuracy on all 1.9M rows. Ideas 1, 2, 7
+  and 8 below were implemented and measured; together they bring the classifier to
+  <b><span data-acc="full_grouped_bal_s42.macro_f1" data-d="3">0.983</span></b> macro F1 and
+  <b><span data-acc="full_grouped_bal_s42.accuracy" data-pct="1">99.7%</span></b> accuracy on connections held out of
+  training. Ideas 3&ndash;6 turned out not to be needed and were not run.</p>
 
-  <h3>The F1 budget: where the missing points are</h3>
-  <p>Macro F1 is the plain average of 15 per-class F1 scores, so reaching 0.95 needs the per-class F1 sum to rise
+  <h3>Before: the F1 budget of the original features</h3>
+  <p>Macro F1 is the plain average of 15 per-class F1 scores, so reaching 0.95 needed the per-class F1 sum to rise
   from <span id="f1-sum">&hellip;</span> to 14.25 &mdash; a gain of <b><span id="f1-need">&hellip;</span></b> F1 points spread
-  over the weak classes. Bars show each class's current F1; the red part is its shortfall to 0.95.</p>
+  over the weak classes. Bars show each class's F1 on the 500k comparison; the red part is its shortfall to 0.95.</p>
   <div id="f1-budget" class="card"></div>
+
+  <h3>Why the original features were stuck</h3>
+  <p>In SQL_injection, XSS, Uploading and Password traffic only about 5&ndash;17% of packets carry any HTTP content. The
+  rest are bare TCP handshake/acknowledgement packets to port 80 on the same web server, and those look identical
+  whichever attack produced them. Measured directly: <b><span data-acc="base_grouped_s42.ambiguous_share" data-pct="2">2.31%</span></b>
+  of rows share an identical 91-feature vector with a row of a <i>different</i> class, which caps macro recall at
+  <b><span data-acc="base_grouped_s42.ceiling_macro_recall" data-d="3">0.969</span></b> for any per-packet model. The
+  information that separates these attacks was in the columns the dataset recipe drops.</p>
+
+  <h3>After: each change, measured</h3>
+  <p>LightGBM on all rows, 80/20. &ldquo;Random&rdquo; splits individual packets; &ldquo;flow-grouped&rdquo; keeps every
+  connection entirely in training or entirely in test (the stricter number).</p>
+  <div id="acc-progress"></div>
+  <div class="legend" style="margin-top:14px"><span><span class="dot boost"></span>Original 91 features</span><span><span class="dot dl"></span>Final (content + flow + class weights)</span></div>
+  <div id="acc-perclass" class="barchart-grid"></div>
 
   <div class="imp">
     <div class="imp-item">
-      <h4><span class="tag high">strongest evidence</span>1. Move from per-packet to behaviour features</h4>
-      <p><b>Why:</b> the dataset rows are individual packets, and the pipeline treats each as independent. But the confused classes (DDoS_HTTP, Password brute-forcing, SQL_injection, Uploading, XSS) differ from normal HTTP mostly in <i>behaviour over time</i> &mdash; request rate, repeated login URIs, burst structure &mdash; not in any single packet's header fields.</p>
-      <p><b>What to change:</b> add windowed features per source host (packets/s, distinct URIs, mean inter-arrival time, method mix, response-code mix) and join them back onto each packet. <code>frame.time</code> and <code>ip.src_host</code> exist in the CSV but are dropped at load by the authors' recipe, so this is possible.</p>
-      <p><b>Risk:</b> Phase B must compute identical windows from a live capture; windows must not straddle the train/test split.</p>
+      <h4><span class="tag done">done</span>1. Move from per-packet to behaviour features</h4>
+      <p><b>What was done:</b> packets are grouped into connections (IP pair, protocol, port pair, in capture order; a new
+      connection after 60 s idle or 120 s active &mdash; CICFlowMeter's default active timeout). Every packet gets 20
+      connection-level features: packet count, duration, rate, SYN/FIN/RST counts, payload totals, HTTP request count and
+      attack-keyword totals. Content-free ACK packets now carry what their connection did.</p>
+      <p><b>Result:</b> the single biggest jump &mdash; flow-grouped macro F1 0.923 &rarr; 0.981. IP addresses and times are
+      used only to <i>group</i> packets, never as features.</p>
     </div>
     <div class="imp-item">
-      <h4><span class="tag high">strong evidence</span>2. Restore content signals the recipe drops &mdash; as numbers, not text</h4>
-      <p><b>Why:</b> SQL injection, XSS and file upload differ from normal HTTP in <i>what is sent</i>, and the authors' recipe drops exactly those columns (<code>http.request.uri.query</code>, <code>http.request.full_uri</code>, <code>http.file_data</code>, <code>tcp.payload</code>) because they are high-cardinality text.</p>
-      <p><b>What to change:</b> keep the text out but derive scalars: URI/query/payload length, byte entropy, counts of special characters (<code>' % ; &lt; &gt; --</code>), keyword flags (<code>select</code>, <code>union</code>, <code>script</code>), multipart/upload markers.</p>
-      <p><b>Risk:</b> this dataset already had a label leak from an export artifact, so every new feature must pass the existing single-feature AUROC guard (&lt; 0.9) before it is trusted.</p>
+      <h4><span class="tag done">done</span>2. Restore content signals the recipe drops &mdash; as numbers, not text</h4>
+      <p><b>What was done:</b> 18 numeric features from <code>tcp.payload</code>, <code>http.request.full_uri</code> and
+      <code>http.file_data</code>: payload length, byte entropy, printable share, HTTP request flag and status code,
+      header counts, URI length/parameters/%-encoding, special-character count, and counts of six generic signature
+      groups (SQL keywords, script/XSS, upload, login/password, path traversal/commands, scanner tool names). Plus one
+      <b>service-port</b> feature: the server side of the connection (80, 1883, 4321&hellip;); ephemeral client ports are
+      excluded because their ranges follow capture time.</p>
+      <p><b>Result:</b> the service port alone lifts flow-grouped macro F1 0.889 &rarr; 0.924; content on its own adds little
+      (only a few packets carry it) but feeds the flow features above.</p>
     </div>
     <div class="imp-item">
-      <h4><span class="tag high">cheap</span>3. Per-class decision thresholds instead of plain argmax</h4>
-      <p><b>Why:</b> the per-class table shows clear precision/recall asymmetry: DDoS_HTTP is over-predicted (precision 0.654, recall 0.914), while Uploading (precision 0.961, recall 0.630) and Fingerprinting (0.832 / 0.579) are under-predicted.</p>
-      <p><b>What to change:</b> on a held-out validation split, fit one multiplicative weight per class on the predicted probabilities (or per-class thresholds) to maximise macro F1, then freeze them. Post-hoc, no retraining.</p>
-      <p><b>Risk:</b> must be tuned on validation data, never on the test rows, or the 0.95 is fitted to the test set.</p>
+      <h4><span class="tag">not needed</span>3. Per-class decision thresholds instead of plain argmax</h4>
+      <p>Not run: after 1, 2 and 7 the precision/recall asymmetry it targeted is gone (e.g. Uploading precision/recall
+      now ~1.00/1.00).</p>
     </div>
     <div class="imp-item">
-      <h4><span class="tag high">targeted</span>4. A specialist second-level model for the confusable cluster</h4>
-      <p><b>Why:</b> a single 15-way softmax spreads its trees across all classes, but <span id="err-share-boost-2">&hellip;</span> of boosting's errors are inside one six-class cluster (see the matrix).</p>
-      <p><b>What to change:</b> stage 1 routes a packet to &ldquo;flood/scan/other&rdquo; or &ldquo;Normal + HTTP family&rdquo;; stage 2 is a separate LightGBM trained only on Normal, DDoS_HTTP, Password, SQL_injection, Uploading and XSS, with its own tuning and the new features from items 1&ndash;2.</p>
-      <p><b>Risk:</b> a stage-1 mistake can't be recovered; evaluate end to end, not stage by stage.</p>
+      <h4><span class="tag">not needed</span>4. A specialist second-level model for the confusable cluster</h4>
+      <p>Not run: the confusable cluster that held <span id="err-share-boost-2">&hellip;</span> of the original errors is now
+      almost clean (see the final confusion matrix). The remaining Password &harr; DDoS_HTTP mix-up is ~2&ndash;4%.</p>
     </div>
     <div class="imp-item">
-      <h4><span class="tag">medium</span>5. Tune hyperparameters for macro F1, with early stopping</h4>
-      <p><b>Why:</b> the booster is fixed at 300 rounds, learning rate 0.05, 31 leaves, with no validation set, no early stopping, no row/column subsampling and default <code>min_data_in_leaf</code>. Those values were picked by held-out <i>log-loss</i> (0.041 vs 0.056 for 127 leaves / lr 0.1), not by macro F1.</p>
-      <p><b>What to change:</b> random/Bayesian search over <code>num_leaves</code> (31&ndash;255), <code>min_data_in_leaf</code>, <code>feature_fraction</code> and <code>bagging_fraction</code> (0.6&ndash;0.9), <code>lambda_l1/l2</code>, <code>max_bin</code>, <code>min_gain_to_split</code>, up to ~2,000 rounds with early stopping on macro F1. Keep <code>min_sum_hessian_in_leaf</code> and <code>lambda_l2</code>: without leaf regularisation this data made training diverge.</p>
+      <h4><span class="tag">partly</span>5. Tune hyperparameters, with early stopping</h4>
+      <p>Only lightly: 63 leaves, learning rate 0.1, feature/bagging fraction 0.8, up to 2,000 rounds with early stopping
+      (patience 50) on a 10% validation split, leaf regularisation kept. No search was run; the features did the work.</p>
     </div>
     <div class="imp-item">
-      <h4><span class="tag">medium</span>6. Other boosters, or an ensemble</h4>
-      <p>Boosting is trained on the server, so any library can slot in; nothing in the federation depends on LightGBM.</p>
-      <div class="table-wrap"><table class="ptable">
-        <thead><tr><th>Option</th><th>Why it might help</th><th>Cost / caveat</th></tr></thead>
-        <tbody>
-          <tr><td style="white-space:normal">XGBoost</td><td style="white-space:normal">Different tree growth (level-wise) makes different errors than LightGBM's leaf-wise</td><td>Slower on CPU for 15 classes</td></tr>
-          <tr><td style="white-space:normal">CatBoost</td><td style="white-space:normal">Ordered boosting and symmetric trees are strong on small classes (Fingerprinting, MITM)</td><td>Slowest to train; model format differs</td></tr>
-          <tr><td style="white-space:normal">LightGBM <code>dart</code> / <code>extra_trees</code></td><td style="white-space:normal">Dropout/randomised splits reduce over-fitting to near-duplicate packets</td><td>Needs more rounds; dart is slow</td></tr>
-          <tr><td style="white-space:normal">Soft-voting / stacking of the above</td><td style="white-space:normal">Averages out each model's mistakes; usually the most reliable modest gain</td><td>3&times; the model size to broadcast to clients (already ~11&ndash;22 MB)</td></tr>
-        </tbody></table></div>
+      <h4><span class="tag">not needed</span>6. Other boosters, or an ensemble</h4>
+      <p>Not run. LightGBM alone already sits close to the ambiguity ceiling of the new feature set
+      (<span data-acc="full_grouped_bal_s42.ceiling_accuracy" data-d="4">0.9999</span> accuracy).</p>
     </div>
     <div class="imp-item">
-      <h4><span class="tag">medium</span>7. More labelled data for the boosting stage, or class weights</h4>
-      <p>In the real pipeline boosting trains on only the 5% server-held calibration set (&asymp; 76k rows), a deliberate privacy design choice; this comparison gave it 400k. A larger calibration set, or sample weights for the rare classes (Fingerprinting has 853 rows in the whole dataset), may help. Fingerprinting alone costs about 0.018 macro F1 at its current score.</p>
-      <p><b>Trade-off:</b> a bigger server-held labelled set weakens the &ldquo;labels never leave clients&rdquo; story.</p>
+      <h4><span class="tag done">done</span>7. Class weights for rare classes</h4>
+      <p><b>What was done:</b> square-root inverse-frequency sample weights (a rare class counts more, without the
+      instability of full inverse-frequency weights). <b>Result:</b> without weights, flow-grouped macro F1 swung between
+      seeds (0.981 / 0.956 / 0.952) because Fingerprinting (156 connections) scored 0.49&ndash;0.88; with weights it is stable
+      at 0.983&ndash;0.985 and Fingerprinting ~0.93. Even trained on only the 5% server calibration set, the classifier reaches
+      <span data-acc="full_grouped_bal_tf0.05_s42.accuracy" data-pct="1">99.7%</span> /
+      <span data-acc="full_grouped_bal_tf0.05_s42.macro_f1" data-d="3">0.979</span>.</p>
     </div>
     <div class="imp-item">
-      <h4><span class="tag risk">validate first</span>8. Check the target is real before chasing it</h4>
-      <p>Train and test rows are a random split of individual packets, so near-identical packets from the <i>same capture session</i> land on both sides &mdash; that flatters every number here. Add a split that holds out whole capture sessions and re-measure the baseline: it will likely read lower than 0.887, and a gain from the ideas above only counts if it survives that split.</p>
-      <p>Also look at the confidently-wrong rows (e.g. 716 Normal packets predicted Password). If the testbed's &ldquo;Normal&rdquo; HTTP and the attack HTTP genuinely overlap at packet level, the ceiling at 0.95 may not be reachable without items 1&ndash;2.</p>
+      <h4><span class="tag done">done</span>8. Check the target is real before chasing it</h4>
+      <p><b>What was done:</b> every result is reported on a <b>flow-grouped split</b> (stratified group k-fold on the
+      connection id), so no connection is on both sides, and repeated over seeds 42/43/44. The first attempt exposed a
+      real problem: the only benign VNC session is one 264,094-packet connection; without an active timeout it landed
+      wholly in test and 16% of Normal was mislabelled. The 120 s active timeout (the standard flow-meter setting) fixed
+      that. The original 91 features score about the same on both splits (0.887 vs 0.889), so they were not inflated by
+      connection memorisation either.</p>
     </div>
   </div>
 
-  <h3>Assumptions behind the current number</h3>
+  <h3>Assumptions behind the final number</h3>
   <ul class="caveat-list">
-    <li>Each row is an independent packet (no temporal context).</li>
-    <li>A random row split is representative of unseen traffic (it likely is not &mdash; see item 8).</li>
-    <li>The class-capped 500k sample is a fair test distribution (it cuts Normal from 71% to ~10%, so precision for attack classes is better than it would be on natural traffic).</li>
-    <li>Single seed (42). Seed-to-seed spread was not measured for this comparison.</li>
-    <li>Plain argmax decides the class, with no per-class thresholds.</li>
+    <li>Classification is per <b>connection record</b> (up to 120 s): flow features summarise the whole record, so this is not a first-packet decision.</li>
+    <li>The service port partly benefits from the testbed: benign traffic here is MQTT (1883) and VNC (5900), never HTTP.</li>
+    <li>Natural class distribution (71% benign), all rows after de-duplication, 3 seeds.</li>
+    <li>Evaluated for the stage-1 classifier on its own; the federated pipeline and Phase B still use the 91 original features (see Caveats).</li>
   </ul>
 </section>
 
@@ -276,7 +317,26 @@
     </tbody></table>
   </div></details>
 
-  <details class="step"><summary><span class="n">2</span>Split: server calibration set and federated pool<span class="mod">data/pipeline.py</span></summary><div class="body">
+  <details class="step"><summary><span class="n">2</span>Service-port, content and flow features (classifier accuracy)<span class="mod">experiments/accuracy/build_features.py</span></summary><div class="body">
+    <h4>Function</h4><p>Give the boosting classifier the information that separates application-layer attacks, which the 91 original features do not contain. Evaluated for the stage-1 classifier on all rows; not yet wired into the federated pipeline or Phase B.</p>
+    <h4>How it works</h4>
+    <ul>
+      <li><b>Service port (1):</b> the server side of each connection (smallest port below 32768), or &minus;1 for ICMP/ARP.</li>
+      <li><b>Content (18):</b> decoded payload length, entropy, printable share, HTTP request flag, status code, header and <code>X-</code> header counts, URI length/parameters/%-encoding, file-data length, special characters, and counts of six generic signature groups.</li>
+      <li><b>Flow (20):</b> packets grouped into connections in capture order (new connection after 60 s idle or 120 s active); each packet gets its connection's packet count, duration, rate, flags, payload, request and keyword totals.</li>
+      <li>Never used as features: IP addresses, timestamps, ephemeral ports, row order (each identifies the capture file, i.e. the label). Exact duplicates are then dropped on the new feature set.</li>
+      <li>Trained with square-root inverse-frequency class weights; evaluated on a flow-grouped split so no connection is in both train and test.</li>
+    </ul>
+    <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
+      <tr><td>features</td><td>91 &rarr; 130</td><td>+1 service port, +18 content, +20 flow</td></tr>
+      <tr><td>rows after dedup</td><td>1,985,768</td><td>more distinct rows, because content now differs</td></tr>
+      <tr><td>idle / active timeout</td><td>60 s / 120 s</td><td>connection boundaries (120 s = CICFlowMeter default)</td></tr>
+      <tr><td>LightGBM</td><td>63 leaves, lr 0.1, early stop 50</td><td>feature/bagging fraction 0.8; leaf regularisation kept</td></tr>
+      <tr><td>class weight</td><td>&radic;(N<sub>max</sub> / N<sub>class</sub>)</td><td>rare classes count more</td></tr>
+    </tbody></table>
+  </div></details>
+
+  <details class="step"><summary><span class="n">3</span>Split: server calibration set and federated pool<span class="mod">data/pipeline.py</span></summary><div class="body">
     <h4>Function</h4><p>Carve out a small, labelled, server-held set to train the boosting model, and keep the rest for federated clients.</p>
     <h4>How it works</h4><p>5% of all rows (stratified by class) become the calibration set; 20% of that is held back to score each boosting version, leaving 76,388 rows to train on. The remainder is stratified-subsampled to 60,000 rows for the federated pool, to keep ~150 evaluation runs affordable. Labels live only on the server &mdash; clients never reveal local attack labels.</p>
     <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
@@ -287,7 +347,7 @@
     </tbody></table>
   </div></details>
 
-  <details class="step"><summary><span class="n">3</span>Non-IID partition and per-client normalisation<span class="mod">data/pipeline.py</span></summary><div class="body">
+  <details class="step"><summary><span class="n">4</span>Non-IID partition and per-client normalisation<span class="mod">data/pipeline.py</span></summary><div class="body">
     <h4>Function</h4><p>Simulate realistic clients whose traffic differs wildly from each other, and prepare each client's private train/validation/test data.</p>
     <h4>How it works</h4>
     <ul>
@@ -305,7 +365,7 @@
     <p><b>Observed consequence:</b> client 5 receives no benign validation rows, so its threshold is infinite and its autoencoder never flags anything &mdash; reported, not hidden.</p>
   </div></details>
 
-  <details class="step"><summary><span class="n">4</span>Boosting bootstrap (cold start)<span class="mod">models/boosting.py</span></summary><div class="body">
+  <details class="step"><summary><span class="n">5</span>Boosting bootstrap (cold start)<span class="mod">models/boosting.py</span></summary><div class="body">
     <h4>Function</h4><p>The first-pass supervised classifier: names known attack types cheaply and decisively. Trained <b>before round 1</b> so clients never filter with an untrained model.</p>
     <h4>How it works</h4><p>LightGBM multiclass on raw features; each boosting iteration adds one tree per class (15). The model is serialised to text so it can be broadcast to clients rather than weight-averaged. Held-out accuracy on the calibration hold-out: 0.963.</p>
     <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
@@ -317,7 +377,7 @@
     </tbody></table>
   </div></details>
 
-  <details class="step"><summary><span class="n">5</span>Client round: boosting filter, then autoencoder training<span class="mod">fl/client.py &middot; models/autoencoder.py</span></summary><div class="body">
+  <details class="step"><summary><span class="n">6</span>Client round: boosting filter, then autoencoder training<span class="mod">fl/client.py &middot; models/autoencoder.py</span></summary><div class="body">
     <h4>Function</h4><p>Each client trains an unsupervised autoencoder on its own &ldquo;normal-looking&rdquo; traffic, so it can later flag traffic unlike anything benign &mdash; the zero-day backstop.</p>
     <h4>How it works</h4>
     <ul>
@@ -334,7 +394,7 @@
     </tbody></table>
   </div></details>
 
-  <details class="step"><summary><span class="n">6</span>Server aggregation: trust filter + trimmed mean<span class="mod">robustness/ &middot; fl/strategy.py</span></summary><div class="body">
+  <details class="step"><summary><span class="n">7</span>Server aggregation: trust filter + trimmed mean<span class="mod">robustness/ &middot; fl/strategy.py</span></summary><div class="body">
     <h4>Function</h4><p>Combine client updates into a new global autoencoder while screening out poisoned (Byzantine) updates.</p>
     <h4>How it works</h4>
     <ul>
@@ -352,7 +412,7 @@
     <p><b>Known limits:</b> at 50% attackers the median becomes the attackers' direction and the filter inverts; late-round attackers look like honest noise.</p>
   </div></details>
 
-  <details class="step"><summary><span class="n">7</span>Incremental boosting update<span class="mod">models/boosting_update.py</span></summary><div class="body">
+  <details class="step"><summary><span class="n">8</span>Incremental boosting update<span class="mod">models/boosting_update.py</span></summary><div class="body">
     <h4>Function</h4><p>Let the supervised model learn from what the autoencoders catch, without clients sharing raw traffic.</p>
     <h4>How it works</h4><p>Every 3 rounds, clients that survived the trust filter surface up to 50 autoencoder-flagged rows with the label an analyst would confirm (false alarms come back as &ldquo;Normal&rdquo;). The server continues LightGBM training for 50 more trees on the calibration set plus the accumulated alerts. If an alert contains a class the model has never seen, it <b>retrains from scratch</b> &mdash; continued training can't learn a new class, because that class's softmax hessian is ~0 and the leaf-regularisation setting blocks every split. The new model is broadcast with the next round.</p>
     <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
@@ -364,7 +424,7 @@
     <p><b>Privacy trade-off:</b> this relaxes &ldquo;raw traffic never leaves a client&rdquo; for capped, confirmed alerts. It is also the most expensive step in time (see Training time).</p>
   </div></details>
 
-  <details class="step"><summary><span class="n">8</span>The Phase A bundle<span class="mod">orchestration/artifacts.py &middot; orchestration/phase_a.py</span></summary><div class="body">
+  <details class="step"><summary><span class="n">9</span>The Phase A bundle<span class="mod">orchestration/artifacts.py &middot; orchestration/phase_a.py</span></summary><div class="body">
     <h4>Function</h4><p>Package everything Phase B needs into a self-describing folder, so enforcement never depends on whatever the current config happens to say.</p>
     <h4>How it works</h4><p>Phase A runs a <b>real</b> Flower server and one OS process per client for 20 rounds, then saves <code>boosting_model.txt</code>, <code>autoencoder_weights.npz</code>, <code>client_normalization.npz</code> (each client's scaler) and <code>manifest.json</code> (per-client thresholds, cascade settings, held-out metrics, seed, git commit). Before saving it re-derives each client's threshold from the saved weights and checks it matches what the clients reported in the final round &mdash; an inconsistent bundle is rejected.</p>
     <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
@@ -374,12 +434,12 @@
     </tbody></table>
   </div></details>
 
-  <details class="step"><summary><span class="n">9</span>Replay and feature extraction (Phase B)<span class="mod">sdn/topology.py &middot; sdn/feature_extraction.py</span></summary><div class="body">
+  <details class="step"><summary><span class="n">10</span>Replay and feature extraction (Phase B)<span class="mod">sdn/topology.py &middot; sdn/feature_extraction.py</span></summary><div class="body">
     <h4>Function</h4><p>Turn a real captured attack into the same 91-feature rows the models were trained on.</p>
     <h4>How it works</h4><p>Mininet builds 10 hosts on one Open vSwitch switch pointed at an os-ken OpenFlow&nbsp;1.3 controller; host <code>h(i+1)</code> is FL client <code>i</code>. <code>tcpreplay</code> replays the real <code>.pcap</code> from a host while <code>tshark</code> extracts 46 fields per packet, mapped to the authors' spelling (tshark 4.x prints booleans as True/False and shortens hex, which silently zeroed <code>tcp.flags.ack</code> before it was fixed). Rows are one-hot encoded with the training vocabulary and scored with <b>that client's</b> scaler and threshold. Mininet needs root, granted by one narrow sudoers rule for the argument-less topology script.</p>
   </div></details>
 
-  <details class="step"><summary><span class="n">10</span>Verdict, mitigation bridge and flow rule<span class="mod">sdn/live_inference.py &middot; sdn/bridge.py &middot; sdn/controller.py</span></summary><div class="body">
+  <details class="step"><summary><span class="n">11</span>Verdict, mitigation bridge and flow rule<span class="mod">sdn/live_inference.py &middot; sdn/bridge.py &middot; sdn/controller.py</span></summary><div class="body">
     <h4>Function</h4><p>Reduce thousands of per-packet cascade outputs to one decision per device and turn it into a real flow-table change.</p>
     <h4>How it works</h4><p>The device verdict is the <b>most frequent non-benign label</b> across its packets (mean confidence of those packets, and the cascade stage that made most of the calls), or &ldquo;benign&rdquo; if none. It is posted to a small REST bridge, which asks the controller to install a rule: a high-priority <b>drop</b> on the source IP, or an OpenFlow <b>meter</b> for rate-limiting. The result is verified against the switch's own <code>ovs-ofctl dump-flows</code>, not the bridge's say-so.</p>
     <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
@@ -390,7 +450,7 @@
     <p><b>Limitation:</b> the verdict needs the whole capture, so this is capture-level mitigation, not per-packet blocking of a live stream.</p>
   </div></details>
 
-  <details class="step"><summary><span class="n">11</span>Evaluation harness and live dashboard<span class="mod">eval/ &middot; dashboard/</span></summary><div class="body">
+  <details class="step"><summary><span class="n">12</span>Evaluation harness and live dashboard<span class="mod">eval/ &middot; dashboard/</span></summary><div class="body">
     <h4>Function</h4><p>Measure what each part contributes, and watch a run as it happens.</p>
     <h4>How it works</h4>
     <ul>
@@ -414,6 +474,7 @@
     <li><span class="phase-name">Zero-day detection<br><span class="status-pill">verified</span></span><span class="phase-desc">All 14 classes tested leave-one-out. For classes boosting has no signal for, the autoencoder supplies the detection: MITM 0%&rarr;89%, DDoS_UDP 9%&rarr;90%, Vulnerability_scanner 10%&rarr;84%.</span></li>
     <li><span class="phase-name">Real federated training<br><span class="status-pill">verified</span></span><span class="phase-desc">A real Flower server plus 10 separate client processes completed 20 rounds: 0.889 attack macro-recall, 0.0346 benign FPR &mdash; closely matching the in-process simulation, so the simulation is representative.</span></li>
     <li><span class="phase-name">Live SDN mitigation<br><span class="status-pill">verified</span></span><span class="phase-desc">A real captured attack replayed through a live Mininet/OpenFlow topology was classified <b>Backdoor</b> (99.7% confidence) and a real drop rule was installed &mdash; confirmed against the switch's own flow table.</span></li>
+    <li><span class="phase-name">Classifier accuracy &ge; 95%<br><span class="status-pill">verified</span></span><span class="phase-desc">With the new features and class weights, boosting reaches <span data-acc="full_grouped_bal_s42.accuracy" data-pct="1">99.7%</span> accuracy and <span data-acc="full_grouped_bal_s42.macro_f1" data-d="3">0.983</span> macro F1 on connections held out of training, 0.983&ndash;0.985 across three seeds, and 99.7% / 0.979 when trained on only the 5% server calibration set.</span></li>
     <li><span class="phase-name">Live dashboard<br><span class="status-pill">verified</span></span><span class="phase-desc">Watched in a browser during a real training run with real, changing data. The check also found and fixed a launch-command bug no unit test had caught.</span></li>
   </ul>
 
@@ -450,13 +511,17 @@
   <ol class="caveat-list">
     <li><b>Mitigation is not real-time.</b> Phase B classifies a full capture, not a packet stream.</li>
     <li><b>The DL comparison used a non-default, rebalanced sample.</b> Its benign false-positive rates (16% boosting, 53% DL) aren't comparable to the pipeline's natural-distribution numbers (0.02% boosting FPR): the sample cut the benign class from 71% to ~10%. The <i>relative</i> result is sound regardless.</li>
-    <li><b>Macro-F1 figures from different experiments are not interchangeable.</b> Boosting scores 0.887 on the balanced 500k test and 0.910 on the natural-distribution test slices of the federated run, where MITM and Fingerprinting have only 1 and 3 test rows. The 0.887 is the more trustworthy figure.</li>
-    <li><b>Random-split optimism.</b> Rows are split at random, so near-duplicate packets from one capture session appear in both train and test. A session-held-out split has not been run; all accuracy-type numbers here are probably optimistic.</li>
-    <li><b>The improvement ideas are untested hypotheses.</b> No claim is made that any of them reaches 0.95, or that 0.95 is attainable at packet level.</li>
+    <li><b>Macro-F1 figures from different experiments are not interchangeable.</b> Boosting scores 0.887 on the balanced 500k comparison, 0.910 on the federated run's small natural-distribution test slices (where MITM and Fingerprinting have 1 and 3 test rows), and 0.983 for the final classifier on all rows with the new features. Compare numbers only within one experiment.</li>
+    <li><b>Random-split optimism &mdash; now checked.</b> The final classifier is reported on a flow-grouped split (no connection in both train and test) as well as a random split; they agree within ~0.005 macro F1. Splits by whole <i>capture file</i> or by time period were not run.</li>
+    <li><b>The service port is partly a testbed effect.</b> In Edge-IIoTset benign traffic is MQTT (1883) and VNC (5900) and never HTTP, so &ldquo;port 80&rdquo; alone hints at an attack. In a network with benign web traffic this feature would separate much less.</li>
+    <li><b>Flow features describe a whole connection record</b> (up to 120 s), the same way CICFlowMeter-style datasets do. The classifier labels connection records; it is not a first-packet decision.</li>
+    <li><b>The new features are not yet in the federated pipeline or Phase B.</b> The ablation, poisoning sweep, zero-day and live-demo results on this site still use the 91 original features. Integrating them, and computing flow features live from tshark, is the next step.</li>
+    <li><b>MITM cannot be scored on the flow-grouped split</b> &mdash; its 1,229 rows are one ARP connection. On the random split its F1 is <span class="mitm-random-2">&hellip;</span>.</li>
+    <li><b>The remaining improvement ideas (3&ndash;6) were not run</b> because the target was met without them; no claim is made about what they would add.</li>
     <li><b>Non-IID vs. malicious data is a real confound.</b> The trust filter targets corrupted <i>updates</i>; an honest client with a very skewed shard can look like a poisoned one and is sometimes excluded for a round.</li>
     <li><b>The trust filter has a documented breaking point.</b> At 50% malicious clients its median reference becomes the attackers' direction. Trimmed-mean alone also fails once colluding attackers exceed its trim fraction.</li>
     <li><b>Only one attack model tested</b> &mdash; sign-flip with an inflated example count. Adaptive attackers are untested.</li>
-    <li><b>Mostly single-seed results.</b> A multi-seed check on one flagged anomaly (20% vs. 30% in the sweep) showed it does <i>not</i> hold across seeds &mdash; noise, not a trend. Most other numbers are still single-seed.</li>
+    <li><b>Mostly single-seed federated results.</b> A multi-seed check on one flagged anomaly (20% vs. 30% in the sweep) showed it does <i>not</i> hold across seeds &mdash; noise, not a trend. The final classifier was run on three seeds; most federated numbers are still single-seed.</li>
     <li><b>Tiny classes.</b> MITM (358&ndash;406 rows) and Fingerprinting (853 rows) rest on few test rows.</li>
     <li><b>Novelty is not a settled claim.</b> A few targeted searches found no published system combining all five parts; that is not a systematic review.</li>
   </ol>
