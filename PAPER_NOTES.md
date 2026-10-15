@@ -13,9 +13,15 @@
 >
 > This is notes, not prose. The paper gets written from this.
 
-Last updated: 2026-10-16 -- the service-port/content/flow features (§8.10)
-are integrated into the federated pipeline and Phase B, and every federated
-experiment was re-run with them (§8.11). Previous update: 2026-09-27, on a new machine (MacBook Pro M5, UTM Ubuntu
+Last updated: 2026-10-16 -- **project complete.** Every phase is done
+(§0), the code and results are committed and pushed (`a06711e`,
+`4e19944`), and the full test suite passes (233 passed, 2 skipped). The
+service-port/content/flow features (§8.10) are integrated into the
+federated pipeline and Phase B, and every federated experiment was re-run
+with them (§8.11). How much data each part trains on: §5.5 (read it
+before writing any "trained on N packets" sentence). What remains is the
+paper itself; open items are limitations / future work (§10, §12).
+Previous update: 2026-09-27, on a new machine (MacBook Pro M5, UTM Ubuntu
 26.04 VM; see setup notes below). Not yet committed to git as of this
 update -- numbers below are tagged "this session" rather than a commit
 hash where that's the case; update with the real commit hash once
@@ -54,8 +60,9 @@ standard launch prefix for any future real multi-process run.
 | 7 SDN | `5cbb35c`; re-run this session (2026-09-27) | **done with a real Phase A bundle** (§8.7) -- corrected the pre-fix demo's misclassification |
 | 8 Dashboard | `0fa7c81`; app tests `f48f5fe`; bug found+fixed this session | **done, now actually verified live** (Training view watched in a real browser during a real Phase A run this session -- round 20, 10/10 clients surviving, boosting model v7, all per-client panels populated with real data) |
 | 11 Orchestration | `0a0726f`; real run this session (2026-09-27) | **real-data Phase A completed end-to-end for the first time** (§8.1a) |
-| 9 End-to-end run | this session, 2026-09-27 | Phase A -> Phase B run back-to-back with the real bundle, no manual patching between them (§8.1a, §8.7) -- **not yet done with the dashboard live throughout**, which the phase description also calls for |
-| 10 Polish | README `2dcad51`; full pytest re-verified this session (224 passed, 2 skipped) on the new machine | in progress -- this file's own update is part of it |
+| 9 End-to-end run | 2026-09-27; repeated with 130 features 2026-10-16 (`a06711e`) | **done**: Phase A -> Phase B back-to-back with the real bundle, no manual patching between them (§8.1a, §8.7, §8.11). The dashboard's Training view was watched live during a real run (§8.8); its Live Simulation view was not separately watched live |
+| 10 Polish | README `2dcad51`, `4e19944`; full pytest 233 passed, 2 skipped (2026-10-16, 7 min 32 s) | **done** |
+| 12 Accuracy + integration | `11c1cfa` (classifier, §8.10), `a06711e` (federated + Phase B, §8.11), `4e19944` (site/notes) | **done**: 99.7% / 0.983 on held-out connections; all federated experiments re-run |
 
 ---
 
@@ -464,6 +471,30 @@ Reviewers will ask about these. Each has a commit.
   unchanged by the clip).
 - Pending: exact per-client × per-class count table for seed 42, to
   generate after the regeneration (memory-bound while it runs).
+
+---
+
+### 5.5 Data scale: how many rows each part trains on (2026-10-16)
+All counts are for the 130-feature pipeline and were read from the run
+artefacts named below. **Do not write "the system was trained on 1.9M
+packets".** What is true:
+
+| Part | Trains on | Evaluated on | Source |
+|---|---:|---:|---|
+| Data processing (cleaning, 39 new features, flow grouping) | all 2,219,216 rows -> 1,985,768 unique | -- | §8.10 |
+| Final classifier, accuracy target (§8.10) | **1,429,825** (72%) + 158,870 early-stopping (8%) | **397,073** unseen rows (20%), whole connections held out | `experiments/accuracy/results/full_grouped_bal_s42.json` |
+| Same classifier on the 5% calibration share only | 89,359 + 9,929 | the same 397,073 | `full_grouped_bal_tf0.05_s42.json` (99.7% / 0.979) |
+| Federated: server bootstrap classifier | 79,430 (4.0%) | 19,858 held back | `runs/phase_a/calibration.npz` |
+| Federated: client autoencoders (10 clients) | 45,474 training rows (pool of 60,000; per client 736-11,549) + 5,530 benign threshold rows | 8,996 client test rows | `runs/phase_a/client_*.npz` |
+
+- Citable sentences: "uses the full Edge-IIoTset (2.2M packets, 1.99M
+  unique after cleaning)"; "the classifier was trained on 1.43M packets
+  and tested on 397k packets from connections it never saw".
+- The federated system as a whole trains on ~125k rows (~6% of the
+  data) because the pool is capped at 60k for runtime (§5.4, limitation 11).
+  The 5%-only classifier row shows the bootstrap loses little from this
+  (0.979 vs 0.983 macro F1 on the same test set); the autoencoder at full
+  scale is untested.
 
 ---
 
@@ -1091,8 +1122,9 @@ before + 9 new in `tests/test_features.py`). The autoencoder is 130 -> 32 -> 16
 
 **Real Phase A** (1 Flower server + 10 client processes, 20 rounds, ~4 min,
 `saved_models/phase_a/manifest.json`; the 91-feature bundle is kept in
-`saved_models/phase_a_base91`): bootstrap boosting accuracy 0.997 (0.963) on
-79,430 calibration rows. On the clients' held-out slices: cascade attack
+`saved_models/phase_a_base91`): bootstrap boosting accuracy 0.997 (0.963), macro F1
+0.985, trained on 79,430 calibration rows and scored on the 19,858 held
+back (`runs/phase_a/calibration.npz`, `boosting_metrics.json`). On the clients' held-out slices: cascade attack
 macro-recall **0.9986** (0.889), benign FPR 0.0350 (0.0346), detection F1
 0.9556; boosting-only 0.9963 / FPR 0.0003 / detection F1 0.9984;
 autoencoder-only 0.7414.
@@ -1250,7 +1282,9 @@ bar; the test now uses the production (extended) feature set.
     so the headline cascade number is more trustworthy at a single seed
     than the AE-alone diagnostic column is. Full multi-seed repeats of
     every sweep/ablation point are still not done.
-11. **Subsampled federated pool** (60k rows) for runtime.
+11. **Subsampled federated pool** (60k rows) for runtime. The federated
+    system trains on ~125k rows (~6%); only the standalone classifier
+    trained on 1.43M (§5.5).
 12. **Evaluation runs in-process**: same code, but no network effects;
     the real multi-process path is covered by tests and Phase A.
 13. **Boosting broadcast size** (~11 MB/round) isn't in the
@@ -1325,7 +1359,8 @@ bar; the test now uses the production (extended) feature set.
   view, §8.8**, which also surfaced and fixed a real launch-command bug.
   The Live Simulation (Phase B) view specifically was not separately
   watched live this session -- worth doing once for completeness.
-- Commit this session's work to git -- as of this update nothing from
+- ~~Commit this session's work to git~~ -- **done**; everything through
+  2026-10-16 is committed and pushed (`4e19944`). Historical note: as of the 2026-09-27 update nothing from
   2026-09-25 through 2026-09-27 is committed yet.
 
 ### 12.1 [RESOLVED] Historical diagnosis: real multi-process Phase A OOM on the old VM (2026-09-25)
