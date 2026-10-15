@@ -29,12 +29,22 @@ out = {
     "cmDl": cm["dl_classifier"],
     "summary": summary,
     "perClassCompare": read_csv("classifier_comparison_per_class.csv"),
-    "sweep": read_csv("poisoning_resistance_sweep.csv"),
-    "zeroDay": read_csv("zero_day_holdout.csv"),
-    "stageReport": read_csv("per_class_stage_report.csv"),
-    "multiseed": read_csv("multiseed_20_30_check.csv"),
-    "ablation": read_csv("ablation_table.csv"),
-    "ablationPerClass": read_csv("ablation_per_class_recall.csv"),
+    # Federated results with the current 130-feature pipeline (results/extended)...
+    "sweep": read_csv("extended/poisoning_resistance_sweep.csv"),
+    "zeroDay": read_csv("extended/zero_day_holdout.csv"),
+    "stageReport": read_csv("extended/per_class_stage_report.csv"),
+    "multiseed": read_csv("extended/multiseed_20_30_check.csv"),
+    "ablation": read_csv("extended/ablation_table.csv"),
+    "ablationPerClass": read_csv("extended/ablation_per_class_recall.csv"),
+    # ...and the original 91-feature results (results/), kept for comparison.
+    "base": {
+        "sweep": read_csv("poisoning_resistance_sweep.csv"),
+        "zeroDay": read_csv("zero_day_holdout.csv"),
+        "stageReport": read_csv("per_class_stage_report.csv"),
+        "multiseed": read_csv("multiseed_20_30_check.csv"),
+        "ablation": read_csv("ablation_table.csv"),
+        "ablationPerClass": read_csv("ablation_per_class_recall.csv"),
+    },
 }
 
 # Classifier-accuracy experiments (experiments/accuracy): one JSON per run.

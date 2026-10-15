@@ -151,6 +151,15 @@ and by Phase A itself.
   fork of Ryu. The spec expected an existing custom controller; none was
   available, so one was built on os-ken rather than on abandoned Ryu.
 
+- **Service-port, content and flow features** (`fl_ids/data/features.py`,
+  `data.extended_features`). In the HTTP-family attacks most packets are
+  content-free ACKs, identical across attacks. The server-side port,
+  numeric payload/URI features and per-connection aggregates (60 s idle /
+  120 s active timeout) separate them. IP addresses, timestamps and
+  ephemeral ports only group packets into flows and are never features.
+  Phase B derives the same features live. `extended_features: false`
+  reproduces the original 91-feature pipeline.
+
 ### Data corrections
 
 - **Placeholder label leak.** The "field doesn't apply" placeholder in the
@@ -212,39 +221,41 @@ and by Phase A itself.
 
 Regenerated after the data corrections above. All real-data numbers from
 before commit `c1cc656` are leak-inflated and must not be cited. Full
-tables, per-class breakdowns and caveats are in `PAPER_NOTES.md`; headline
-numbers only here.
+tables, per-class breakdowns and caveats are in `PAPER_NOTES.md` (§8.10
+classifier, §8.11 federated pipeline); headline numbers only here. The
+current pipeline uses 130 features (the 91 base features plus the
+service-port, content and flow features of `fl_ids/data/features.py`);
+numbers in brackets are the original 91-feature results (`results/`), kept
+for comparison. New results are in `results/extended/`.
 
+- **Classifier** (LightGBM, all 1.99M rows, connections held out of
+  training, 3 seeds): 99.7% accuracy, 0.983–0.985 macro F1 [96.4%, 0.889].
+- **Real Phase A run** (real Flower server + 10 client processes):
+  0.999 attack macro-recall [0.889], 0.035 benign FPR [0.035];
+  bootstrap boosting accuracy 0.997 [0.963].
+- **Zero-day (leave-one-attack-class-out)**, all 14 classes, 0% attackers:
+  cascade 0.943 macro-recall [0.736], boosting-only 0.801 [0.533],
+  autoencoder-alone 0.757 [0.493]. Two classes got worse: MITM
+  0.894 → 0.695, and Uploading for boosting alone (0.487 → 0.080; cascade
+  still 0.517 → 0.716).
 - **Ablation** (30% sign-flip attackers, 20 rounds, seed 42): full cascade
-  gets 0.887 attack macro-recall and 0.731 zero-day macro-recall, vs.
-  boosting-only's 0.875 / 0.518 and autoencoder-only's 0.191 / 0.325. The
-  cascade barely beats boosting alone on *known* attacks, but the
-  autoencoder backstop nearly doubles zero-day detection — that's where
-  its value shows up, not in the headline cascade number.
+  1.000 attack / 0.930 zero-day macro-recall [0.887 / 0.731], vs.
+  boosting-only's 0.996 / 0.795 and autoencoder-only's 0.372 / 0.577.
+  Without the trust filter (plain FedAvg, trimmed mean only) the
+  autoencoder is poisoned (recall ~0, loss diverges) and zero-day falls
+  back to boosting's ~0.80. On *known* attacks boosting alone now has the
+  better detection F1 (0.998 vs 0.961): the backstop's ~3% false alarms
+  cost more than it adds there; its value is on unseen attacks.
 - **Poisoning sweep** (0/20/30/40/50% sign-flip attackers): attack
-  macro-recall stays in a tight 0.878–0.887 band through 40% attackers.
-  The trust filter is what keeps the federated autoencoder usable —
-  without it (plain FedAvg), autoencoder-alone recall collapses to 0
-  even at 30%. At 50% the coordinate-median-based filter itself breaks
-  down (malicious-client survival jumps to 96%) — an expected limit of
-  median-based defenses, not a bug.
-- **Zero-day (leave-one-attack-class-out)**, all 14 classes, 0%
-  attackers: the cascade is at least as good as `max(boosting-only,
-  autoencoder-alone)` for every single held-out class. The backstop's
-  value is starkest on classes boosting has zero training signal for —
-  MITM (0% boosting-only → 89% cascade), DDoS_UDP (9% → 90%),
-  Vulnerability_scanner (10% → 84%).
-- **Real Phase A run** (real Flower server + 10 real client processes,
-  not the in-process simulation used for the sweeps above): 0.889 attack
-  macro-recall, 0.0346 benign FPR — closely matches the in-process
-  simulation's numbers, a useful cross-check that the faster simulation
-  is representative.
-- **Phase B**, real Phase A bundle, `Backdoor_attack.pcap` replayed:
-  correctly classified as Backdoor (0.997 confidence, boosting stage
-  alone), installed a real `drop` flow rule, verified via the switch's
-  own flow table. Mitigation is capture-level, not per-packet/streaming
-  — see Known limitations.
-- **Boosting vs. a supervised DL classifier** (separate from the ablation
-  above; see "Running" section): boosting wins decisively as a
-  classifier too, not just as a detector — 0.887 vs. 0.621 macro F1 on
-  the same 500k-row sample. Full breakdown in `PAPER_NOTES.md` §8.9.
+  macro-recall 0.997–1.000 at every fraction, zero-day 0.90–0.94 up to
+  40%. Attacker survival 0.10 / 0.12 / 0.36 at 20 / 30 / 40% [0.28 / 0.32 /
+  0.24]. At 50% the coordinate-median-based filter breaks down as before
+  (survival 100%), an expected limit of median-based defences.
+- **Phase B**, new bundle, `Backdoor_attack.pcap` replayed: Backdoor
+  (0.997 confidence, boosting stage), 24,669 of 24,914 packets flagged,
+  real `drop` flow rule verified in the switch's own flow table. Live
+  extraction derives the same features as training: 99.8% of live rows
+  match the capture's training rows exactly. Mitigation is still
+  capture-level, not per-packet/streaming (see Known limitations).
+- **Boosting vs. a supervised DL classifier** (91 features, 500k-row
+  sample): 0.887 vs. 0.622 macro F1. Full breakdown in `PAPER_NOTES.md` §8.9.

@@ -195,7 +195,7 @@
       });
       s += "</svg>";
       var lg = '<div class="legend" style="margin-top:10px">' + series.map(function (se) { return '<span><span class="dot" style="background:' + se.c + '"></span>' + se.l + "</span>"; }).join("") + "</div>";
-      el.innerHTML = s + lg + '<p class="meta" style="margin-top:8px">x-axis: fraction of clients running a sign-flip poisoning attack. AE-alone and zero-day recall collapse together at 50% &mdash; the trust filter\'s documented breaking point.</p>';
+      el.innerHTML = s + lg + '<p class="meta" style="margin-top:8px">x-axis: fraction of clients running a sign-flip poisoning attack. At 50% AE-alone recall collapses and zero-day detection falls back to boosting alone &mdash; the trust filter\'s documented breaking point.</p>';
     })();
 
     // ---- pipeline diagrams ----
@@ -203,18 +203,18 @@
       id: "a", aria: "Phase A training pipeline",
       nodes: [
         { id: "n1", col: 0, row: 0, cls: "data", title: "1 · Raw dataset", lines: ["Edge-IIoTset CSV", "2,219,216 rows × 63 columns", "15 attack / normal classes"] },
-        { id: "n2", col: 1, row: 0, cls: "data", title: "2 · Clean & encode", lines: ["drop 16 ID/payload columns", "fix label-leak placeholder", "dedupe · repair MITM rows", "one-hot → 1,909,719 × 91"] },
+        { id: "n2", col: 1, row: 0, cls: "data", title: "2 · Clean & encode", lines: ["fix label leak · repair MITM", "+39 port/content/flow features", "(IPs/times only group flows)", "dedupe · one-hot → 1.99M × 130"] },
         { id: "n3", col: 2, row: 0, cls: "data", title: "3 · Split", lines: ["Server calibration set: 5%", "(stratified, labelled)", "Federated pool: the rest,", "subsampled to 60,000 rows"] },
-        { id: "n4", col: 3, row: 0, cls: "model", title: "4 · Boosting bootstrap", lines: ["LightGBM on raw features", "300 rounds · lr 0.05 · 31 leaves", "trained BEFORE round 1", "held-out accuracy 0.963"] },
+        { id: "n4", col: 3, row: 0, cls: "model", title: "4 · Boosting bootstrap", lines: ["LightGBM on raw features", "300 rounds · sqrt class weights", "trained BEFORE round 1", "held-out accuracy 0.997"] },
         { id: "n5", col: 2, row: 1, cls: "fed", title: "5 · Non-IID partition", lines: ["Dirichlet α=0.3 → 10 clients", "per client: 15% test,", "15% benign val, rest train", "z-score per client, clip ±10"] },
-        { id: "n6", col: 3, row: 1, cls: "fed", title: "6 · Client round (×10)", lines: ["boosting filters traffic", "(confident attacks skipped)", "train autoencoder on the rest", "91→32→16→8 · 5 epochs · MSE"] },
+        { id: "n6", col: 3, row: 1, cls: "fed", title: "6 · Client round (×10)", lines: ["boosting filters traffic", "(confident attacks skipped)", "train autoencoder on the rest", "130→32→16→8 · 5 epochs · MSE"] },
         { id: "n7", col: 3, row: 2, cls: "robust", title: "7 · Server aggregation", lines: ["Δ = new − old weights", "cosine / MAD / norm trust filter", "trimmed mean (15%) → global AE", "repeated for 20 rounds"] },
         { id: "n8", col: 3, row: 3, cls: "model", title: "8 · Boosting update", lines: ["every 3 rounds: ≤50 confirmed", "alerts per surviving client", "+50 trees (or retrain)", "→ rebroadcast to clients"] },
         { id: "n9", col: 2, row: 2, cls: "out", title: "9 · Phase A bundle", lines: ["boosting model + AE weights", "per-client scaler & threshold", "manifest + provenance", "→ saved_models/phase_a"] }
       ],
       edges: [
         { from: "n1", to: "n2", label: "63 cols" },
-        { from: "n2", to: "n3", label: "1.91M × 91" },
+        { from: "n2", to: "n3", label: "1.99M × 130" },
         { from: "n3", to: "n4", label: "labelled" },
         { from: "n3", to: "n5", mode: "v", label: "pool → 60k" },
         { from: "n5", to: "n6", label: "clients" },
@@ -231,7 +231,7 @@
       nodes: [
         { id: "b1", col: 0, row: 0, cls: "data", title: "1 · Captured traffic", lines: ["real .pcap, e.g.", "Backdoor_attack.pcap", "24,914 packets"] },
         { id: "b2", col: 1, row: 0, cls: "net", title: "2 · Mininet replay", lines: ["10 hosts · 1 OVS switch", "os-ken OpenFlow 1.3 controller", "tcpreplay from host h1"] },
-        { id: "b3", col: 2, row: 0, cls: "data", title: "3 · tshark features", lines: ["46 fields per packet, mapped", "to the authors' spelling", "one-hot encode like training"] },
+        { id: "b3", col: 2, row: 0, cls: "data", title: "3 · tshark features", lines: ["61 fields per packet, mapped", "to the authors' spelling", "same derived features as training"] },
         { id: "b4", col: 3, row: 0, cls: "out", title: "4 · Load Phase A bundle", lines: ["boosting model, AE weights", "h1 = client 0: its scaler", "and its anomaly threshold"] },
         { id: "b5", col: 3, row: 1, cls: "model", title: "5 · Boosting stage", lines: ["class + probability per packet", "attack and ≥ 0.7 → final label", "is that attack type"] },
         { id: "b6", col: 2, row: 1, cls: "fed", title: "6 · Autoencoder stage", lines: ["otherwise: reconstruction error", "> client threshold → anomalous", "else → benign"] },

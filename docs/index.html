@@ -44,8 +44,8 @@
   <div class="tiles">
     <div class="tile win"><div class="label">Final classifier macro F1</div><div class="value"><span data-acc="full_grouped_bal_s42.macro_f1" data-d="3">0.983</span></div><div class="sub"><span data-acc="full_grouped_bal_s42.accuracy" data-pct="1">99.7%</span> accuracy on held-out connections (was <span data-acc="base_grouped_s42.macro_f1" data-d="3">0.889</span> / <span data-acc="base_grouped_s42.accuracy" data-pct="1">96.4%</span>)</div></div>
     <div class="tile"><div class="label">Boosting vs. DL</div><div class="value" data-bind="boosting.macro_f1" data-d="3">0.887</div><div class="sub">macro F1 vs. <span data-bind="dl_classifier.macro_f1" data-d="3">0.622</span> for a comparable DL classifier (base features)</div></div>
-    <div class="tile"><div class="label">Cascade zero-day recall</div><div class="value">0.731</div><div class="sub">vs. 0.518 for boosting alone</div></div>
-    <div class="tile"><div class="label">Real Phase A run</div><div class="value">0.889</div><div class="sub">attack macro-recall, real 10-client FL training</div></div>
+    <div class="tile"><div class="label">Cascade zero-day recall</div><div class="value">0.943</div><div class="sub">vs. 0.801 for boosting alone (was 0.736 / 0.533)</div></div>
+    <div class="tile"><div class="label">Real Phase A run</div><div class="value">0.999</div><div class="sub">attack macro-recall, real 10-client FL training (was 0.889)</div></div>
     <div class="tile"><div class="label">Real SDN demo</div><div class="value">Correct</div><div class="sub">Backdoor attack classified &amp; blocked live</div></div>
   </div>
 </section>
@@ -136,14 +136,15 @@
       <tr><td>Building the new features (all 2.2M rows)</td><td>&asymp; 1.5 min</td><td style="white-space:normal">decoding payloads and grouping 2.2M packets into &asymp; 393k flows; written once to Parquet and reused by every run</td></tr>
       <tr><td>DL classifier (comparison)</td><td>10.2 s</td><td style="white-space:normal">15 epochs &times; 1,563 minibatches of 256; the network has only 8,271 weights</td></tr>
       <tr><td>One in-process federated run, 20 rounds (no boosting updates)</td><td>&asymp; 2 min</td><td style="white-space:normal">&asymp; 3 s per round, plus ~20&ndash;25 s to parse the 1.16 GB CSV</td></tr>
-      <tr><td>Real Phase A (1 server + 10 client processes, 20 rounds)</td><td>5 min 15 s (+ ~30 s data prep)</td><td style="white-space:normal">20 rounds including 6 boosting updates; start-up of 11 separate Python processes</td></tr>
-      <tr><td>Standalone zero-day (14 held-out classes)</td><td>&asymp; 61 min (VM time)</td><td style="white-space:normal">14 full retrains, &asymp; 4.4 min each</td></tr>
-      <tr><td>Poisoning sweep (5 fractions + 70 per-fraction zero-day retrains)</td><td>&asymp; 5 h (VM time)</td><td style="white-space:normal">75 full retrains, &asymp; 4 min each</td></tr>
-      <tr><td>Full test suite</td><td>6 min 14 s</td><td style="white-space:normal">224 tests; several integration tests train real models</td></tr>
+      <tr><td>Real Phase A (1 server + 10 client processes, 20 rounds)</td><td>&asymp; 4 min [5 min 15 s]</td><td style="white-space:normal">20 rounds including 6 boosting updates; start-up of 11 separate Python processes. The 130-feature matrix loads from a cache in seconds instead of re-parsing the CSV</td></tr>
+      <tr><td>Standalone zero-day (14 held-out classes)</td><td>&asymp; 46 min [&asymp; 61 min]</td><td style="white-space:normal">14 full retrains, &asymp; 3.3 min each, run alongside the ablation</td></tr>
+      <tr><td>Ablation (5 variants + 70 zero-day retrains)</td><td>&asymp; 2 h 40 min</td><td style="white-space:normal">run alongside the zero-day experiment and then the sweep</td></tr>
+      <tr><td>Poisoning sweep (5 fractions + 70 per-fraction zero-day retrains)</td><td>&asymp; 3 h 45 min [&asymp; 5 h]</td><td style="white-space:normal">75 full retrains, &asymp; 3 min each</td></tr>
+      <tr><td>Full test suite</td><td>&asymp; 7.5 min [6 min 14 s]</td><td style="white-space:normal">233 tests; several integration tests train real models</td></tr>
     </tbody>
   </table>
   </div>
-  <p class="src">VM time = time on the Linux VM's own clock; the VM pauses whenever the Mac sleeps, so wall-clock on the Mac was longer. Times are from this run's logs, single measurements, not averaged.</p>
+  <p class="src">[Brackets] = the original 91-feature runs. VM time = time on the Linux VM's own clock; the VM pauses whenever the Mac sleeps, so wall-clock on the Mac was longer. Times are from this run's logs, single measurements, not averaged.</p>
 
   <h3>Why a full federated run takes ~4 minutes when a round takes seconds</h3>
   <ul class="caveat-list">
@@ -260,7 +261,7 @@
     <li>Classification is per <b>connection record</b> (up to 120 s): flow features summarise the whole record, so this is not a first-packet decision.</li>
     <li>The service port partly benefits from the testbed: benign traffic here is MQTT (1883) and VNC (5900), never HTTP.</li>
     <li>Natural class distribution (71% benign), all rows after de-duplication, 3 seeds.</li>
-    <li>Evaluated for the stage-1 classifier on its own; the federated pipeline and Phase B still use the 91 original features (see Caveats).</li>
+    <li>The same features now run in the whole federated pipeline and in Phase B; their system-level results are under Verification.</li>
   </ul>
 </section>
 
@@ -317,8 +318,8 @@
     </tbody></table>
   </div></details>
 
-  <details class="step"><summary><span class="n">2</span>Service-port, content and flow features (classifier accuracy)<span class="mod">experiments/accuracy/build_features.py</span></summary><div class="body">
-    <h4>Function</h4><p>Give the boosting classifier the information that separates application-layer attacks, which the 91 original features do not contain. Evaluated for the stage-1 classifier on all rows; not yet wired into the federated pipeline or Phase B.</p>
+  <details class="step"><summary><span class="n">2</span>Service-port, content and flow features (classifier accuracy)<span class="mod">data/features.py &middot; data/pipeline.py</span></summary><div class="body">
+    <h4>Function</h4><p>Give the boosting classifier the information that separates application-layer attacks, which the 91 original features do not contain. Used by the whole pipeline (<code>data.extended_features</code>, implemented in <code>fl_ids/data/features.py</code>) and by Phase B, which derives the same features from the live capture.</p>
     <h4>How it works</h4>
     <ul>
       <li><b>Service port (1):</b> the server side of each connection (smallest port below 32768), or &minus;1 for ICMP/ARP.</li>
@@ -367,7 +368,7 @@
 
   <details class="step"><summary><span class="n">5</span>Boosting bootstrap (cold start)<span class="mod">models/boosting.py</span></summary><div class="body">
     <h4>Function</h4><p>The first-pass supervised classifier: names known attack types cheaply and decisively. Trained <b>before round 1</b> so clients never filter with an untrained model.</p>
-    <h4>How it works</h4><p>LightGBM multiclass on raw features; each boosting iteration adds one tree per class (15). The model is serialised to text so it can be broadcast to clients rather than weight-averaged. Held-out accuracy on the calibration hold-out: 0.963.</p>
+    <h4>How it works</h4><p>LightGBM multiclass on raw features; each boosting iteration adds one tree per class (15). The model is serialised to text so it can be broadcast to clients rather than weight-averaged. Rows are weighted by &radic;(largest class &divide; their class) so rare classes count more, in the bootstrap and in every update. Held-out accuracy on the calibration hold-out: 0.997 (0.963 with the original features).</p>
     <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
       <tr><td>boosting.num_boost_round</td><td>300</td><td>iterations (&times;15 trees)</td></tr>
       <tr><td>boosting.learning_rate</td><td>0.05</td><td>step size per tree</td></tr>
@@ -382,7 +383,7 @@
     <h4>How it works</h4>
     <ul>
       <li>The client runs the broadcast boosting model on its local rows and discards the ones boosting confidently calls an attack (probability &ge; 0.7). The autoencoder trains only on what is left, so it never learns attacks as &ldquo;normal.&rdquo;</li>
-      <li>Dense autoencoder 91 &rarr; 32 &rarr; 16 &rarr; <b>8</b> &rarr; 16 &rarr; 32 &rarr; 91 (7,299 parameters), MSE reconstruction loss.</li>
+      <li>Dense autoencoder 130 &rarr; 32 &rarr; 16 &rarr; <b>8</b> &rarr; 16 &rarr; 32 &rarr; 130 (9,834 parameters), MSE reconstruction loss.</li>
       <li>The client returns updated weights, a 50-bin histogram of reconstruction errors, and (every 3rd round) up to 50 flagged rows with analyst-confirmed labels. Raw traffic otherwise never leaves the client.</li>
       <li>Anomaly threshold = 97th percentile of reconstruction error on the client's benign validation slice, recomputed every round &mdash; so about 3% of benign traffic is flagged by construction.</li>
     </ul>
@@ -436,7 +437,7 @@
 
   <details class="step"><summary><span class="n">10</span>Replay and feature extraction (Phase B)<span class="mod">sdn/topology.py &middot; sdn/feature_extraction.py</span></summary><div class="body">
     <h4>Function</h4><p>Turn a real captured attack into the same 91-feature rows the models were trained on.</p>
-    <h4>How it works</h4><p>Mininet builds 10 hosts on one Open vSwitch switch pointed at an os-ken OpenFlow&nbsp;1.3 controller; host <code>h(i+1)</code> is FL client <code>i</code>. <code>tcpreplay</code> replays the real <code>.pcap</code> from a host while <code>tshark</code> extracts 46 fields per packet, mapped to the authors' spelling (tshark 4.x prints booleans as True/False and shortens hex, which silently zeroed <code>tcp.flags.ack</code> before it was fixed). Rows are one-hot encoded with the training vocabulary and scored with <b>that client's</b> scaler and threshold. Mininet needs root, granted by one narrow sudoers rule for the argument-less topology script.</p>
+    <h4>How it works</h4><p>Mininet builds 10 hosts on one Open vSwitch switch pointed at an os-ken OpenFlow&nbsp;1.3 controller; host <code>h(i+1)</code> is FL client <code>i</code>. <code>tcpreplay</code> replays the real <code>.pcap</code> from a host while <code>tshark</code> extracts all 61 dataset fields per packet, mapped to the authors' spelling (tshark 4.x prints booleans as True/False and shortens hex, which silently zeroed <code>tcp.flags.ack</code> before it was fixed). The service-port, content and flow features are derived with the same code as in training (99.8% of live rows from the Backdoor capture match its training rows exactly). Rows are one-hot encoded with the training vocabulary and scored with <b>that client's</b> scaler and threshold. Mininet needs root, granted by one narrow sudoers rule for the argument-less topology script.</p>
   </div></details>
 
   <details class="step"><summary><span class="n">11</span>Verdict, mitigation bridge and flow rule<span class="mod">sdn/live_inference.py &middot; sdn/bridge.py &middot; sdn/controller.py</span></summary><div class="body">
@@ -465,14 +466,15 @@
 
 <section id="verification">
   <h2>Does the pipeline work as intended?</h2>
-  <p>Yes &mdash; each part was verified on real data and real processes, not just unit tests. The complete tables are on the
-  <a href="results.html">cumulative results page</a>.</p>
+  <p>Yes &mdash; each part was verified on real data and real processes, not just unit tests. Results below are for the
+  current 130-feature pipeline; numbers in [brackets] are the same experiment with the original 91 features. The complete
+  tables, old and new, are on the <a href="results.html">cumulative results page</a>.</p>
 
   <ul class="phase-list">
-    <li><span class="phase-name">Ablation<br><span class="status-pill">verified</span></span><span class="phase-desc">With 30% poisoned clients, the full cascade, boosting-only and autoencoder-only reach 0.887 / 0.875 / 0.191 attack macro-recall. The backstop nearly doubles zero-day detection (0.731 vs. 0.518) while barely moving known-attack recall &mdash; its value is catching attacks boosting never saw.</span></li>
-    <li><span class="phase-name">Poisoning resistance<br><span class="status-pill">verified</span></span><span class="phase-desc">Attack macro-recall stays in a tight 0.878&ndash;0.887 band from 0% to 40% malicious clients. At 50% the median-based trust filter breaks down as expected (malicious survival 96%).</span></li>
-    <li><span class="phase-name">Zero-day detection<br><span class="status-pill">verified</span></span><span class="phase-desc">All 14 classes tested leave-one-out. For classes boosting has no signal for, the autoencoder supplies the detection: MITM 0%&rarr;89%, DDoS_UDP 9%&rarr;90%, Vulnerability_scanner 10%&rarr;84%.</span></li>
-    <li><span class="phase-name">Real federated training<br><span class="status-pill">verified</span></span><span class="phase-desc">A real Flower server plus 10 separate client processes completed 20 rounds: 0.889 attack macro-recall, 0.0346 benign FPR &mdash; closely matching the in-process simulation, so the simulation is representative.</span></li>
+    <li><span class="phase-name">Ablation<br><span class="status-pill">verified</span></span><span class="phase-desc">With 30% poisoned clients, the full cascade, boosting-only and autoencoder-only reach 1.000 / 0.996 / 0.372 attack macro-recall [0.887 / 0.875 / 0.191]. Zero-day detection: 0.930 for the full cascade vs. 0.795 for boosting alone [0.731 vs. 0.518]. Without the trust filter the autoencoder is poisoned and zero-day falls back to boosting's ~0.80. On known attacks boosting alone now has the better detection F1 (0.998 vs. 0.961): the backstop's value is catching attacks boosting never saw.</span></li>
+    <li><span class="phase-name">Poisoning resistance<br><span class="status-pill">verified</span></span><span class="phase-desc">Attack macro-recall stays at 0.997&ndash;1.000 from 0% to 50% malicious clients [0.878&ndash;0.887], and zero-day recall at 0.90&ndash;0.94 up to 40%. Attacker survival is 10% / 12% / 36% at 20 / 30 / 40% [28% / 32% / 24%]. At 50% the median-based trust filter breaks down as expected (malicious survival 100%).</span></li>
+    <li><span class="phase-name">Zero-day detection<br><span class="status-pill">verified</span></span><span class="phase-desc">All 14 classes tested leave-one-out: cascade 0.943 macro-recall [0.736], boosting alone 0.801 [0.533], autoencoder alone 0.757 [0.493]. Biggest gains: Password 0.44&rarr;0.97, Ransomware 0.54&rarr;1.00, SQL_injection 0.61&rarr;1.00, XSS 0.52&rarr;0.99. Two got worse: MITM 0.89&rarr;0.69, and Uploading for boosting alone (cascade still 0.52&rarr;0.72).</span></li>
+    <li><span class="phase-name">Real federated training<br><span class="status-pill">verified</span></span><span class="phase-desc">A real Flower server plus 10 separate client processes completed 20 rounds: 0.999 attack macro-recall [0.889], 0.035 benign FPR, closely matching the in-process simulation, so the simulation is representative.</span></li>
     <li><span class="phase-name">Live SDN mitigation<br><span class="status-pill">verified</span></span><span class="phase-desc">A real captured attack replayed through a live Mininet/OpenFlow topology was classified <b>Backdoor</b> (99.7% confidence) and a real drop rule was installed &mdash; confirmed against the switch's own flow table.</span></li>
     <li><span class="phase-name">Classifier accuracy &ge; 95%<br><span class="status-pill">verified</span></span><span class="phase-desc">With the new features and class weights, boosting reaches <span data-acc="full_grouped_bal_s42.accuracy" data-pct="1">99.7%</span> accuracy and <span data-acc="full_grouped_bal_s42.macro_f1" data-d="3">0.983</span> macro F1 on connections held out of training, 0.983&ndash;0.985 across three seeds, and 99.7% / 0.979 when trained on only the 5% server calibration set.</span></li>
     <li><span class="phase-name">Live dashboard<br><span class="status-pill">verified</span></span><span class="phase-desc">Watched in a browser during a real training run with real, changing data. The check also found and fixed a launch-command bug no unit test had caught.</span></li>
@@ -488,7 +490,7 @@
   <div class="table-wrap">
   <table class="ptable">
     <tbody>
-      <tr><td>Capture</td><td style="white-space:normal">Backdoor_attack.pcap (24,914 packets; 23,895 classified non-benign)</td></tr>
+      <tr><td>Capture</td><td style="white-space:normal">Backdoor_attack.pcap (24,914 packets; 24,669 classified non-benign [23,895])</td></tr>
       <tr><td>Classification</td><td style="white-space:normal"><b>Backdoor</b>, confidence 0.997, decided by the boosting stage alone</td></tr>
       <tr><td>Mitigation action</td><td style="white-space:normal">Block</td></tr>
       <tr><td>Installed flow rule</td><td style="white-space:normal"><code>priority=100,ip,nw_src=10.0.0.1 actions=drop</code></td></tr>
@@ -497,7 +499,7 @@
   </table>
   </div>
   <div class="callout warn">
-    <b>Real limitation, found by this run.</b> The flow table shows 23,586 packets already matched the default
+    <b>Real limitation, found by this run.</b> The flow table shows 23,161 packets already matched the default
     &ldquo;allow&rdquo; rule before the block rule's own timer starts &mdash; classification happens only after the whole
     capture has been analysed, not packet by packet. This is an architectural property of the current pipeline
     (batch classification of a capture), not a bug, and it is stated here rather than glossed over.
@@ -515,7 +517,7 @@
     <li><b>Random-split optimism &mdash; now checked.</b> The final classifier is reported on a flow-grouped split (no connection in both train and test) as well as a random split; they agree within ~0.005 macro F1. Splits by whole <i>capture file</i> or by time period were not run.</li>
     <li><b>The service port is partly a testbed effect.</b> In Edge-IIoTset benign traffic is MQTT (1883) and VNC (5900) and never HTTP, so &ldquo;port 80&rdquo; alone hints at an attack. In a network with benign web traffic this feature would separate much less.</li>
     <li><b>Flow features describe a whole connection record</b> (up to 120 s), the same way CICFlowMeter-style datasets do. The classifier labels connection records; it is not a first-packet decision.</li>
-    <li><b>The new features are not yet in the federated pipeline or Phase B.</b> The ablation, poisoning sweep, zero-day and live-demo results on this site still use the 91 original features. Integrating them, and computing flow features live from tshark, is the next step.</li>
+    <li><b>Trade-offs of the new features.</b> On known attacks boosting alone now has a higher detection F1 than the full cascade (0.998 vs. 0.961), because the autoencoder's ~3% by-design false alarms cost more than it adds there. Two held-out classes got worse as zero-day attacks (MITM 0.89&rarr;0.69; Uploading for boosting alone), and attacker survival at 40% rose (24%&rarr;36%, single seed).</li>
     <li><b>MITM cannot be scored on the flow-grouped split</b> &mdash; its 1,229 rows are one ARP connection. On the random split its F1 is <span class="mitm-random-2">&hellip;</span>.</li>
     <li><b>The remaining improvement ideas (3&ndash;6) were not run</b> because the target was met without them; no claim is made about what they would add.</li>
     <li><b>Non-IID vs. malicious data is a real confound.</b> The trust filter targets corrupted <i>updates</i>; an honest client with a very skewed shard can look like a poisoned one and is sometimes excluded for a round.</li>
