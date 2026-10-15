@@ -169,6 +169,17 @@ class BoostingClassifier:
             "num_threads": 1,
         }
 
+    def _sample_weights(self, y: np.ndarray) -> np.ndarray | None:
+        """Per-row weights for `config.class_weighting` ("none" -> None)."""
+        mode = getattr(self.config, "class_weighting", "none")
+        if mode == "none":
+            return None
+        if mode != "sqrt":
+            raise ValueError(f"Unknown boosting.class_weighting {mode!r}; expected 'none' or 'sqrt'")
+        counts = np.bincount(y, minlength=self.num_classes).astype(float)
+        class_w = np.sqrt(counts.max() / np.maximum(counts, 1.0))
+        return class_w[y]
+
     def train(self, X: np.ndarray, y: np.ndarray) -> None:
         """Train (or retrain) on labeled attack-type data.
 
@@ -176,7 +187,7 @@ class BoostingClassifier:
             X: Feature matrix, shape (n_samples, n_features).
             y: Integer-encoded attack-type labels, shape (n_samples,).
         """
-        train_set = lgb.Dataset(X, label=y)
+        train_set = lgb.Dataset(X, label=y, weight=self._sample_weights(y))
         params = self._train_params()
         logger.info(
             "Training boosting classifier: %d samples, %d classes, %d rounds",
@@ -215,7 +226,8 @@ class BoostingClassifier:
             self.config, self.num_classes, self.benign_class, self.seed, self.confidence_threshold
         )
         updated._booster = lgb.train(
-            self._train_params(), lgb.Dataset(X, label=y), num_boost_round=num_boost_round, init_model=self._booster
+            self._train_params(), lgb.Dataset(X, label=y, weight=updated._sample_weights(y)),
+            num_boost_round=num_boost_round, init_model=self._booster
         )
         logger.info(
             "Continued boosting training: +%d trees on %d rows (now %d trees)",

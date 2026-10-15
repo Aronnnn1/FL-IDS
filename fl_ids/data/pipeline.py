@@ -396,8 +396,22 @@ def partition_and_normalize_clients(
     return client_data
 
 
+# Bump when fl_ids.data.features changes what it computes, so stale caches are rebuilt.
+EXTENDED_FEATURES_VERSION = 1
+
+
+def _cache_key(csv_path: str | Path, capture_repairs: dict[str, str] | None) -> str:
+    parts = [str(Path(csv_path).resolve()), str(Path(csv_path).stat().st_size), str(int(Path(csv_path).stat().st_mtime))]
+    for name, path in sorted((capture_repairs or {}).items()):
+        parts += [name, str(Path(path).stat().st_size), str(int(Path(path).stat().st_mtime))]
+    return f"v{EXTENDED_FEATURES_VERSION}|" + "|".join(parts)
+
+
 def load_and_encode(
-    csv_path: str | Path, capture_repairs: dict[str, str] | None = None
+    csv_path: str | Path,
+    capture_repairs: dict[str, str] | None = None,
+    extended_features: bool = False,
+    cache_path: str | Path | None = None,
 ) -> tuple[np.ndarray, np.ndarray, LabelEncoder, list[str], int]:
     """Load, clean, and encode the raw CSV into a feature matrix and integer labels.
 
@@ -411,6 +425,14 @@ def load_and_encode(
         capture_repairs: `{attack_type: re-extracted CSV}` — rows of these
             attack types are replaced before cleaning (`data.capture_repairs`,
             see `fl_ids.data.repair`). None or empty loads the CSV as is.
+        extended_features: Add the service-port, content and flow features
+            (`fl_ids.data.features`, `data.extended_features`): the raw
+            payload/URI/port/address/time columns are read to derive them and
+            then dropped, so they never become features themselves. Exact
+            duplicates are dropped on the extended feature set.
+        cache_path: With `extended_features`, an `.npz` to reuse the encoded
+            result from (`data.feature_cache`); rebuilt when the CSV, a repair
+            file or `EXTENDED_FEATURES_VERSION` changes. None disables caching.
 
     Returns:
         (X, y, label_encoder, feature_names, benign_class).
@@ -419,12 +441,31 @@ def load_and_encode(
         AssertionError: If NaNs remain in the feature matrix after cleaning
             (would indicate a bug in `clean_dataframe`).
     """
-    df = load_raw_csv(csv_path)
+    key = _cache_key(csv_path, capture_repairs) if (extended_features and cache_path) else None
+    if key and Path(cache_path).exists():
+        cached = np.load(cache_path, allow_pickle=False)
+        if str(cached["key"]) == key:
+            label_encoder = LabelEncoder()
+            label_encoder.classes_ = cached["classes"].astype(object)  # same dtype as a freshly fitted encoder
+            logger.info("Loaded extended features from cache %s: %s", cache_path, cached["X"].shape)
+            return (cached["X"], cached["y"], label_encoder, cached["feature_names"].tolist(),
+                    int(cached["benign_class"]))
+        logger.info("Feature cache %s is stale; rebuilding", cache_path)
+
+    # Extended features need the raw columns the recipe drops; read them all.
+    df = load_raw_csv(csv_path, drop_columns=[] if extended_features else None)
     if capture_repairs:
         from fl_ids.data.repair import apply_capture_repairs  # imports live extraction, which imports this module
 
         df = apply_capture_repairs(df, capture_repairs)
     df = canonicalize_placeholders(df)
+    if extended_features:
+        from fl_ids.data.features import derive_features
+
+        df = df.reset_index(drop=True)
+        derived = derive_features(df)
+        df = df.drop(columns=[c for c in DEFAULT_DROP_COLUMNS if c in df.columns])
+        df = pd.concat([df, derived], axis=1)
     df = clean_dataframe(df)
     df = one_hot_encode_categoricals(df)
 
@@ -437,6 +478,12 @@ def load_and_encode(
     X = feature_df.to_numpy(dtype=np.float32)
 
     assert not np.isnan(X).any(), "NaNs present in feature matrix after cleaning"
+
+    if key:
+        Path(cache_path).parent.mkdir(parents=True, exist_ok=True)
+        np.savez(cache_path, key=np.array(key), X=X, y=y, classes=np.asarray(label_encoder.classes_).astype(str),
+                 feature_names=np.array(feature_names), benign_class=np.array(benign_class))
+        logger.info("Wrote feature cache %s", cache_path)
 
     return X, y, label_encoder, feature_names, benign_class
 
@@ -462,7 +509,7 @@ def build_federated_dataset(
           integer classes used in `y`.
         - The list of feature column names, in `X` column order.
     """
-    X, y, label_encoder, feature_names, benign_class = load_and_encode(csv_path, config.capture_repairs)
+    X, y, label_encoder, feature_names, benign_class = load_and_encode(csv_path, config.capture_repairs, config.extended_features, config.feature_cache)
     client_data = partition_and_normalize_clients(X, y, benign_class, config, seed)
     return client_data, label_encoder, feature_names
 
@@ -499,7 +546,7 @@ def build_server_and_federated_dataset(
         standardizes it however the boosting model expects (see
         `fl_ids.models.boosting`'s feature-scale design decision).
     """
-    X, y, label_encoder, feature_names, benign_class = load_and_encode(csv_path, config.capture_repairs)
+    X, y, label_encoder, feature_names, benign_class = load_and_encode(csv_path, config.capture_repairs, config.extended_features, config.feature_cache)
 
     X_calib, X_pool, y_calib, y_pool = train_test_split(
         X, y, train_size=calibration_fraction, random_state=seed, stratify=y
