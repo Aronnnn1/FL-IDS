@@ -56,6 +56,18 @@ from fl_ids.sdn.demo_io import DEMO_CONFIG_PATH, DEMO_RESULT_PATH
 
 logger = logging.getLogger(__name__)
 
+# Steps of the live demo, timed with fl_ids.utils.journey and returned in its result.
+LIVE_DEMO_STAGES = [
+    "Start the Mininet network",
+    "Load the model bundle",
+    "Register hosts with the bridge",
+    "Replay the capture through the switch",
+    "Extract features with tshark",
+    "Classify with the cascade",
+    "Send the verdict, install the drop rule",
+    "Read back the switch's flow table",
+]
+
 
 def build_topology(
     num_hosts: int,
@@ -162,6 +174,7 @@ def run_live_pcap_demo(
     bridge_url: str,
     replay_host_name: str = "h1",
     result_path: str | Path = DEMO_RESULT_PATH,
+    journey: "Journey | None" = None,
 ) -> dict:
     """Phase B: replay real traffic, classify it with the Phase A models, mitigate it for real.
 
@@ -179,6 +192,8 @@ def run_live_pcap_demo(
         bridge_url: Base URL of the running SDN mitigation bridge (component 9).
         replay_host_name: Which host replays the traffic (h<i+1> is FL client i).
         result_path: Where to write the JSON result for the Phase B orchestrator.
+        journey: Times each step (`fl_ids.utils.journey`); a new one if not given.
+            Its stages are returned in the result under `"journey"`.
 
     Returns:
         The result: the device classification, the bridge's `/mitigate`
@@ -191,8 +206,13 @@ def run_live_pcap_demo(
     from fl_ids.sdn.feature_extraction import extract_features_for_inference
     from fl_ids.sdn.live_inference import classify_device_traffic
     from fl_ids.utils.config import load_config
+    from fl_ids.utils.journey import Journey
 
+    journey = journey or Journey("live_demo", LIVE_DEMO_STAGES)
+    load_stage = journey.stage(LIVE_DEMO_STAGES[1])
+    load_stage.__enter__()
     artifacts = load_phase_a_artifacts(artifact_dir, load_config().boosting)
+    load_stage.__exit__(None, None, None)
     logger.info(
         "Loaded Phase A bundle from %s (%d clients, trained %s)",
         artifact_dir, len(artifacts.client_ids), artifacts.manifest.get("provenance", {}).get("created_at", "?"),
@@ -201,6 +221,8 @@ def run_live_pcap_demo(
     # Register every host with the bridge up front (not just the replaying
     # one, and before any traffic flows), so the dashboard's device and
     # topology panels are populated for the whole run.
+    register_stage = journey.stage(LIVE_DEMO_STAGES[2])
+    register_stage.__enter__()
     health = requests.get(f"{bridge_url}/health", timeout=5).json()
     datapath_ids = health["connected_datapaths"]
     if not datapath_ids:
@@ -219,21 +241,30 @@ def run_live_pcap_demo(
             timeout=5,
         )
 
-    _tcpreplay_output, packets_before, packets_after = replay_pcap(net, pcap_path, replay_host_name=replay_host_name)
+    register_stage.__exit__(None, None, None)
+
+    with journey.stage(LIVE_DEMO_STAGES[3]):
+        _tcpreplay_output, packets_before, packets_after = replay_pcap(
+            net, pcap_path, replay_host_name=replay_host_name
+        )
     if packets_after <= packets_before:
         logger.warning(
             "Switch packet counters didn't increase during replay (before=%d, after=%d) -- "
             "traffic may not have actually transited the switch",
             packets_before, packets_after,
         )
-    live_X_raw = extract_features_for_inference(pcap_path, artifacts.feature_names)
-    verdict = classify_device_traffic(artifacts, replay_host_name, live_X_raw)
+    with journey.stage(LIVE_DEMO_STAGES[4]):
+        live_X_raw = extract_features_for_inference(pcap_path, artifacts.feature_names)
+    with journey.stage(LIVE_DEMO_STAGES[5]):
+        verdict = classify_device_traffic(artifacts, replay_host_name, live_X_raw)
     logger.info(
         "Device-level classification for %s (client %d): %s (confidence=%.3f, stage=%s, %d/%d packets non-benign)",
         verdict.device_id, verdict.client_id, verdict.classification, verdict.confidence, verdict.stage,
         verdict.num_non_benign, verdict.num_packets,
     )
 
+    mitigate_stage = journey.stage(LIVE_DEMO_STAGES[6])
+    mitigate_stage.__enter__()
     response = requests.post(
         f"{bridge_url}/mitigate",
         json={
@@ -246,13 +277,15 @@ def run_live_pcap_demo(
     )
     mitigation = response.json()
     logger.info("Mitigation result: %s", mitigation)
+    mitigate_stage.__exit__(None, None, None)
 
     # Capture the real flow-table proof *now*, from inside this process --
     # the topology (and with it, the switch) gets torn down right after
     # this returns, so an external `ovs-ofctl` check racing that teardown
     # isn't reliable.
-    switch = net.get("s1")
-    flow_dump = switch.cmd("ovs-ofctl -O OpenFlow13 dump-flows s1")
+    with journey.stage(LIVE_DEMO_STAGES[7]):
+        switch = net.get("s1")
+        flow_dump = switch.cmd("ovs-ofctl -O OpenFlow13 dump-flows s1")
     logger.info("Flow table after mitigation (ovs-ofctl dump-flows s1):\n%s", flow_dump)
 
     result = {
@@ -264,6 +297,7 @@ def run_live_pcap_demo(
         "switch_packets_before": packets_before,
         "switch_packets_after": packets_after,
         "flow_table": flow_dump,
+        "journey": journey.to_dict(),
     }
     import json
 
@@ -323,12 +357,16 @@ if __name__ == "__main__":
     parser.set_defaults(**file_defaults)
     args = parser.parse_args()
 
-    mininet_net = build_topology(args.num_hosts, args.controller_ip, args.controller_port, args.bridge_iface)
+    from fl_ids.utils.journey import Journey
+
+    demo_journey = Journey("live_demo", LIVE_DEMO_STAGES)
+    with demo_journey.stage(LIVE_DEMO_STAGES[0]):
+        mininet_net = build_topology(args.num_hosts, args.controller_ip, args.controller_port, args.bridge_iface)
     try:
         if args.replay_pcap:
             run_live_pcap_demo(
                 mininet_net, args.replay_pcap, args.artifact_dir, args.bridge_url,
-                replay_host_name=args.replay_host, result_path=args.result_path,
+                replay_host_name=args.replay_host, result_path=args.result_path, journey=demo_journey,
             )
         if args.hold_seconds > 0:
             import time

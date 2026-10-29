@@ -1,0 +1,14 @@
+2026-10-30 02:34:43,944 [INFO] fl_ids.utils.journey: [phase_a] stage 1/6 started: Load, clean and encode the dataset (t+0.0s)
+2026-10-30 02:34:45,509 [INFO] fl_ids.data.pipeline: Loaded extended features from cache data/processed/encoded_extended.npz: (1985768, 130)
+2026-10-30 02:34:45,835 [INFO] fl_ids.utils.journey: [phase_a] stage 1/6 done: Load, clean and encode the dataset in 1.9s
+2026-10-30 02:34:45,836 [INFO] fl_ids.utils.journey: [phase_a] stage 2/6 started: Calibration split, bootstrap classifier, client partition (t+1.9s)
+2026-10-30 02:34:49,582 [INFO] fl_ids.models.boosting: Training boosting classifier: 79430 samples, 15 classes, 300 rounds
+2026-10-30 02:35:00,367 [WARNING] fl_ids.data.pipeline: Client 0 has zero benign validation samples (heavy Dirichlet skew or too few benign samples in its shard)
+2026-10-30 02:35:00,376 [WARNING] fl_ids.data.pipeline: Client 2 has zero benign validation samples (heavy Dirichlet skew or too few benign samples in its shard)
+2026-10-30 02:35:00,394 [WARNING] fl_ids.data.pipeline: Client 13 has zero benign validation samples (heavy Dirichlet skew or too few benign samples in its shard)
+2026-10-30 02:35:00,401 [INFO] __main__: Prepared 79430 calibration rows, 60000 federated rows across 20 clients; bootstrap boosting accuracy 0.997
+2026-10-30 02:35:00,402 [INFO] fl_ids.utils.journey: [phase_a] stage 2/6 done: Calibration split, bootstrap classifier, client partition in 14.6s
+2026-10-30 02:35:00,416 [INFO] fl_ids.utils.journey: [phase_a] stage 3/6 started: Federated training (t+16.5s)
+2026-10-30 02:35:02,192 [INFO] __main__: Started Flower server on 127.0.0.1:9091 and 20 clients (0 sign-flip attackers) for 20 rounds; logs in runs/phase_a_20c
+2026-10-30 02:35:02,192 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 0/20 finished (t+18.2s)
+2026-10-30 02:36:20,506 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 1/20 finished (t+96.5s)

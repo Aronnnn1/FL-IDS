@@ -12,13 +12,17 @@
   <span class="brand">FL-IDS</span>
   <nav>
     <a class="on" href="index.html#summary">Summary</a>
+    <a href="#novelty">Novelty</a>
     <a href="#comparison">Boosting vs. DL</a>
     <a href="#confusion">Confusion matrices</a>
     <a href="#training-time">Training time</a>
     <a href="#improvements">Accuracy &ge; 95%</a>
+    <a href="#class-split">Class split</a>
     <a href="#pipeline">Pipeline</a>
     <a href="#steps">Step-by-step</a>
     <a href="#verification">Verification</a>
+    <a href="#clients20">20 clients</a>
+    <a href="#journey">Journey</a>
     <a href="#caveats">Caveats</a>
     <a href="results.html">Cumulative results &rarr;</a>
   </nav>
@@ -51,6 +55,53 @@
     <div class="tile"><div class="label">Real SDN demo</div><div class="value">Correct</div><div class="sub">Backdoor attack classified &amp; blocked live</div></div>
   </div>
 </section>
+
+<!-- GEN:novelty -->
+<section id="novelty">
+  <h2>What is new in FL-IDS</h2>
+  <p>Each part of FL-IDS on its own has published precedent (listed below). What we did not find in the literature is
+  all five working together as one system, plus the four contributions of our own listed here. Every claim points to a
+  measured result on this site.</p>
+  <div class="table-wrap"><table class="ptable novelty">
+    <thead><tr><th>#</th><th>Novel element</th><th>Why it matters</th><th>Evidence</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td style="white-space:normal"><b>The five-part combination</b>: boosting-first cascade + federated
+      autoencoder backstop + trust-filtered aggregation + Flower federated learning + SDN mitigation, as one end-to-end system</td>
+      <td style="white-space:normal">Detection, collaboration without sharing raw traffic, poisoning resistance and automatic
+      blocking usually appear in separate papers; here a verdict flows from federated training to a real OpenFlow drop rule</td>
+      <td style="white-space:normal">Real Phase A &rarr; Phase B run: Backdoor blocked, rule read back from the switch
+      (<a href="#verification">Verification</a>, <a href="#journey">Journey</a>)</td></tr>
+      <tr><td>2</td><td style="white-space:normal"><b>A poisoning-protected anomaly backstop</b>: the autoencoder is trained
+      only on traffic the classifier passes as normal, and its federated updates go through a trust filter that works on
+      weight <i>deltas</i> against a coordinate-wise median (cosine sign check + MAD outlier + EMA trust history) before a
+      trimmed mean</td>
+      <td style="white-space:normal">The backstop is what catches attacks the classifier never saw, and it is exactly the
+      part a malicious client would target</td>
+      <td style="white-space:normal">30% attackers: autoencoder-alone recall 0.712 with the filter vs. 0.002 with plain
+      FedAvg (loss 5&times;10<sup>20</sup>); zero-day 0.930 vs. 0.795 for boosting alone</td></tr>
+      <tr><td>3</td><td style="white-space:normal"><b>Two errors found and fixed in Edge-IIoTset</b>: a placeholder
+      spelling (&ldquo;0&rdquo; vs &ldquo;0.0&rdquo;) that tracks the label, and column-shifted MITM rows</td>
+      <td style="white-space:normal">One column alone separated normal from attack traffic perfectly (AUROC 1.0), so
+      results trained on the released CSV are likely inflated; MITM was repaired from the authors' own capture</td>
+      <td style="white-space:normal"><a href="#steps">Step 2</a>; PAPER_NOTES &sect;5.3</td></tr>
+      <tr><td>4</td><td style="white-space:normal"><b>Leak-free connection features with an ambiguity ceiling and a strict
+      split</b>: service port, payload content and flow features that never use IPs or timestamps as inputs, evaluated on
+      whole connections held out of training</td>
+      <td style="white-space:normal">Shows <i>why</i> per-packet models stall: 2.31% of rows are identical across classes,
+      capping macro recall at 0.969 whatever the model; the new features cut that to 0.01%</td>
+      <td style="white-space:normal">99.7% accuracy, 0.983 macro F1 on 397k unseen packets (<a href="#improvements">Accuracy</a>)</td></tr>
+      <tr><td>5</td><td style="white-space:normal"><b>Training/live feature parity</b>: Phase B derives the same 130
+      features from a live capture with the same code used in training</td>
+      <td style="white-space:normal">A model is only as good live as its features; mismatches silently break deployment</td>
+      <td style="white-space:normal">99.8% of live rows byte-identical to the capture's training rows</td></tr>
+    </tbody>
+  </table></div>
+  <p class="meta"><b>Precedents (not claimed as new):</b> federated autoencoders for IoT anomaly detection (Mothukuri et al.
+  2021; DeepFed 2020), cosine-similarity robust aggregation (FLTrust 2021; SignGuard 2022), a LightGBM + autoencoder
+  two-stage IDS (Math. Biosci. Eng. 2023), and FL with SDN mitigation (MiTFed 2023). <b>Caveat:</b> &ldquo;not found&rdquo;
+  rests on targeted searches, not a systematic review (see <a href="#caveats">Caveats</a>).</p>
+</section>
+<!-- /GEN:novelty -->
 
 <section id="comparison">
   <h2>Boosting vs. a supervised DL classifier</h2>
@@ -267,6 +318,39 @@
   </ul>
 </section>
 
+<!-- GEN:class-split -->
+<section id="class-split">
+  <h2>Class split: all 2,219,201 rows of the dataset</h2>
+  <p>How many rows of each class there are, and where they go. <b>Raw</b> = the authors' CSV. <b>After cleaning</b> =
+  after the MITM repair, the new features and removing exact duplicates (the dataset every model here uses).
+  <b>Classifier</b> = the final classifier's flow-grouped split (train includes the 8% used for early stopping).
+  <b>Federated</b> = the server's 5% calibration set (bootstrap training / held-back scoring) and the 60,000-row pool
+  shared out to the clients.</p>
+  <div class="table-wrap"><table class="ptable dense classsplit">
+    <thead><tr><th>Class</th><th>Raw</th><th>After cleaning</th><th>Share</th><th>Classifier train</th>
+    <th>Classifier test</th><th>Fed. calibration (train / held back)</th><th>Fed. client pool</th></tr></thead>
+    <tbody><tr><td>Backdoor</td><td>24,862</td><td>24,167</td><td style="white-space:nowrap"><span class="sharebar" style="width:1.10px"></span>1.22%</td><td>19,334</td><td>4,833</td><td>967 / 241</td><td>730</td></tr><tr><td>DDoS_HTTP</td><td>49,911</td><td>49,768</td><td style="white-space:nowrap"><span class="sharebar" style="width:2.26px"></span>2.51%</td><td>39,815</td><td>9,953</td><td>1,990 / 498</td><td>1,504</td></tr><tr><td>DDoS_ICMP</td><td>116,436</td><td>68,758</td><td style="white-space:nowrap"><span class="sharebar" style="width:3.12px"></span>3.46%</td><td>55,006</td><td>13,752</td><td>2,750 / 688</td><td>2,078</td></tr><tr><td>DDoS_TCP</td><td>50,062</td><td>50,062</td><td style="white-space:nowrap"><span class="sharebar" style="width:2.27px"></span>2.52%</td><td>40,050</td><td>10,012</td><td>2,002 / 501</td><td>1,513</td></tr><tr><td>DDoS_UDP</td><td>121,568</td><td>121,567</td><td style="white-space:nowrap"><span class="sharebar" style="width:5.51px"></span>6.12%</td><td>97,253</td><td>24,314</td><td>4,862 / 1,216</td><td>3,673</td></tr><tr><td>Fingerprinting</td><td>1,001</td><td>872</td><td style="white-space:nowrap"><span class="sharebar" style="width:0.14px"></span>0.04%</td><td>698</td><td>174</td><td>35 / 9</td><td>26</td></tr><tr><td>MITM</td><td>1,214</td><td>406</td><td style="white-space:nowrap"><span class="sharebar" style="width:0.14px"></span>0.02%</td><td>406</td><td>0</td><td>16 / 4</td><td>12</td></tr><tr><td>Normal</td><td>1,615,643</td><td>1,436,597</td><td style="white-space:nowrap"><span class="sharebar" style="width:65.11px"></span>72.34%</td><td>1,149,278</td><td>287,319</td><td>57,464 / 14,366</td><td>43,407</td></tr><tr><td>Password</td><td>50,153</td><td>50,033</td><td style="white-space:nowrap"><span class="sharebar" style="width:2.27px"></span>2.52%</td><td>40,026</td><td>10,007</td><td>2,002 / 500</td><td>1,512</td></tr><tr><td>Port_Scanning</td><td>22,564</td><td>20,213</td><td style="white-space:nowrap"><span class="sharebar" style="width:0.92px"></span>1.02%</td><td>16,171</td><td>4,042</td><td>809 / 202</td><td>611</td></tr><tr><td>Ransomware</td><td>10,925</td><td>9,885</td><td style="white-space:nowrap"><span class="sharebar" style="width:0.45px"></span>0.50%</td><td>7,908</td><td>1,977</td><td>395 / 99</td><td>299</td></tr><tr><td>SQL_injection</td><td>51,203</td><td>50,981</td><td style="white-space:nowrap"><span class="sharebar" style="width:2.31px"></span>2.57%</td><td>40,784</td><td>10,197</td><td>2,039 / 510</td><td>1,540</td></tr><tr><td>Uploading</td><td>37,634</td><td>37,243</td><td style="white-space:nowrap"><span class="sharebar" style="width:1.69px"></span>1.88%</td><td>29,794</td><td>7,449</td><td>1,490 / 372</td><td>1,125</td></tr><tr><td>Vulnerability_scanner</td><td>50,110</td><td>50,044</td><td style="white-space:nowrap"><span class="sharebar" style="width:2.27px"></span>2.52%</td><td>40,035</td><td>10,009</td><td>2,002 / 500</td><td>1,512</td></tr><tr><td>XSS</td><td>15,915</td><td>15,172</td><td style="white-space:nowrap"><span class="sharebar" style="width:0.69px"></span>0.76%</td><td>12,137</td><td>3,035</td><td>607 / 152</td><td>458</td></tr><tr class="total"><td><b>Total</b></td><td><b>2,219,201</b></td><td><b>1,985,768</b></td><td>100%</td><td><b>1,588,695</b></td><td><b>397,073</b></td><td><b>79,430 / 19,858</b></td><td><b>60,000</b></td></tr></tbody>
+  </table></div>
+  <p class="meta">Normal traffic is 72.3% of all rows; Fingerprinting and MITM
+  are under 0.05% each. MITM has no classifier test rows because all its rows are one connection, which a
+  connection-held-out split cannot divide. DDoS_ICMP and Normal lose the most rows to de-duplication (identical packets).
+  The MITM repair replaces its 1,214 broken rows with 1,229 re-extracted ones, so 2,219,216 rows enter
+  cleaning. Source:
+  <code>results/class_split/</code>.</p>
+
+  <h3>The 60,000-row pool split across 20 clients</h3>
+  <p>Each class is divided among the clients by a Dirichlet(&alpha; = 0.3) draw (seed 42), so every client sees a very
+  different mix &mdash; the non-IID setting federated learning has to cope with. Client sizes range from
+  318 to 11,313 rows. Grey cells = the client has none of that class.
+  Highlighted rows (0, 2, 13) received no Normal rows for their benign validation slice, so they cannot set an
+  anomaly threshold and their autoencoder never flags (their classifier still works).</p>
+  <div class="table-wrap"><table class="ptable dense clientsplit">
+    <thead><tr><th>Client</th><th title="Backdoor">Backdoor</th><th title="DDoS_HTTP">DDoS HTTP</th><th title="DDoS_ICMP">DDoS ICMP</th><th title="DDoS_TCP">DDoS TCP</th><th title="DDoS_UDP">DDoS UDP</th><th title="Fingerprinting">Fingerprinting</th><th title="MITM">MITM</th><th title="Normal">Normal</th><th title="Password">Password</th><th title="Port_Scanning">Port Scanning</th><th title="Ransomware">Ransomware</th><th title="SQL_injection">SQL injection</th><th title="Uploading">Uploading</th><th title="Vulnerability_scanner">Vulnerability scanner</th><th title="XSS">XSS</th><th>Total</th><th>Train</th><th>Benign val.</th><th>Test</th></tr></thead>
+    <tbody><tr class="warnrow"><td>0</td><td>106</td><td class="zero">0</td><td>55</td><td>13</td><td class="zero">0</td><td>7</td><td class="zero">0</td><td class="zero">0</td><td>2</td><td>21</td><td>1</td><td>32</td><td>86</td><td>120</td><td>1</td><td><b>444</b></td><td>378</td><td>0</td><td>66</td></tr><tr><td>1</td><td class="zero">0</td><td>11</td><td>113</td><td>116</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td>7,212</td><td>78</td><td>42</td><td>8</td><td>387</td><td>34</td><td>29</td><td>121</td><td><b>8,151</b></td><td>6,008</td><td>921</td><td>1,222</td></tr><tr class="warnrow"><td>2</td><td>109</td><td>169</td><td>74</td><td>127</td><td>29</td><td>1</td><td class="zero">0</td><td class="zero">0</td><td>1</td><td>1</td><td>57</td><td class="zero">0</td><td class="zero">0</td><td>19</td><td>9</td><td><b>596</b></td><td>507</td><td>0</td><td>89</td></tr><tr><td>3</td><td>3</td><td class="zero">0</td><td>3</td><td>1</td><td>1,084</td><td>1</td><td class="zero">0</td><td>5,202</td><td>111</td><td>8</td><td>15</td><td>6</td><td>447</td><td>4</td><td>8</td><td><b>6,893</b></td><td>5,197</td><td>663</td><td>1,033</td></tr><tr><td>4</td><td class="zero">0</td><td>53</td><td>101</td><td>12</td><td>37</td><td class="zero">0</td><td>1</td><td>26</td><td>1</td><td>4</td><td>13</td><td>5</td><td>9</td><td>36</td><td>20</td><td><b>318</b></td><td>268</td><td>3</td><td>47</td></tr><tr><td>5</td><td>99</td><td>2</td><td>59</td><td>3</td><td>123</td><td>3</td><td class="zero">0</td><td>3,889</td><td>19</td><td class="zero">0</td><td>2</td><td>145</td><td class="zero">0</td><td>70</td><td>9</td><td><b>4,423</b></td><td>3,264</td><td>496</td><td>663</td></tr><tr><td>6</td><td>6</td><td>1</td><td>127</td><td class="zero">0</td><td>132</td><td>2</td><td>1</td><td>10,442</td><td>537</td><td>1</td><td>10</td><td>2</td><td class="zero">0</td><td>4</td><td>48</td><td><b>11,313</b></td><td>8,286</td><td>1,331</td><td>1,696</td></tr><tr><td>7</td><td>29</td><td>198</td><td class="zero">0</td><td>47</td><td class="zero">0</td><td>1</td><td>2</td><td>569</td><td class="zero">0</td><td>33</td><td>6</td><td>309</td><td>226</td><td>89</td><td>17</td><td><b>1,526</b></td><td>1,226</td><td>72</td><td>228</td></tr><tr><td>8</td><td>6</td><td>48</td><td>1</td><td>249</td><td>2</td><td class="zero">0</td><td>1</td><td>454</td><td>2</td><td class="zero">0</td><td>12</td><td>152</td><td>11</td><td>273</td><td>59</td><td><b>1,270</b></td><td>1,023</td><td>57</td><td>190</td></tr><tr><td>9</td><td>3</td><td class="zero">0</td><td class="zero">0</td><td>284</td><td>940</td><td>2</td><td class="zero">0</td><td>2,687</td><td>5</td><td>29</td><td>31</td><td>107</td><td>1</td><td>368</td><td>1</td><td><b>4,458</b></td><td>3,448</td><td>342</td><td>668</td></tr><tr><td>10</td><td>50</td><td>409</td><td>213</td><td class="zero">0</td><td>118</td><td class="zero">0</td><td class="zero">0</td><td>133</td><td>37</td><td>66</td><td>1</td><td>81</td><td>8</td><td>140</td><td class="zero">0</td><td><b>1,256</b></td><td>1,051</td><td>17</td><td>188</td></tr><tr><td>11</td><td>1</td><td>15</td><td class="zero">0</td><td class="zero">0</td><td>22</td><td class="zero">0</td><td class="zero">0</td><td>2,838</td><td>546</td><td>59</td><td class="zero">0</td><td>1</td><td>11</td><td class="zero">0</td><td class="zero">0</td><td><b>3,493</b></td><td>2,609</td><td>361</td><td>523</td></tr><tr><td>12</td><td class="zero">0</td><td>28</td><td>30</td><td>129</td><td>192</td><td class="zero">0</td><td>6</td><td>644</td><td class="zero">0</td><td>29</td><td class="zero">0</td><td>139</td><td>49</td><td>43</td><td>14</td><td><b>1,303</b></td><td>1,025</td><td>83</td><td>195</td></tr><tr class="warnrow"><td>13</td><td>106</td><td>141</td><td class="zero">0</td><td>16</td><td>54</td><td>1</td><td class="zero">0</td><td>7</td><td>18</td><td>131</td><td>3</td><td>1</td><td>11</td><td class="zero">0</td><td>124</td><td><b>613</b></td><td>522</td><td>0</td><td>91</td></tr><tr><td>14</td><td>11</td><td>4</td><td class="zero">0</td><td>29</td><td>246</td><td class="zero">0</td><td class="zero">0</td><td>5,323</td><td>11</td><td>28</td><td class="zero">0</td><td>3</td><td>2</td><td>25</td><td class="zero">0</td><td><b>5,682</b></td><td>4,152</td><td>678</td><td>852</td></tr><tr><td>15</td><td class="zero">0</td><td>2</td><td>839</td><td>19</td><td>247</td><td>1</td><td class="zero">0</td><td>1,396</td><td class="zero">0</td><td>17</td><td>61</td><td>31</td><td>75</td><td>33</td><td class="zero">0</td><td><b>2,721</b></td><td>2,134</td><td>179</td><td>408</td></tr><tr><td>16</td><td>10</td><td>24</td><td>52</td><td class="zero">0</td><td>167</td><td>1</td><td class="zero">0</td><td>614</td><td class="zero">0</td><td>90</td><td>13</td><td>138</td><td class="zero">0</td><td>90</td><td>1</td><td><b>1,200</b></td><td>943</td><td>77</td><td>180</td></tr><tr><td>17</td><td class="zero">0</td><td>11</td><td>135</td><td>32</td><td>251</td><td>3</td><td class="zero">0</td><td>685</td><td>8</td><td>24</td><td>62</td><td class="zero">0</td><td>115</td><td>158</td><td>4</td><td><b>1,488</b></td><td>1,179</td><td>86</td><td>223</td></tr><tr><td>18</td><td>189</td><td>301</td><td class="zero">0</td><td>409</td><td>19</td><td class="zero">0</td><td class="zero">0</td><td>8</td><td>118</td><td>26</td><td>3</td><td class="zero">0</td><td class="zero">0</td><td>10</td><td>21</td><td><b>1,104</b></td><td>938</td><td>1</td><td>165</td></tr><tr><td>19</td><td>2</td><td>87</td><td>276</td><td>27</td><td>10</td><td>3</td><td>1</td><td>1,278</td><td>18</td><td>2</td><td>1</td><td>1</td><td>40</td><td>1</td><td>1</td><td><b>1,748</b></td><td>1,324</td><td>162</td><td>262</td></tr></tbody>
+  </table></div>
+</section>
+<!-- /GEN:class-split -->
+
 <section id="pipeline">
   <h2>The pipeline at a glance</h2>
   <p>Two phases, kept deliberately separate: <b>Phase A</b> trains the models offline (federated), and <b>Phase B</b>
@@ -313,7 +397,7 @@
     </ul>
     <h4>Parameters</h4>
     <table class="ptable"><thead><tr><th>Parameter</th><th>Value</th><th>Effect</th></tr></thead><tbody>
-      <tr><td>rows</td><td>2,219,216 &rarr; 1,909,719</td><td>after NaN/duplicate removal and MITM repair</td></tr>
+      <tr><td>rows</td><td>2,219,201 &rarr; 1,909,719</td><td>2,219,216 after the MITM repair (1,214 rows replaced by 1,229), then NaN/duplicate removal</td></tr>
       <tr><td>columns loaded</td><td>47 of 63</td><td>identity/payload columns never enter memory</td></tr>
       <tr><td>categorical columns</td><td>7</td><td>http.request.method, http.referer, http.request.version, dns.qry.name.len, mqtt.conack.flags, mqtt.protoname, mqtt.topic</td></tr>
       <tr><td>data.capture_repairs</td><td>MITM</td><td>path to the re-extracted CSV; loading fails loudly if it is missing</td></tr>
@@ -507,6 +591,59 @@
     (batch classification of a capture), not a bug, and it is stated here rather than glossed over.
   </div>
 </section>
+
+<!-- GEN:clients20 -->
+<section id="clients20">
+  <h2>Scaling to 20 clients</h2>
+  <p>The same 130-feature system, 20 rounds, seed 42, with the 60,000-row pool split across <b>20</b> clients instead of
+  10 (Dirichlet &alpha; = 0.3). Scored on the clients' held-out test slices (about 9,000 rows), no attackers.</p>
+  <div class="table-wrap"><table class="ptable">
+    <thead><tr><th>Metric</th><th>10 clients</th><th>20 clients</th></tr></thead>
+    <tbody><tr><td>Classifier alone: accuracy / macro F1</td><td>0.9974 / 0.9783</td><td>0.9983 / 0.9952</td></tr><tr><td>Autoencoder alone: attack recall</td><td>0.728</td><td>0.685</td></tr><tr><td>Autoencoder alone: AUROC (attack vs. normal)</td><td>0.982</td><td>0.977</td></tr><tr><td>Cascade: attack detection recall</td><td>0.9996</td><td>0.9960</td></tr><tr><td>Cascade: accuracy / macro F1 (normal vs. attack)</td><td>0.9759 / 0.9706</td><td>0.9721 / 0.9662</td></tr><tr><td>Cascade: false alarms on normal traffic</td><td>3.32%</td><td>3.72%</td></tr>
+    <tr><td>Clients with no normal rows to set an alarm threshold</td><td>0</td><td>3 of 20</td></tr>
+    <tr><td>Autoencoder data sent per round (all clients)</td><td>786,720 bytes</td><td>1,573,440 bytes</td></tr>
+    <tr><td>Time per federated round (in-process)</td><td>&asymp; 3 s</td><td>&asymp; 4.3 s</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Reading it:</b> doubling the clients leaves detection essentially unchanged &mdash; the cascade still catches
+  99.6% of attacks &mdash; while each client gets half as much data. The cost shows in the autoencoder: lower recall on
+  its own (0.685 vs. 0.728) and slightly more false alarms (3.7% vs. 3.3%), and 3 clients get no normal rows at
+  all to calibrate on. Communication per round doubles, since every client sends its update.</p>
+  <p class="meta"><b>Scope:</b> this 20-client run uses the in-process simulation (the same client, strategy and
+  trust-filter code as the real run, in one Python process). A real run with 20 separate client processes exhausted the
+  VM's 7.4 GB of RAM (21 Python processes each loading PyTorch and LightGBM) and was stopped after round 1; it needs a
+  machine with more memory. The classifier rows rest on few rows for rare classes (Fingerprinting 4, MITM 1). Single seed.
+  Source: <code>results/clients20/per_class_stage_report.csv</code>, <code>logs/clients20/</code>.</p>
+</section>
+<!-- /GEN:clients20 -->
+
+<!-- GEN:journey -->
+<section id="journey">
+  <h2>The whole journey, timed</h2>
+  <p>One real end-to-end run: raw dataset &rarr; federated training with 10 separate client
+  processes &rarr; model bundle &rarr; live replay of a Backdoor attack through Mininet &rarr; verdict &rarr; drop rule on the
+  switch. <b>Total: 3.7 min (219 s)</b> (Phase A 3.5 min (211 s), Phase B 8.6 s).</p>
+  <div class="jtrack" aria-label="Timeline of the run"><div class="jbar a" style="left:0.00%;width:0.85%" title="Load, clean and encode the dataset: 1.9s"></div><div class="jbar a" style="left:0.85%;width:6.58%" title="Calibration split, bootstrap classifier, client partition: 14.4s"></div><div class="jbar a" style="left:7.43%;width:87.20%" title="Federated training: 191.2s"></div><div class="jbar a" style="left:94.68%;width:0.40%" title="Calibrate client anomaly thresholds: 0.1s"></div><div class="jbar a" style="left:94.75%;width:1.14%" title="Evaluate on the clients' test slices: 2.5s"></div><div class="jbar a" style="left:95.98%;width:0.40%" title="Save the model bundle: 0.2s"></div><div class="jbar b" style="left:96.06%;width:0.40%" title="Load the model bundle: 0.1s"></div><div class="jbar b" style="left:96.10%;width:1.00%" title="Start the SDN bridge and controller: 2.2s"></div><div class="jbar b" style="left:97.10%;width:2.89%" title="Network, replay, classify and block (root process): 6.3s"></div><div class="jbar b" style="left:100.00%;width:0.40%" title="Check the switch's flow table: 0.0s"></div></div>
+  <div class="jlegend"><span class="a"></span>Phase A: training &nbsp; <span class="b"></span>Phase B: live detection and blocking</div>
+  <div class="table-wrap"><table class="ptable jtable">
+    <thead><tr><th>Phase</th><th>Stage</th><th>Starts at</th><th>Takes</th><th>Share</th></tr></thead>
+    <tbody><tr class="a"><td>Phase A</td><td>Load, clean and encode the dataset</td><td>0.0 s</td><td>1.9 s</td><td>0.8%</td></tr><tr class="a"><td>Phase A</td><td>Calibration split, bootstrap classifier, client partition</td><td>1.9 s</td><td>14.4 s</td><td>6.6%</td></tr><tr class="a"><td>Phase A</td><td>Federated training</td><td>16.3 s</td><td>3.2 min (191 s)</td><td>87.2%</td></tr><tr class="a"><td>Phase A</td><td>Calibrate client anomaly thresholds</td><td>3.5 min (208 s)</td><td>0.1 s</td><td>0.1%</td></tr><tr class="a"><td>Phase A</td><td>Evaluate on the clients' test slices</td><td>3.5 min (208 s)</td><td>2.5 s</td><td>1.1%</td></tr><tr class="a"><td>Phase A</td><td>Save the model bundle</td><td>3.5 min (210 s)</td><td>0.2 s</td><td>0.1%</td></tr><tr class="b"><td>Phase B</td><td>Load the model bundle</td><td>3.5 min (211 s)</td><td>0.1 s</td><td>0.0%</td></tr><tr class="b"><td>Phase B</td><td>Start the SDN bridge and controller</td><td>3.5 min (211 s)</td><td>2.2 s</td><td>1.0%</td></tr><tr class="b"><td>Phase B</td><td>Network, replay, classify and block (root process)</td><td>3.5 min (213 s)</td><td>6.3 s</td><td>2.9%</td></tr><tr class="sub"><td></td><td>&#8627; Start the Mininet network</td><td></td><td>0.5 s</td><td></td></tr><tr class="sub"><td></td><td>&#8627; Load the model bundle</td><td></td><td>0.1 s</td><td></td></tr><tr class="sub"><td></td><td>&#8627; Register hosts with the bridge</td><td></td><td>0.0 s</td><td></td></tr><tr class="sub"><td></td><td>&#8627; Replay the capture through the switch</td><td></td><td>0.3 s</td><td></td></tr><tr class="sub"><td></td><td>&#8627; Extract features with tshark</td><td></td><td>2.6 s</td><td></td></tr><tr class="sub"><td></td><td>&#8627; Classify with the cascade</td><td></td><td>0.6 s</td><td></td></tr><tr class="sub"><td></td><td>&#8627; Send the verdict, install the drop rule</td><td></td><td>0.0 s</td><td></td></tr><tr class="sub"><td></td><td>&#8627; Read back the switch's flow table</td><td></td><td>0.0 s</td><td></td></tr><tr class="b"><td>Phase B</td><td>Check the switch's flow table</td><td>3.7 min (219 s)</td><td>0.0 s</td><td>0.0%</td></tr></tbody>
+  </table></div>
+  <h3>Inside federated training: when each round finished</h3>
+  <div class="rounds"><span title="round 1 done at 27.4s" style="left:13.01%">1</span><span title="round 2 done at 29.9s" style="left:14.20%">2</span><span title="round 3 done at 40.5s" style="left:19.23%">3</span><span title="round 4 done at 43.5s" style="left:20.65%">4</span><span title="round 5 done at 46.5s" style="left:22.08%">5</span><span title="round 6 done at 58.6s" style="left:27.82%">6</span><span title="round 7 done at 62.6s" style="left:29.72%">7</span><span title="round 8 done at 66.1s" style="left:31.38%">8</span><span title="round 9 done at 80.2s" style="left:38.08%">9</span><span title="round 10 done at 84.7s" style="left:40.21%">10</span><span title="round 11 done at 88.7s" style="left:42.11%">11</span><span title="round 12 done at 105.3s" style="left:49.99%">12</span><span title="round 13 done at 110.3s" style="left:52.37%">13</span><span title="round 14 done at 115.8s" style="left:54.98%">14</span><span title="round 15 done at 134.4s" style="left:63.81%">15</span><span title="round 16 done at 139.9s" style="left:66.42%">16</span><span title="round 17 done at 145.4s" style="left:69.03%">17</span><span title="round 18 done at 168.5s" style="left:80.00%">18</span><span title="round 19 done at 175.1s" style="left:83.13%">19</span><span title="round 20 done at 182.1s" style="left:86.46%">20</span></div>
+  <p class="meta">Position = time since Phase A started (3.5 min (211 s) in total). Rounds 3, 6, 9&hellip; are slower
+  because the server also continues training the classifier on confirmed alerts.</p>
+  <h3>Where is a run right now?</h3>
+  <p>Every run now tracks itself (<code>fl_ids/utils/journey.py</code>). Phase A and Phase B log a line as each stage starts
+  and ends (<code>[phase_a] stage 3/6 started: Federated training (t+16.3s)</code>), report the round during training
+  (<code>round 7/20 finished</code>), and keep <code>journey.json</code> in the run folder up to date with the current
+  stage, so a running job can be checked at any moment. The live demo times its own steps the same way and they appear
+  above as sub-steps.</p>
+  <p class="meta">Scope: one run, seed 42, on the 4-core-equivalent VM; the Phase A feature matrix loads from a cache
+  (building it from the raw CSV adds about 1.5&ndash;2 minutes). Source: <code>runs/journey/</code>,
+  <code>logs/journey/</code>.</p>
+</section>
+<!-- /GEN:journey -->
 
 <section id="caveats">
   <h2>Caveats and limitations</h2>

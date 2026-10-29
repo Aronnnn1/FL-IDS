@@ -255,3 +255,22 @@ table.dense th, table.dense td { font-size: 12px; padding: 5px 8px; }
 .lo { background: color-mix(in srgb, var(--critical) 14%, transparent); }
 .src { font-size: 12px; color: var(--text-muted); margin: 6px 0 10px; }
 .tag.done { background: var(--good); color: #fff; border-color: transparent; }
+
+/* generated sections (tools/build_new_sections.py) */
+.sharebar { display:inline-block; height:9px; background:var(--accent, #2a6f97); border-radius:2px; margin-right:6px; vertical-align:middle; }
+.classsplit td, .clientsplit td { font-variant-numeric: tabular-nums; }
+.classsplit tr.total td { border-top: 2px solid var(--border, #ccc); }
+.clientsplit th { font-size: 11px; white-space: normal; min-width: 52px; }
+.clientsplit td.zero { color: var(--text-secondary, #888); background: var(--surface-2, rgba(127,127,127,.08)); }
+.clientsplit tr.warnrow td { background: rgba(214, 140, 0, .14); }
+.jtrack { position:relative; height:30px; border-radius:6px; background:var(--surface-2, rgba(127,127,127,.1)); margin:14px 0 6px; overflow:hidden; }
+.jbar { position:absolute; top:4px; bottom:4px; border-radius:3px; border-right:2px solid var(--bg, #fff); }
+.jbar.a, .jlegend .a, .jtable tr.a td:first-child { background:#2a6f97; }
+.jbar.b, .jlegend .b, .jtable tr.b td:first-child { background:#c8553d; }
+.jtable tr.a td:first-child, .jtable tr.b td:first-child { color:#fff; font-weight:600; }
+.jtable tr.sub td { font-size: 12px; color: var(--text-secondary, #666); padding-top:2px; padding-bottom:2px; }
+.jlegend { font-size:12px; color:var(--text-secondary, #666); margin-bottom:10px; }
+.jlegend span { display:inline-block; width:12px; height:10px; border-radius:2px; margin:0 4px 0 0; vertical-align:middle; }
+.rounds { position:relative; height:34px; border-bottom:1px solid var(--border, #ccc); margin:8px 12px 4px; }
+.rounds span { position:absolute; bottom:4px; transform:translateX(-50%); font-size:10px; background:#2a6f97; color:#fff; border-radius:8px; padding:1px 4px; }
+.novelty td:first-child { font-weight:700; }
