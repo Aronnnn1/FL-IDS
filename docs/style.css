@@ -268,6 +268,8 @@ table.dense th, table.dense td { font-size: 12px; padding: 5px 8px; }
 .jbar.a, .jlegend .a, .jtable tr.a td:first-child { background:#2a6f97; }
 .jbar.b, .jlegend .b, .jtable tr.b td:first-child { background:#c8553d; }
 .jtable tr.a td:first-child, .jtable tr.b td:first-child { color:#fff; font-weight:600; }
+.jtable td { white-space: nowrap; }
+.jtable td:nth-child(2) { font-family: inherit; white-space: normal; }
 .jtable tr.sub td { font-size: 12px; color: var(--text-secondary, #666); padding-top:2px; padding-bottom:2px; }
 .jlegend { font-size:12px; color:var(--text-secondary, #666); margin-bottom:10px; }
 .jlegend span { display:inline-block; width:12px; height:10px; border-radius:2px; margin:0 4px 0 0; vertical-align:middle; }
