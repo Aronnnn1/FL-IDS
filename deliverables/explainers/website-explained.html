@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The FL-IDS website, explained simply</title>
+<style>
+  @page { size: A4; margin: 15mm 15mm 15mm 15mm; }
+  :root { --navy:#1E2761; --teal:#0A9396; --coral:#D64550; --gold:#C98A0B; --ink:#1b1b1b; --muted:#5B6770;
+          --tn:#E3E7F4; --tt:#DDF1F2; --tc:#F9E1E3; --tg:#FBF0D9; --grey:#F1F2F4; }
+  * { box-sizing: border-box; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; color: var(--ink); font-size: 11pt; line-height: 1.5; margin: 0; background:#fff; }
+  h1 { font-size: 25pt; color: var(--navy); margin: 0 0 4px; line-height: 1.15; }
+  h2 { font-size: 16pt; color: var(--navy); margin: 24px 0 6px; padding-bottom: 3px; border-bottom: 2px solid var(--tn); }
+  h3 { font-size: 12.5pt; margin: 14px 0 4px; color: var(--ink); }
+  h2, h3 { break-after: avoid; }
+  p { margin: 6px 0; }
+  .lead { font-size: 12.5pt; color: var(--muted); }
+  .cover { border-radius: 14px; background: var(--tn); padding: 20px 24px; margin-bottom: 14px; }
+  .site { background: var(--grey); border-radius: 10px; padding: 8px 14px; margin: 8px 0; font-size: 10pt; color: #333; break-inside: avoid; }
+  .site::before { content: "On the site: "; font-weight: 700; color: var(--muted); }
+  .eli5 { background: var(--tg); border-radius: 10px; padding: 8px 14px; margin: 8px 0; break-inside: avoid; }
+  .eli5::before { content: "Like you're five: "; font-weight: 700; color: var(--gold); }
+  .why { background: var(--tt); border-radius: 10px; padding: 8px 14px; margin: 8px 0; break-inside: avoid; }
+  .why::before { content: "Why it matters: "; font-weight: 700; color: var(--teal); }
+  .warn { background: var(--tc); border-radius: 10px; padding: 8px 14px; margin: 8px 0; break-inside: avoid; }
+  .warn::before { content: "Careful: "; font-weight: 700; color: var(--coral); }
+  table { border-collapse: collapse; width: 100%; font-size: 9.6pt; margin: 8px 0; }
+  tr { break-inside: avoid; }
+  thead { display: table-header-group; }
+  th { background: var(--navy); color: #fff; text-align: left; padding: 4px 7px; font-weight: 600; }
+  td { padding: 4px 7px; border-bottom: 1px solid #e3e5e8; vertical-align: top; }
+  td:first-child { font-weight: 600; white-space: nowrap; }
+  ul, ol { margin: 4px 0; padding-left: 20px; } li { margin: 3px 0; }
+  .toc { columns: 2; font-size: 10.5pt; }
+  .toc li { break-inside: avoid; }
+  figure { margin: 8px 0; text-align: center; break-inside: avoid; }
+  figure img { max-width: 92%; }
+  figcaption { font-size: 9pt; color: var(--muted); }
+  .small { font-size: 9.5pt; color: var(--muted); }
+  code { font-size: 9.5pt; background: var(--grey); padding: 0 3px; border-radius: 3px; }
+  .pb { break-before: page; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>The FL-IDS website, explained simply</h1>
+  <p class="lead">A walk through every section of <b>aronnnn1.github.io/FL-IDS</b> and its <b>Cumulative results</b> page:
+  what each line says, and what it means in plain words.</p>
+  <p class="small">How to use this: each part shows what the site says (grey), then a simple explanation (yellow), and
+  sometimes why it matters (green) or a warning (pink). A dictionary of every attack type and every score is at the end.</p>
+</div>
+
+<h3>The story we use throughout</h3>
+<div class="eli5">Think of a big school with many classrooms. Children pass little <b>notes</b> to each other all day; these are
+the <b>packets</b> travelling on a network. Most notes are friendly (<b>normal traffic</b>), but some come from
+<b>bullies</b> (<b>attacks</b>). Our system is a team of helpers:
+<b>guard 1</b> has a photo book of 14 known kinds of bully (<b>LightGBM classifier</b>);
+<b>guard 2</b> knows what normal notes look like and spots anything weird (<b>autoencoder</b>);
+the <b>classrooms learn together</b> by sharing lessons, not notes (<b>federated learning</b>);
+a <b>fair principal</b> throws out lessons from sneaky classrooms (<b>trust filter</b>);
+and an <b>automatic door</b> locks bullies out (<b>SDN</b>).</div>
+
+<h3>What's in this guide</h3>
+<ol class="toc">
+  <li>Top bar and title</li><li>The five headline tiles</li><li>Boosting vs. a deep-learning classifier</li>
+  <li>Confusion matrices</li><li>Training time</li><li>How macro F1 was pushed past 0.95</li>
+  <li>The pipeline at a glance</li><li>Every step explained (12 steps)</li><li>Does the pipeline work?</li>
+  <li>Caveats and limitations</li><li>Cumulative results page (sections 1&ndash;8 + index)</li>
+  <li>Dictionary: the 15 kinds of traffic</li><li>Dictionary: every score and word</li>
+</ol>
+
+<!-- ====================================================== 1 -->
+<h2>1. The top bar and the title</h2>
+<div class="site">Menu links: Summary &middot; Boosting vs. DL &middot; Confusion matrices &middot; Training time &middot;
+Accuracy &ge; 95% &middot; Pipeline &middot; Step-by-step &middot; Verification &middot; Caveats &middot; Cumulative results &rarr; and a Light/Dark mode button.</div>
+<div class="eli5">This is the table of contents. Clicking a word jumps to that part of the page. The button changes the
+colours from white to dark, like turning the lights down. &ldquo;Cumulative results&rdquo; opens a second page with every
+table of numbers in one place.</div>
+
+<div class="site">Title: &ldquo;Boosting vs. Deep Learning, and the full FL-IDS pipeline&rdquo;.</div>
+<div class="eli5">The page tells two stories: a <i>contest</i> between two kinds of guard 1 (a &ldquo;boosting&rdquo; guard
+and a &ldquo;deep-learning&rdquo; guard), and the <i>whole system</i> from start to finish (the &ldquo;pipeline&rdquo;,
+like a factory line).</div>
+
+<div class="site">&ldquo;A federated, cascade-based intrusion detection system for IoT/IIoT traffic: a supervised LightGBM
+classifier as the first pass, with a client-side autoencoder as a federated, poisoning-resistant backstop for zero-day attacks.&rdquo;</div>
+<div class="eli5">Word by word:
+<b>intrusion detection system</b> = a burglar alarm for networks.
+<b>IoT/IIoT traffic</b> = notes passed between smart gadgets in homes and factories.
+<b>federated</b> = many classrooms learn together without handing over their notes.
+<b>cascade</b> = a line of checks, one after another, like two guards at two gates.
+<b>supervised LightGBM classifier as the first pass</b> = guard 1, who learned from labelled examples (&ldquo;this note is from bully X&rdquo;).
+<b>client-side autoencoder</b> = guard 2, who lives in each classroom.
+<b>poisoning-resistant</b> = hard to trick during training.
+<b>backstop for zero-day attacks</b> = a safety net for bullies nobody has ever seen.</div>
+
+<div class="site">&ldquo;This site reports (1) a head-to-head comparison of boosting against a deep-learning classifier, (2) how long
+things take and why, (3) how the classifier was pushed past 0.95 macro F1 and 95% accuracy &mdash; and checked on a stricter,
+connection-held-out test, (4) a visual and step-by-step explanation of the whole pipeline, and (5) verification that it works
+end to end, with its limitations stated plainly.&rdquo;</div>
+<div class="eli5">The five things you'll find: (1) which kind of guard 1 is better; (2) how long the computer took for each job;
+(3) how we got the score above our 95% goal, and proved we didn't cheat by testing on whole conversations the system had never
+seen; (4) pictures and steps showing how everything works; (5) proof that it all works together, plus what it still can't do.</div>
+
+<div class="site">&ldquo;Dataset: Edge-IIoTset (Ferrag et al., 2022). All numbers come from real runs of the code in this repository.
+Full notes and sources: PAPER_NOTES.md.&rdquo;</div>
+<div class="eli5">The notes we learned from come from a public collection called <b>Edge-IIoTset</b>, recorded by researchers
+(Ferrag and team) on a real test network with more than ten kinds of sensors. Every number on the site came from actually
+running our programs; nothing was made up. PAPER_NOTES.md is our diary of every experiment.</div>
+<div class="site">&ldquo;Project status: complete (16 October 2026). Every phase is implemented, run on the real data and verified end to end; the research paper is being written.&rdquo;</div>
+<div class="eli5">The project is finished: every part was built, tried on the real notes and checked from start to end. The only thing left is writing it up as a research paper.</div>
+
+<!-- ====================================================== 2 -->
+<h2>2. The five headline tiles</h2>
+<table>
+<tr><th>Tile</th><th>What it says</th><th>Like you're five</th></tr>
+<tr><td>Final classifier macro F1</td><td>0.983; 99.7% accuracy on held-out connections (was 0.889 / 96.4%)</td>
+<td>Guard 1's final report card. 0.983 out of 1 means it is excellent at <i>every</i> kind of bully, even rare ones. It gets
+99.7 of every 100 notes right, on conversations it had never seen. Before our improvements it was 0.889 and 96.4%.</td></tr>
+<tr><td>Boosting vs. DL</td><td>0.887 macro F1 vs. 0.622 for a comparable DL classifier (base features)</td>
+<td>In the contest, the boosting guard scored 0.887 and the deep-learning guard only 0.622. Boosting won by a lot. (This
+contest used the original clues, before our improvements.)</td></tr>
+<tr><td>Cascade zero-day recall</td><td>0.943 vs. 0.801 for boosting alone (was 0.731 / 0.518)</td>
+<td>When we hid a kind of bully from training and then tested, both guards together caught 94 of every 100; guard 1 alone
+caught 80. Before the new clues it was 73 and 52.</td></tr>
+<tr><td>Real Phase A run</td><td>0.999 attack macro-recall, real 10-client FL training (was 0.889)</td>
+<td>We ran the real thing with ten separate programs acting as ten classrooms. It caught about 99.9% of bullies, averaged over
+bully types (89% before the new clues).</td></tr>
+<tr><td>Real SDN demo</td><td>Correct: Backdoor attack classified &amp; blocked live</td>
+<td>We replayed a real attack; the system named it correctly (&ldquo;Backdoor&rdquo;) and the automatic door locked the attacker out.</td></tr>
+</table>
+
+<!-- ====================================================== 3 -->
+<h2>3. Boosting vs. a supervised deep-learning classifier</h2>
+<div class="site">&ldquo;If you swap LightGBM boosting for a deep-learning classifier as the cascade's first pass &mdash; same attack-type labels,
+same task, comparable effort &mdash; which is more accurate? Both were trained and evaluated on the exact same 500,000-row sample
+(400k train / 100k test, stratified); boosting on raw features, the DL classifier on standardized features.&rdquo;</div>
+<div class="eli5">A fair race between two guards. <b>Boosting</b> (LightGBM) is a team of hundreds of tiny yes/no questions
+(&ldquo;Is the note longer than 100 letters? Is it sent to door 80?&rdquo;) whose votes are added up. <b>Deep learning</b>
+(a small neural network, an &ldquo;MLP&rdquo; with 8,271 adjustable knobs) learns by mixing all the numbers together through
+layers. Both got the same 500,000 notes: 400,000 to study and 100,000 for the exam. &ldquo;Stratified&rdquo; means each bully
+type appears in study and exam in the same proportions. &ldquo;Standardized&rdquo; means the deep-learning guard got the numbers
+rescaled to similar sizes, because that's what it needs; the boosting guard doesn't need that.</div>
+
+<h3>The comparison table</h3>
+<table>
+<tr><th>Row</th><th>Boosting</th><th>DL</th><th>What it means</th></tr>
+<tr><td>Accuracy</td><td>0.8908</td><td>0.6779</td><td>Share of exam notes answered right: 89% vs 68%.</td></tr>
+<tr><td>Macro F1</td><td>0.8872</td><td>0.6218</td><td>Average score over the 15 note types, each counted equally. The fairest single number.</td></tr>
+<tr><td>Weighted F1</td><td>0.8924</td><td>0.6681</td><td>Same, but big note types count more.</td></tr>
+<tr><td>Benign false-positive rate</td><td>0.1599</td><td>0.5341</td><td>How often a <i>friendly</i> note is wrongly called a bully. Lower is better: 16% vs 53%.</td></tr>
+<tr><td>Train time</td><td>55.5 s</td><td>10.2 s</td><td>Study time. Deep learning studied faster but learned less.</td></tr>
+<tr><td>Model size</td><td>12.8 MB, 300 trees &times; 15 classes</td><td>8,271 parameters</td><td>How big each &ldquo;brain&rdquo; is.</td></tr>
+</table>
+<p>The &ldquo;Gap&rdquo; column is boosting minus DL; a plus sign means boosting is better.</p>
+
+<h3>&ldquo;Per-class recall: where the gap actually is&rdquo;</h3>
+<div class="site">Bars for each of the 15 classes, Boost vs DL, e.g. XSS 0.761 vs 0.072, SQL_injection 0.767 vs 0.183, Fingerprinting 0.579 vs 0.000,
+Port_Scanning 0.997 vs 0.498 &hellip; DDoS_TCP/UDP 1.000 vs 1.000, Password 0.831 vs 0.860.</div>
+<div class="eli5"><b>Recall</b> = &ldquo;of all the bullies of this type, how many did you catch?&rdquo; Each pair of bars is one bully type.
+Boosting catches 76% of XSS bullies; deep learning catches only 7%. For floods (DDoS) both catch everything, because floods are
+loud and obvious. The bars are sorted so the biggest differences come first. Password is the one type where DL is slightly
+better (0.860 vs 0.831), but only because DL guesses &ldquo;Password&rdquo; for almost everything (see the confusion matrices).</div>
+
+<div class="site">&ldquo;Why boosting wins here.&rdquo; Trees split directly on the numbers (packet counts, flags, protocol fields); a small
+network must learn the same boundaries through weighted sums, and with 400k rows and 15 epochs it doesn't manage it for subtle classes.</div>
+<div class="eli5">Our data is a big spreadsheet of numbers. Boosting asks sharp questions like &ldquo;is this number above 5?&rdquo;, which
+is exactly how spreadsheet data separates. The small network has to blend everything and learn slowly; with 15 practice passes
+(&ldquo;epochs&rdquo;) it never learned the fine differences between sneaky web attacks and normal traffic.</div>
+<div class="site">&ldquo;Honest caveat.&rdquo; The DL model was deliberately small; a bigger one might do better. The right claim is
+&ldquo;this DL classifier doesn't beat boosting here&rdquo;, not &ldquo;DL cannot work&rdquo;.</div>
+<div class="eli5">We only raced against a small deep-learning guard. A bigger one, trained longer, might do better, and we say so
+instead of overclaiming.</div>
+
+<!-- ====================================================== 4 -->
+<h2>4. Confusion matrices</h2>
+<div class="site">&ldquo;Rows are the true class, columns the predicted class. Cell colour is the fraction of that true class landing in that column,
+so the outlined diagonal reads as recall. Hover a cell for the exact count.&rdquo; Buttons: <b>Counts</b> / <b>% of true class</b>.</div>
+<div class="eli5">A confusion matrix is a <b>scoreboard of mix-ups</b>. Each <b>row</b> is what the note <i>really</i> was; each
+<b>column</b> is what the guard <i>said</i> it was. The diagonal (top-left to bottom-right) is where the guard was right. Anything
+off the diagonal is a mistake: row &ldquo;Normal&rdquo;, column &ldquo;Password&rdquo; = friendly notes the guard wrongly called
+password attacks. Darker colour = more notes. &ldquo;Counts&rdquo; shows how many notes; &ldquo;% of true class&rdquo; shows what
+share of that row. The colour bar shows 0% to 100% of the row.</div>
+
+<h3>Boosting's matrix (500k comparison, original clues)</h3>
+<div class="eli5">Mostly a strong diagonal, with some mix-ups among web traffic. Examples you can read off the table:
+of 9,848 real <b>Normal</b> notes, 8,273 were called Normal, but 716 were called Password, 521 SQL_injection and 325 DDoS_HTTP.
+Of 7,361 <b>Uploading</b> notes, only 4,634 were right; 1,443 were called DDoS_HTTP and 553 Port_Scanning. Floods
+(DDoS_TCP, DDoS_UDP: 9,848 each) are perfect.</div>
+<div class="site">&ldquo;Boosting's errors sit mostly inside one application-layer cluster &mdash; DDoS_HTTP, Password, SQL_injection, Uploading,
+XSS and Normal &mdash; which together account for 84% (9,225 of 10,921) of all its mistakes.&rdquo;</div>
+<div class="eli5">Of all 10,921 mistakes, 84% were confusions <i>within</i> one family of six web-related types. These all look alike
+because they all talk to the same web server. That told us exactly where to improve.</div>
+
+<h3>Deep learning's matrix</h3>
+<div class="site">&ldquo;Password absorbs large fractions of DDoS_HTTP, Normal, SQL_injection, Uploading and Vulnerability_scanner &mdash; a strong
+&lsquo;when unsure, guess Password&rsquo; bias &hellip; The same cluster holds 78% (25,224 of 32,207) of its mistakes, but it also fails on
+Port_Scanning &harr; DDoS_TCP and Fingerprinting.&rdquo;</div>
+<div class="eli5">The deep-learning guard made three times as many mistakes (32,207), and had a bad habit: when unsure, it shouted
+&ldquo;Password!&rdquo;. Of 9,848 Normal notes it called 4,532 Password, and of 3,013 XSS notes it called 1,981 Password. It also
+called half of the Port_Scanning notes (1,990 of 3,995) DDoS_TCP, and never once got Fingerprinting right.</div>
+
+<h3>Final classifier's matrix (after our improvements)</h3>
+<div class="site">Boosting with the new clues and class weights, on all 1,985,768 rows: trained on 1,429,825 and tested on 397,073 from whole connections never seen in training. &ldquo;The HTTP-family
+cluster holds 67% (744 of 1,112 remaining errors).&rdquo; Remaining mix-ups: Password &harr; DDoS_HTTP, Ransomware &rarr; Backdoor. &ldquo;MITM has no row
+here &hellip; on the random split its F1 is 0.994.&rdquo;</div>
+<div class="eli5">This exam was much bigger (about 397,000 notes), and the guard made only <b>1,112 mistakes</b> in total. Examples:
+of 287,319 Normal notes, 287,082 were right; of 10,197 SQL_injection notes, 10,191 were right. Remaining mix-ups: 406 Password notes
+called DDoS_HTTP and 198 the other way (both knock on the same website), and 98 Ransomware notes called Backdoor (both use door number 4321).
+<b>MITM</b> is missing because all of its notes are <i>one single conversation</i>, which can't be split between studying and the
+exam. On the normal (random) exam MITM scores 0.994.</div>
+<figure><img src="../figures/out_pres/confusion_final.png" style="width:62%"><figcaption>The final classifier's mix-up scoreboard as shares of each row. Dark diagonal = right.</figcaption></figure>
+
+<!-- ====================================================== 5 -->
+<h2>5. Training time: how long, and why</h2>
+<div class="site">&ldquo;Training either classifier is quick (boosting ~1 minute, DL ~10 seconds). What is slow is the evaluation methodology &mdash; the poisoning
+sweep and zero-day experiments retrain the whole federated pipeline 75 and 14 times.&rdquo;</div>
+<div class="eli5">Teaching one guard is fast. What takes hours is our <i>testing</i>: to prove things, we rebuild the whole school's
+training from scratch again and again (75 times for one test, 14 for another), like rehearsing a whole play 75 times.</div>
+<div class="site">Bar: Boosting 55.5 s, &ldquo;5.4&times; slower&rdquo;; DL classifier 10.2 s, &ldquo;baseline&rdquo;.</div>
+
+<h3>&ldquo;Measured wall-clock times&rdquo; table, row by row</h3>
+<table>
+<tr><th>Job</th><th>Time</th><th>Simple meaning</th></tr>
+<tr><td>Boosting classifier (comparison)</td><td>55.5 s</td><td>300 rounds &times; 15 types = 4,500 tiny trees, on purpose on one CPU core so results repeat exactly.</td></tr>
+<tr><td>Final classifier</td><td>24 s</td><td>Our new guard 1 on 1.43 million notes. It stopped early after 54 rounds once it stopped improving, using 4 cores. That's a quicker exploration setting, not the exact-repeat mode.</td></tr>
+<tr><td>Building the new features</td><td>&asymp; 1.5 min</td><td>Reading all 2.2 million notes, opening their contents and grouping them into about 393,000 conversations. Done once and saved (as a &ldquo;Parquet&rdquo; file).</td></tr>
+<tr><td>DL classifier</td><td>10.2 s</td><td>15 passes over the data in batches of 256 notes; a tiny brain (8,271 knobs).</td></tr>
+<tr><td>One in-process federated run</td><td>&asymp; 2 min</td><td>20 rounds of classrooms learning together inside one program; about 3 s per round, plus 20&ndash;25 s to read the 1.16 GB file.</td></tr>
+<tr><td>Real Phase A</td><td>&asymp; 4 min [5 min 15 s]</td><td>The real version: 1 principal program + 10 classroom programs talking over the network, including 6 guard-1 updates. Faster now because the 130 clues are read from a saved copy instead of re-reading the big file.</td></tr>
+<tr><td>Standalone zero-day</td><td>&asymp; 46 min [&asymp; 61 min]</td><td>14 full retrainings (one per hidden bully type), about 3.3 min each.</td></tr>
+<tr><td>Ablation</td><td>&asymp; 2 h 40 min</td><td>5 versions of the system, plus 70 hidden-bully retrainings.</td></tr>
+<tr><td>Poisoning sweep</td><td>&asymp; 3 h 45 min [&asymp; 5 h]</td><td>75 full retrainings at different numbers of sneaky classrooms.</td></tr>
+<tr><td>Full test suite</td><td>&asymp; 7.5 min [6 min 14 s]</td><td>233 automatic checks that the code does what it should (224 before, plus 9 for the new clues).</td></tr>
+</table>
+<div class="site">&ldquo;VM time = time on the Linux VM's own clock; the VM pauses whenever the Mac sleeps &hellip; single measurements, not averaged.&rdquo;</div>
+<div class="eli5">Our programs ran inside a pretend computer (a <b>virtual machine</b>) on a MacBook. When the Mac slept, the pretend
+computer's clock paused too, so these times are &ldquo;awake time&rdquo;. Each was measured once.</div>
+
+<h3>&ldquo;Why a full federated run takes ~4 minutes when a round takes seconds&rdquo;</h3>
+<ul>
+<li><b>Boosting updates are the bottleneck.</b> Every 3 rounds guard 1 gets extra lessons. That round takes about 43 s instead
+of 5&ndash;7 s: classrooms spend about 10 s checking notes with the bigger guard, and the principal spends about 33 s teaching it 50 more trees per type. Six of these
+per run take about three-quarters of the time (estimated from timestamps).</li>
+<li><b>Single-threaded on purpose.</b> If guard 1 studies with several cores at once, tiny timing differences change the
+result. One bully type's score jumped between 0.0 and 0.88 on identical runs! So we force one core: slower, but repeatable.</li>
+<li><b>The model grows.</b> Each update adds trees (300 &rarr; 600), so later rounds are slower.</li>
+<li><b>Evaluation multiplies everything.</b> Every test point is a full retraining, so minutes become hours.</li>
+<li><b>Modest hardware.</b> No graphics card (not needed: our brains are tiny), 4 cores, limited memory: 11 programs
+loading big libraries nearly ran out until we limited their helper threads.</li>
+<li><b>Data loading every time.</b> Reading the 1.16 GB file takes 15&ndash;25 s per program start.</li>
+</ul>
+<div class="site">&ldquo;How to speed it up (none applied yet)&rdquo;: cache the cleaned data, update guard 1 less often, allow multi-core for exploring, use a machine with more memory.</div>
+<div class="eli5">Ideas to make it faster that we haven't done yet: save the cleaned notes so we don't re-read them, give guard 1
+fewer extra lessons, use several cores when we're just exploring, and get a computer with more memory.</div>
+
+<!-- ====================================================== 6 -->
+<h2>6. How macro F1 was pushed past 0.95</h2>
+<div class="site">&ldquo;The target was &ge; 95% accuracy and &ge; 0.95 macro F1. With the original 91 features, boosting reached 0.887 macro F1 on the
+500k comparison sample, and 0.889 macro F1 / 96.4% accuracy on all 1.9M rows. Ideas 1, 2, 7 and 8 below were implemented and measured
+&hellip; 0.983 macro F1 and 99.7% accuracy &hellip; Ideas 3&ndash;6 turned out not to be needed.&rdquo;</div>
+<div class="eli5">Our goal: at least 95 right out of 100, and a fairness score (macro F1) of at least 0.95. With the original
+91 clues per note we had 96.4% but only 0.889 fairness, because some bully types were badly caught. We tried four ideas; they got us to
+99.7% and 0.983. Four other ideas were never needed.</div>
+
+<h3>&ldquo;Before: the F1 budget of the original features&rdquo;</h3>
+<div class="site">&ldquo;Macro F1 is the plain average of 15 per-class F1 scores, so reaching 0.95 needed the per-class F1 sum to rise from 13.31 (= 0.887 &times; 15)
+to 14.25 &mdash; a gain of 0.94 F1 points.&rdquo; Bars: Fingerprinting F1 0.683 (&minus;0.267), Uploading 0.761, DDoS_HTTP 0.762, SQL_injection 0.768,
+Password 0.787, XSS 0.857, Normal 0.905, Port_Scanning 0.916, Ransomware 0.933, then Backdoor 0.962 and the rest &ldquo;ok&rdquo;.</div>
+<div class="eli5">Imagine 15 school subjects with marks out of 1. The average must reach 0.95, so all marks together must
+add up to 14.25. We had 13.31, so we were 0.94 marks short. The red bit of each bar shows how far each subject was below 0.95.
+The weakest &ldquo;subjects&rdquo; were Fingerprinting, Uploading, DDoS_HTTP, SQL_injection and Password.</div>
+
+<h3>&ldquo;Why the original features were stuck&rdquo;</h3>
+<div class="site">&ldquo;In SQL_injection, XSS, Uploading and Password traffic only about 5&ndash;17% of packets carry any HTTP content. The rest are bare TCP
+handshake/acknowledgement packets to port 80 &hellip; 2.31% of rows share an identical 91-feature vector with a row of a different class,
+which caps macro recall at 0.969 for any per-packet model.&rdquo;</div>
+<div class="eli5">Most notes in web attacks are <b>empty envelopes</b> saying &ldquo;got it&rdquo; (TCP acknowledgements) sent to the
+website door (port 80). Only 5&ndash;17 of every 100 actually have a message inside. Empty envelopes from different bullies look
+<i>exactly</i> the same. We counted: 2.31% of all notes had an identical twin with a <i>different</i> answer. When twins have different
+answers, no guard can get both right, so even a perfect guard could reach at most 0.969. The clues that tell them apart were in
+columns the dataset's standard recipe throws away.</div>
+
+<h3>&ldquo;After: each change, measured&rdquo; (the table)</h3>
+<div class="site">&ldquo;Random&rdquo; splits individual packets; &ldquo;flow-grouped&rdquo; keeps every connection entirely in training or entirely in test.</div>
+<table>
+<tr><th>Clues the guard had</th><th>Random acc.</th><th>Random F1</th><th>Grouped acc.</th><th>Grouped F1</th><th>Meaning</th></tr>
+<tr><td>Original 91</td><td>96.38%</td><td>0.8868</td><td>96.37%</td><td>0.8892</td><td>Where we started.</td></tr>
+<tr><td>+ service port</td><td>98.02%</td><td>0.9245</td><td>98.03%</td><td>0.9236</td><td>Knowing <i>which door</i> helped a lot.</td></tr>
+<tr><td>+ content</td><td>98.02%</td><td>0.9268</td><td>98.02%</td><td>0.9232</td><td>What's inside the letters: little help alone, since few letters have content.</td></tr>
+<tr><td>+ flow</td><td>99.77%</td><td>0.9879</td><td>99.75%</td><td>0.9808</td><td>The whole conversation: the big jump.</td></tr>
+<tr><td>+ class weights</td><td>99.76%</td><td>0.9867</td><td>99.72%</td><td>0.9828</td><td>Rare types count more: steadier across tries.</td></tr>
+</table>
+<div class="eli5"><b>Random split</b> = shuffle all notes and split them into study and exam piles, so notes from the same conversation can
+land in both. <b>Flow-grouped split</b> = whole conversations go to one pile only, so the exam is truly new. The grouped number is
+the honest one. The note under the table says: after removing exact duplicates there were 1,909,719 notes with the old clues and
+1,985,768 with all 130 clues (more notes become different from each other once their contents count). Repeating with three
+random shuffles (seeds 42/43/44) gave 0.983, 0.983 and 0.985 (grouped) and 0.987 each time (random).</div>
+<div class="site">Bars &ldquo;Before&rdquo; vs &ldquo;Final&rdquo; per class: Fingerprinting 0.681 &rarr; 0.926, Uploading 0.758 &rarr; 1.000, DDoS_HTTP 0.762 &rarr; 0.969,
+SQL_injection 0.804 &rarr; 1.000, XSS 0.847 &rarr; 0.978, Password 0.838 &rarr; 0.968, Port_Scanning 0.914 &rarr; 0.992, Backdoor 0.947 &rarr; 0.981,
+Vulnerability_scanner 0.973 &rarr; 0.997, Normal 0.979 &rarr; 1.000, Ransomware 0.948 &rarr; 0.950, floods already 1.000.</div>
+<div class="eli5">Each bully type's mark before and after. The weak subjects jumped the most; the easy ones were already perfect.</div>
+
+<h3>The eight ideas, one by one</h3>
+<table>
+<tr><th>Idea</th><th>Status</th><th>What it means</th></tr>
+<tr><td>1. Behaviour features</td><td>done</td><td>Group notes into <b>conversations</b> (same two devices, same doors; a new conversation after 60 s of silence
+or after 120 s in total). Every note gets 20 conversation clues: how many notes, how long, how fast, how many &ldquo;hello/goodbye/hang-up&rdquo;
+signals (SYN/FIN/RST), total content, web requests, bad-word totals. Now empty envelopes carry their conversation's story. Biggest
+jump: 0.923 &rarr; 0.981. IP addresses and times are used only to <i>group</i>, never as clues.</td></tr>
+<tr><td>2. Content as numbers</td><td>done</td><td>18 number clues about the message: length, how jumbled it is (<b>entropy</b>), share of readable
+letters, whether it's a web request, the web reply code, header counts, web-address length and parts, special characters, and counts of
+six groups of tell-tale words (database tricks, script tricks, uploads, logins, sneaky folder paths, names of hacking tools). Plus
+<b>service port</b>: which door the conversation uses (80 = website, 1883 = sensor messages, 4321 = what the backdoor uses). The
+random &ldquo;return-address&rdquo; doors are not used, because their numbers follow the recording time, which would give away the answer.
+The port alone: 0.889 &rarr; 0.924.</td></tr>
+<tr><td>3. Per-class thresholds</td><td>not needed</td><td>A trick to tune when to say each answer. The problem it fixed (e.g. Uploading
+being under-called) disappeared: Uploading is now about 1.00/1.00.</td></tr>
+<tr><td>4. Specialist model</td><td>not needed</td><td>A second guard just for the web family. That family, which held 84% of the old mistakes, is now
+almost clean; the leftover Password/DDoS_HTTP mix-up is only 2&ndash;4%.</td></tr>
+<tr><td>5. Tuning settings</td><td>partly</td><td>We set the guard's study settings sensibly (63 leaves per tree, learning speed 0.1, uses 80% of
+clues and rows each round, stops when it stops improving for 50 rounds), but didn't search for the best settings. The new clues did the work.</td></tr>
+<tr><td>6. Other boosters</td><td>not needed</td><td>Other tree libraries or mixing several. Not needed: the guard is already near the best possible
+score for these clues (the &ldquo;ceiling&rdquo;, 0.9999).</td></tr>
+<tr><td>7. Class weights</td><td>done</td><td>Rare bully types count a bit more (square-root rule). Without it, the score wobbled between tries
+(0.981, 0.956, 0.952) because Fingerprinting, with only 156 conversations, scored anywhere from 0.49 to 0.88. With it: steady at 0.983&ndash;0.985,
+Fingerprinting about 0.93. Even studying only 5% of the data: 99.7% and 0.979.</td></tr>
+<tr><td>8. Check it's real</td><td>done</td><td>We used the strict conversation-level exam and three seeds. This caught a real problem: all
+normal &ldquo;remote screen&rdquo; (VNC) traffic was <i>one</i> conversation of 264,094 notes. It landed entirely in the exam, so the guard had
+never seen anything like it and called 16% of normal notes bullies. Cutting long conversations into 2-minute pieces, which is what
+standard network tools do, fixed it. The old clues scored the same on both exams, so they weren't cheating either.</td></tr>
+</table>
+
+<h3>&ldquo;Assumptions behind the final number&rdquo;</h3>
+<ul>
+<li><b>Per connection record, up to 120 s:</b> the guard judges a whole conversation piece, not the very first note.</li>
+<li><b>The service port is partly a testbed effect:</b> in this dataset friendly traffic never used the website door, so &ldquo;door 80&rdquo; already hints
+&ldquo;bully&rdquo;. In a real office with normal web browsing it would help less.</li>
+<li><b>Natural mix:</b> 71% friendly notes, all notes after removing duplicates, 3 seeds.</li>
+<li><b>Now used everywhere:</b> the whole-school training, every experiment and the live demo all use the 130 clues. Numbers in [brackets] on the site are the old 91-clue results.</li>
+</ul>
+
+<!-- ====================================================== 7 -->
+<h2>7. The pipeline at a glance</h2>
+<div class="site">&ldquo;Two phases, kept deliberately separate: Phase A trains the models offline (federated), and Phase B loads the saved bundle and enforces
+decisions on live traffic.&rdquo; Legend colours: Data, Boosting (supervised), Federated clients/autoencoder, Server-side robustness, Network/SDN, Output artefact.</div>
+<div class="eli5"><b>Phase A</b> = school term: everyone studies, then the trained guards are packed into a box (the &ldquo;bundle&rdquo;).
+<b>Phase B</b> = the guards go on duty at the door. Keeping them apart means study problems and door problems can't get mixed up.
+The colours on the diagram say which kind of job each box is.</div>
+
+<h3>Phase A diagram, box by box</h3>
+<table>
+<tr><th>Box</th><th>Says</th><th>Like you're five</th></tr>
+<tr><td>1 Raw dataset</td><td>2,219,216 rows &times; 63 columns, 15 classes</td><td>The big pile: 2.2 million notes, 63 facts about each, 15 kinds (normal + 14 bully types).</td></tr>
+<tr><td>2 Clean &amp; encode</td><td>drop 16 columns, fix label-leak placeholder, dedupe, repair MITM, one-hot; +39 port/content/flow features &rarr; 1,985,768 &times; 130</td><td>Fix the hidden cheat sheet (&ldquo;0&rdquo; vs &ldquo;0.0&rdquo;), fix the broken MITM rows, add the 39 new clues (which door, what's inside the letter, the whole conversation; name tags and times are used only to group notes into conversations, then thrown away), remove exact copies, and turn words into numbers (&ldquo;one-hot&rdquo;: a yes/no column per word). Result: 2.0 million notes &times; 130 number clues.</td></tr>
+<tr><td>3 Split</td><td>Server calibration set 5% (stratified, labelled); pool subsampled to 60,000</td><td>The principal keeps 5% of the notes, with answers, to teach guard 1. From the rest, 60,000 are given out to classrooms (a smaller set so the 150 test runs finish in time).</td></tr>
+<tr><td>4 Boosting bootstrap</td><td>LightGBM on raw features, 300 rounds, sqrt class weights; trained before round 1; held-out accuracy 0.997</td><td>Guard 1 studies first, so classrooms never use an untrained guard. Rare bully types count a bit more (class weights). On a practice test it got 99.7% (96.3% before).</td></tr>
+<tr><td>5 Non-IID partition</td><td>Dirichlet &alpha;=0.3 &rarr; 10 clients; 15% test, 15% benign val; z-score per client, clip &plusmn;10</td><td>Share notes unevenly among 10 classrooms, as in real life where each site sees different traffic (&ldquo;non-IID&rdquo;). Each classroom keeps some notes for exams and some friendly ones for setting its alarm level, and rescales its numbers its own way, with extremes capped at 10.</td></tr>
+<tr><td>6 Client round (&times;10)</td><td>boosting filters; train autoencoder; 130&rarr;32&rarr;16&rarr;8; 5 epochs; MSE</td><td>Each classroom lets guard 1 remove the obvious bullies, then teaches guard 2 on what's left by squeezing 130 numbers into 8 and rebuilding them, 5 practice passes, scored by how big the rebuilding mistakes are (MSE).</td></tr>
+<tr><td>7 Server aggregation</td><td>&Delta; = new &minus; old weights; trust filter; trimmed mean 15% &rarr; global AE; &times;20 rounds</td><td>The principal looks at what each classroom <i>changed</i> (&Delta;), throws out suspicious changes, averages the rest while ignoring the 15% most extreme from each side, and sends back the improved guard 2. 20 times.</td></tr>
+<tr><td>8 Boosting update</td><td>every 3 rounds: &le;50 confirmed alerts per surviving client; +50 trees or retrain</td><td>Every third round, honest classrooms send up to 50 suspicious notes that a human confirmed, and guard 1 learns from them.</td></tr>
+<tr><td>9 Phase A bundle</td><td>models, per-client scaler &amp; threshold, manifest &rarr; saved_models/phase_a</td><td>Pack everything into a labelled box: both guards, each classroom's settings, and a list of what's inside and how it was made.</td></tr>
+</table>
+<p class="small">Arrow labels: &ldquo;63 cols&rdquo;, &ldquo;1.99M &times; 130&rdquo;, &ldquo;labelled&rdquo;, &ldquo;pool &rarr; 60k&rdquo;, &ldquo;model broadcast&rdquo; (guard 1 sent to classrooms),
+&ldquo;&Delta; weights + alerts&rdquo; (changes sent up), &ldquo;new global AE &times;20&rdquo; (the loop), &ldquo;round 20&rdquo; (then save).</p>
+
+<h3>Phase B diagram, box by box</h3>
+<table>
+<tr><th>Box</th><th>Like you're five</th></tr>
+<tr><td>1 Captured traffic</td><td>A real recording (a &ldquo;.pcap&rdquo; file) of a Backdoor attack: 24,914 notes.</td></tr>
+<tr><td>2 Mininet replay</td><td>A pretend network with 10 computers and 1 switch; the switch obeys a controller (os-ken, speaking OpenFlow 1.3). We play the recording from computer h1 (tcpreplay).</td></tr>
+<tr><td>3 tshark features</td><td>A tool (tshark) reads each note and writes down all 61 facts the dataset has, spelled the same way, works out the same 39 extra clues with the very same code as training, then turns words into numbers exactly like in training.</td></tr>
+<tr><td>4 Load bundle</td><td>Open the box from Phase A. Computer h1 is classroom 0, so it uses classroom 0's settings.</td></tr>
+<tr><td>5 Boosting stage</td><td>Guard 1 names each note; if it's an attack and guard 1 is &ge; 70% sure, that's the answer.</td></tr>
+<tr><td>6 Autoencoder stage</td><td>Otherwise guard 2 checks: too different from normal &rarr; &ldquo;anomalous&rdquo;, else &ldquo;benign&rdquo; (friendly).</td></tr>
+<tr><td>7 Device verdict</td><td>For the whole device: the most common bully label, the average confidence, and which guard decided most.</td></tr>
+<tr><td>8 Mitigation bridge</td><td>A small web service (REST) gets the verdict. &ge; 85% sure &rarr; <b>block</b>; &ge; 50% &rarr; <b>rate-limit</b> (slow down); otherwise allow and watch.</td></tr>
+<tr><td>9 Switch flow table</td><td>The controller sends the switch a rule (&ldquo;flow-mod&rdquo;): drop, or a speed limit (&ldquo;meter&rdquo;). We read the switch's rule list (ovs-ofctl dump-flows) to prove it's there.</td></tr>
+</table>
+
+<h3>&ldquo;The cascade decision rule (one implementation, used by evaluation, dashboard and SDN)&rdquo;</h3>
+<ol>
+<li>Guard 1 guesses a type and how sure it is.</li>
+<li>If it's an attack and it's at least 70% sure, that's the final answer; guard 2 isn't asked.</li>
+<li>Otherwise guard 2 measures how badly it can rebuild the note (the &ldquo;reconstruction error&rdquo;). If that's above this classroom's alarm level
+(&ldquo;threshold&rdquo;), the answer is &ldquo;anomalous&rdquo; (maybe a brand-new bully), with confidence = how far above the line it is, capped at 1.
+Otherwise it's &ldquo;benign&rdquo;.</li>
+</ol>
+<div class="why">The exact same rule is used in testing, on the dashboard and at the door, so the scores we report are the same decisions the door makes.</div>
+
+<!-- ====================================================== 8 -->
+<h2>8. &ldquo;Every step explained&rdquo; (the 12 fold-out steps)</h2>
+<div class="site">&ldquo;What each stage does, how it works, and the parameters that control it. Values are the ones used in this project's runs (configs/config.yaml);
+module paths are relative to fl_ids/.&rdquo;</div>
+<div class="eli5">Each step opens like a drawer. Inside: <b>Function</b> (what it's for), <b>How it works</b>, and <b>Parameters</b>
+(the settings knobs, all kept in one settings file, config.yaml). The grey text on the right of each step is the program file that does it.</div>
+
+<h3>Step 1: Load, clean and encode the data</h3>
+<ul>
+<li><b>Function:</b> turn the dataset file into a clean number table <b>X</b> (1,909,719 &times; 91) and answers <b>y</b> (15 types as numbers).</li>
+<li>Read 47 of the 63 columns: drop 15 name-tag/time/raw-message columns as the dataset's authors suggest, plus <code>Attack_label</code>,
+which is just &ldquo;attack or not&rdquo; and would hand the guard the answer.</li>
+<li><b>Fix the placeholder:</b> &ldquo;doesn't apply&rdquo; was written <code>0</code> in some recordings and <code>0.0</code> in others, and the spelling matched
+the answer. One column alone (<code>mqtt.topic_0.0</code>) told friendly from bully perfectly (AUROC 1.0 = perfect separation). We made both spellings the same;
+now the best single clue only reaches about 0.71.</li>
+<li>Drop empty rows and 309,497 exact copies.</li>
+<li><b>Repair MITM:</b> the MITM rows had values under the wrong column names. We replaced the 1,214 broken rows with 1,229 rows rebuilt from the original recording.</li>
+<li>Turn 7 word columns (like the web method &ldquo;GET&rdquo;) into yes/no number columns &rarr; 91 clues. Parameters list the counts and the 7 columns; if the
+repaired MITM file is missing, the program stops loudly instead of silently using broken data.</li>
+</ul>
+
+<h3>Step 2: Service-port, content and flow features</h3>
+<ul>
+<li><b>Function:</b> give guard 1 the clues that separate web attacks. First tested on guard 1 alone, now plugged into the whole system: training, every experiment and the live demo. The same code makes the clues in training and live, and 99.8% of live notes came out exactly equal to their training copies.</li>
+<li>Service port (1 clue), content (18 clues) and flow/conversation (20 clues), as described in section 6. Never used as clues: IP addresses, times, random
+return doors, row order (each would reveal which recording, and so which answer).</li>
+<li>Class weights and the strict conversation-level exam.</li>
+<li>Parameters: 91 &rarr; 130 clues; 1,985,768 notes after removing copies; 60 s / 120 s conversation cut-offs (the 120 s one is the CICFlowMeter tool's default);
+63 leaves, learning speed 0.1, stop after 50 rounds without improvement; weight = &radic;(biggest class size &divide; this class size).</li>
+</ul>
+
+<h3>Step 3: Split: server calibration set and federated pool</h3>
+<ul><li>5% of notes (same mix of types) go to the principal with answers; 20% of that is kept for testing each new version of guard 1, leaving 79,430 to teach with (76,388 with the old clues).
+The rest is trimmed to 60,000 notes for classrooms; after each classroom keeps some for exams and alarm-setting, 45,474 are left to learn from. So the whole-school system learns from about 125,000 notes. Only the stand-alone guard 1 in section 6 studied 1.43 million. Answers stay with the principal; classrooms never reveal their notes' answers.</li></ul>
+
+<h3>Step 4: Non-IID partition and per-client normalisation</h3>
+<ul>
+<li>For each note type, a random &ldquo;Dirichlet&rdquo; draw decides how much of it each classroom gets. Small &alpha; (0.3) = very uneven; one classroom may be 94% friendly notes.</li>
+<li>Each classroom keeps 15% for its exam and 15% of its friendly notes to set its alarm level; the rest is for study.</li>
+<li>Each classroom rescales numbers using <i>only its own</i> study notes (a z-score: how many &ldquo;typical steps&rdquo; from average), capped at &plusmn;10 so
+one odd counter can't drown out everything.</li>
+<li>Guard 1 always gets the raw, un-rescaled numbers: each classroom's rescaling is different and would confuse a shared guard.</li>
+<li>Note: classroom 5 got no friendly practice notes, so its alarm never rings. We report this rather than hide it.</li>
+</ul>
+
+<h3>Step 5: Boosting bootstrap (cold start)</h3>
+<ul><li>Guard 1 studies before round 1, on raw numbers, adding one tree per type per round (15 trees per round). Settings: 300 rounds, learning speed 0.05, 31 leaves.
+<b>Leaf regularisation</b> (min_sum_hessian, lambda_l2) keeps it calm; without it, training went wild and false alarms jumped between 0.1% and 16% when
+just 1% of the notes changed. &ldquo;Deterministic, one thread&rdquo; = same answer every time. Rare types get a bit more weight (&radic; class weights). Practice-test accuracy: 0.997 (was 0.963).</li></ul>
+
+<h3>Step 6: Client round: boosting filter, then autoencoder training</h3>
+<ul>
+<li>Each classroom removes notes guard 1 confidently calls bullies, then trains guard 2 only on the rest, so guard 2 never learns bullies as &ldquo;normal&rdquo;.</li>
+<li>Guard 2's shape: 130 &rarr; 32 &rarr; 16 &rarr; <b>8</b> &rarr; 16 &rarr; 32 &rarr; 130 (9,834 knobs; 7,299 with the old 91 clues). It squeezes and rebuilds; mistakes are measured with MSE.</li>
+<li>It sends back its knob changes, a 50-bar chart of its rebuilding errors and, every third round, up to 50 confirmed suspicious notes. Otherwise notes never leave.</li>
+<li>Alarm level = the 97th percentile of rebuilding error on its friendly practice notes: the level that only 3% of friendly notes exceed. So about 3% false alarms, by design.</li>
+<li>Settings: learning speed 0.001, 5 passes, 64 notes at a time; 97th percentile; 0.7 confidence for guard 1.</li>
+</ul>
+
+<h3>Step 7: Server aggregation: trust filter + trimmed mean</h3>
+<ul>
+<li>The principal compares <b>changes</b>, not whole brains: whole brains all look about 99% alike because they start from the same copy.</li>
+<li>The reference is the <b>median</b> change (the middle value for every knob). For each classroom it measures the <b>cosine similarity</b> (do the changes point
+the same way? +1 = same, 0 = unrelated, &minus;1 = opposite) and the size.</li>
+<li>A classroom is excluded if (a) it is an outlier compared with the others this round (MAD test), (b) its change points the opposite way (cosine &lt; 0),
+or (c) its long-term trust score has fallen below 0.5.</li>
+<li>Remaining changes are size-capped at 2&times; the typical size and averaged with a trimmed mean (drop the top and bottom 15% for each knob). If nobody passes, the round is skipped.</li>
+<li>Settings: MAD 3.0; minimum cosine 0; minimum trust 0.5; trust memory 0.3 (30% this round, 70% history); cap 2.0; trim 0.15.</li>
+<li><b>Known limits:</b> at 50% sneaky classrooms, the &ldquo;middle&rdquo; becomes theirs; late in training, sneaky changes can look like honest noise.</li>
+</ul>
+
+<h3>Step 8: Incremental boosting update</h3>
+<ul><li>Every 3 rounds, honest classrooms send up to 50 confirmed suspicious notes (false alarms come back as &ldquo;Normal&rdquo;). Guard 1 adds 50 trees per type.
+If a note is a <i>brand-new</i> type, guard 1 is retrained from scratch, because adding trees can't teach a type it has never seen. The new guard 1 is sent out next round.
+Trade-off: those few confirmed notes do leave the classroom. This is also the slowest step.</li></ul>
+
+<h3>Step 9: The Phase A bundle</h3>
+<ul><li>The real run (1 principal + 10 classroom programs, 20 rounds) saves guard 1, guard 2's knobs, each classroom's rescaling and alarm level, and a manifest
+(settings, scores, seed, code version). Before saving, it recomputes the alarm levels and checks they match; a mismatched box is rejected.
+Settings: 20 rounds; principal's address 127.0.0.1:9091; option to add sneaky classrooms for demos.</li></ul>
+
+<h3>Step 10: Replay and feature extraction (Phase B)</h3>
+<ul><li>Mininet builds 10 computers on one Open vSwitch with the os-ken controller; computer h(i+1) is classroom i. tcpreplay plays the recording; tshark extracts
+all 61 facts per note, and the same code as training adds the 39 extra clues. Newer tshark writes True/False and short hex numbers, which silently zeroed one clue until we fixed it. Mininet needs administrator
+rights, given by one narrow permission rule.</li></ul>
+
+<h3>Step 11: Verdict, mitigation bridge and flow rule</h3>
+<ul><li>The device's verdict is its most common bully label (or benign). It goes to the bridge, which asks the controller for a <b>drop</b> rule (&ge; 0.85) or a
+<b>meter</b>/speed limit (&ge; 0.5). We check the switch's own rule list, not just the bridge's word. Ports: 6653 for the controller, 8080 for the bridge.
+Limitation: it needs the whole recording first, so it's not note-by-note.</li></ul>
+
+<h3>Step 12: Evaluation harness and live dashboard</h3>
+<ul>
+<li><b>Variants</b> compared fairly: full system; plain averaging (FedAvg, no trust filter); trimmed mean only; guard 2 only; guard 1 only.</li>
+<li>Headline scores are not plain accuracy, because 71% of notes are friendly, so a broken guard that never shouts still looks &ldquo;accurate&rdquo;.</li>
+<li><b>Poisoning sweep</b> at 0/20/30/40/50% sneaky classrooms; <b>zero-day</b> test hiding each of 14 types.</li>
+<li>Tests run all classrooms inside one program to save time; the real multi-program version is Phase A.</li>
+<li>The <b>Streamlit dashboard</b> is a live web page showing the training and the door as they happen.</li>
+</ul>
+
+<!-- ====================================================== 9 -->
+<h2>9. &ldquo;Does the pipeline work as intended?&rdquo;</h2>
+<div class="site">&ldquo;Yes &mdash; each part was verified on real data and real processes, not just unit tests.&rdquo;</div>
+<table>
+<tr><th>Item</th><th>Like you're five</th></tr>
+<tr><td>Ablation</td><td>&ldquo;Ablation&rdquo; = remove one part and see what breaks. With 30% sneaky classrooms: the full system catches 1.000, guard 1 alone 0.996, guard 2 alone
+0.372 [before: 0.887 / 0.875 / 0.191]. For brand-new bullies: 0.930 vs 0.795 [0.731 vs 0.518]. So guard 2 matters mostly for <i>new</i> bullies. On bullies it already knows, guard 1 alone now has the better score (0.998 vs 0.961), because guard 2's planned 3% false alarms cost more than the little it adds.</td></tr>
+<tr><td>Poisoning resistance</td><td>Catch rate stays between 0.997 and 1.000 from 0% to 50% sneaky classrooms [0.878&ndash;0.887], and new-bully catch stays 0.90&ndash;0.94 up to 40%. Sneaky changes that got past the filter: 10% / 12% / 36% at 20 / 30 / 40% [28% / 32% / 24%]. At 50% the filter breaks: every sneaky change gets through. That's expected.</td></tr>
+<tr><td>Zero-day detection</td><td>Each of 14 types hidden in turn. Both guards together: 0.943 [0.736]; guard 1 alone 0.801 [0.533]. Big gains: Password 0.44 &rarr; 0.97, SQL_injection 0.61 &rarr; 1.00, XSS 0.52 &rarr; 0.99. Where guard 1 knew nothing, guard 2 saved the day: Uploading 8% &rarr; 72%, MITM 0% &rarr; 69%. Two got worse than before: MITM (was 89%) and Uploading for guard 1 alone.</td></tr>
+<tr><td>Real federated training</td><td>11 real programs, 20 rounds: 0.999 catch rate [0.889] with 3.5% false alarms, matching the faster one-program simulation.</td></tr>
+<tr><td>Live SDN mitigation</td><td>Real attack replayed &rarr; &ldquo;Backdoor&rdquo;, 99.7% sure &rarr; drop rule installed and seen on the switch.</td></tr>
+<tr><td>Classifier accuracy &ge; 95%</td><td>99.7% and 0.983 on unseen conversations; 0.983&ndash;0.985 over three tries; 99.7%/0.979 studying only 5% of the data.</td></tr>
+<tr><td>Live dashboard</td><td>We watched it in a browser during real training, and found and fixed a start-up bug that the automatic tests had missed.</td></tr>
+</table>
+<div class="site">&ldquo;Poisoning-resistance sweep&rdquo; chart: x-axis = % of clients running a sign-flip attack; lines = attack macro-recall, zero-day macro-recall, AE-alone macro-recall.
+&ldquo;AE-alone and zero-day recall collapse together at 50%.&rdquo;</div>
+<div class="eli5">Left to right: more and more sneaky classrooms. A <b>sign-flip attack</b> is a sneaky classroom sending the exact opposite of what it learned, five times
+louder. The top line (catching known bullies) stays flat; the middle line (new bullies) stays flat until 40%; the bottom line (guard 2 alone) drops to 0
+at 50%, when the sneaky ones become the majority.</div>
+<figure><img src="../figures/out_pres/poisoning_sweep.png" style="width:85%"></figure>
+
+<h3>&ldquo;Live SDN demo: what actually happened&rdquo;</h3>
+<div class="site">An earlier demo misclassified this capture as DDoS_HTTP; after fixing two data bugs (the label-leak and a tshark version issue) and using a fully trained bundle, it classifies correctly.</div>
+<table>
+<tr><th>Row</th><th>Like you're five</th></tr>
+<tr><td>Capture</td><td>The Backdoor recording: 24,914 notes, 24,669 judged not-friendly (23,895 before the new clues).</td></tr>
+<tr><td>Classification</td><td>&ldquo;Backdoor&rdquo;, 99.7% sure, decided by guard 1 alone.</td></tr>
+<tr><td>Mitigation action</td><td>Block.</td></tr>
+<tr><td>Installed flow rule</td><td><code>priority=100,ip,nw_src=10.0.0.1 actions=drop</code> = &ldquo;high-priority rule: any note from computer 10.0.0.1, throw it away.&rdquo;</td></tr>
+<tr><td>Verified against</td><td>The switch's own rule list.</td></tr>
+</table>
+<div class="warn">&ldquo;Real limitation&rdquo;: 23,161 notes had already passed through the normal &ldquo;allow&rdquo; rule before the block rule appeared, because the
+system judges after reading the whole recording. The door locked, but late. This is how it's built today, not a bug, and the site says so.</div>
+
+<!-- ====================================================== 10 -->
+<h2>10. Caveats and limitations (all 16)</h2>
+<div class="site">&ldquo;Every number above is real, but every result has a scope.&rdquo;</div>
+<ol>
+<li><b>Mitigation is not real-time:</b> the door locks after the recording is analysed.</li>
+<li><b>The DL contest used a rebalanced sample:</b> friendly notes were cut from 71% to 10%, so its false-alarm numbers (16%, 53%) can't be compared with the
+system's normal ones (0.02%). Who won is still fair.</li>
+<li><b>Different experiments' F1 can't be compared:</b> 0.887 (contest), 0.910 (small federated test, where MITM had 1 test note and Fingerprinting 3), 0.983 (final). Compare only within one experiment.</li>
+<li><b>Random-split optimism, now checked:</b> the strict and random exams agree within about 0.005. Splits by whole recording file or by time weren't tried.</li>
+<li><b>Service port is partly a testbed effect</b> (no friendly website traffic in this dataset).</li>
+<li><b>Flow clues describe a whole conversation piece (&le; 120 s):</b> not a first-note decision.</li>
+<li><b>Trade-offs of the new clues:</b> on bullies it already knows, guard 1 alone now scores better than both guards together (0.998 vs 0.961) because of guard 2's planned 3% false alarms; two hidden bully types got harder to catch (MITM 0.89 &rarr; 0.69, and Uploading for guard 1 alone); and at 40% sneaky classrooms more sneaky changes got through (24% &rarr; 36%, one seed only).</li>
+<li><b>MITM can't be scored on the strict exam:</b> it's one conversation (1,229 notes). On the random exam its F1 is 0.994.</li>
+<li><b>Ideas 3&ndash;6 weren't run:</b> no claims about them.</li>
+<li><b>Unusual but honest classrooms can look sneaky:</b> a classroom with very unusual notes sometimes gets excluded for a round.</li>
+<li><b>The filter breaks at 50%;</b> trimmed mean alone also breaks once sneaky classrooms outnumber what it trims.</li>
+<li><b>Only one kind of sneaky classroom tested</b> (sign-flip, exaggerating its size); cleverer ones are untested.</li>
+<li><b>Mostly one seed for whole-school tests:</b> one odd pattern (20% vs 30%) disappeared with other seeds, so it was noise. The final guard used three seeds.</li>
+<li><b>The whole-school system uses a sample:</b> the stand-alone guard 1 studied 1.43 million notes, but the whole-school system learns from about 125,000, so the 150 or so test runs finish in time. Guard 1 studying only the principal's 5% still scored 99.7% / 0.979; guard 2 was never tried on all the notes.</li>
+<li><b>Tiny classes:</b> MITM (358&ndash;406 notes) and Fingerprinting (853) give few exam notes, so their scores wobble.</li>
+<li><b>Novelty isn't proven:</b> our searches found no system with all five parts, but that's not a complete review.</li>
+</ol>
+
+<!-- ====================================================== 11 -->
+<h2>11. The Cumulative results page</h2>
+<div class="site">&ldquo;Every experiment run for this project, in one place &hellip; All values are loaded directly from the result files &hellip; nothing is retyped. Best value in
+a column is highlighted green; clear weaknesses red.&rdquo;</div>
+<div class="eli5">This page is the big report-card binder. The computer fills the tables straight from the result files, so nobody could mistype a number.
+Green = best in that column; red = clearly weak.</div>
+
+<h3>Run provenance (&ldquo;where these numbers came from&rdquo;)</h3>
+<table>
+<tr><th>Row</th><th>Like you're five</th></tr>
+<tr><td>Dataset</td><td>2,219,216 notes &rarr; 1,985,768 after cleaning, 130 clues, 15 types. Old 91-clue runs (section 9 and the [brackets]): 1,909,719 notes. (The DL contest had 1,909,671 because it ran before the MITM fix.)</td></tr>
+<tr><td>Classifier-accuracy runs</td><td>Section 8: 130 clues, 1,985,768 notes, natural mix, random and strict exams.</td></tr>
+<tr><td>Seed</td><td>The random &ldquo;shuffle number&rdquo;: 42 for everything, 43 and 44 for repeat checks. Same seed = same shuffle = repeatable.</td></tr>
+<tr><td>Federation</td><td>10 classrooms, unevenness 0.3, 20 rounds, 60,000 shared-out notes, principal keeps 5%.</td></tr>
+<tr><td>Hardware</td><td>MacBook Pro M5 running an Ubuntu pretend-computer: 4 cores, 7.2 GB memory (12 GB for the real run), no graphics card.</td></tr>
+<tr><td>Software</td><td>Python and libraries with versions; 233 tests pass, 2 skipped.</td></tr>
+</table>
+
+<h3>Section 1: Boosting vs. supervised DL classifier</h3>
+<div class="eli5">The same contest as on the main page, plus a per-type table with <b>precision</b> (&ldquo;when you say this type, how often are you right?&rdquo;),
+<b>recall</b> (&ldquo;of this type, how many did you catch?&rdquo;), <b>F1</b> (both combined) for each guard, and <b>F1 gap</b> (boosting minus DL). Stand-out rows:
+XSS gap +0.724 (DL caught only 7%); Fingerprinting DL 0.000 (never right); Password DL precision 0.282 (when DL says &ldquo;Password&rdquo; it's usually wrong).
+&ldquo;Test rows&rdquo; = how many exam notes of that type (e.g. 9,848 for most; only 72 for MITM and 171 for Fingerprinting).</div>
+
+<h3>Section 2: Per-class report (full federated system)</h3>
+<div class="eli5">One full-system training with no sneaky classrooms, examined on 9,000 exam notes from the classrooms. <b>AUROC</b> = how well a guard ranks
+bullies above friendly notes (1.0 = perfect, 0.5 = coin flip). Guard 1 alone: accuracy 0.997, macro F1 0.978 [0.963 / 0.910]; perfect on floods, Uploading, SQL_injection and XSS; weakest is Ransomware (recall 0.879, only 58 exam notes)
+[before: Uploading 0.572, DDoS_HTTP 0.628, SQL_injection 0.706]. MITM (3 exam notes) and Fingerprinting (3) are too few to trust.
+Second table, &ldquo;friendly vs attack&rdquo; only: guard 2 alone catches 73% of attacks [50%] with 3.3% false alarms, and ranks bullies above friendly notes much better (AUROC 0.982 [0.805]); both guards together
+(&ldquo;cascade_combined&rdquo;) catch 99.95% of attacks [88.3%] with overall accuracy 0.976 [0.944].</div>
+
+<h3>Section 3: Ablation</h3>
+<div class="eli5">Five versions of the system, each with 30% sneaky classrooms (classrooms 0, 6 and 9). Columns: <b>attack macro-recall</b> (catch rate averaged over bully types),
+<b>benign FPR</b> (false alarms), <b>detection F1</b> (friendly-vs-attack score), <b>zero-day macro-recall</b> (new bullies), <b>AE-alone recall</b> (guard 2 by itself),
+<b>final val loss</b> (guard 2's final rebuilding mistake; small = healthy), <b>rounds to converge</b> (when learning settled), <b>comm. bytes</b> (data sent: 15.7 million bytes, about 15 MB, over 20 rounds; 11.7 million with the old 91 clues, because guard 2 now has more knobs).</div>
+<ul>
+<li><b>full_pipeline:</b> catches every known bully (1.000), best new-bully catch (0.930 [0.731]), guard 2 still works (0.712 [0.421]), healthy loss 0.028, settled by round 5.</li>
+<li><b>plain_fedavg</b> (no filter, plain average): guard 2 ruined (0.002), loss exploded to 5&times;10<sup>20</sup>, never settled. New bullies fall back to guard 1&rsquo;s 0.79.</li>
+<li><b>trimmed_mean_only:</b> also ruined (0.000), loss 13,162.</li>
+<li><b>autoencoder_only</b> (no guard 1): catches only 0.372 [0.191].</li>
+<li><b>boosting_only:</b> 0.996 [0.875], almost zero false alarms (0.02%), best friendly-vs-attack score (0.998), but only 0.795 on new bullies [0.518]. No federated training, so 0 bytes sent.</li>
+</ul>
+<p>The second table lists each bully type's catch rate under each version. In the full system every type is caught (1.000). Guard 2 alone is weak on most (e.g. Backdoor 0.02) but perfect on MITM (1.000).</p>
+
+<h3>Section 4: Poisoning-resistance sweep</h3>
+<div class="eli5">The full system at 0%, 20%, 30%, 40% and 50% sneaky classrooms. <b>Attacker survival</b> = how often a sneaky classroom's change got past the filter:
+0.100, 0.117, 0.362, then 1.000 at 50% (the filter fails) [before: 0.275, 0.317, 0.238, 0.960]. Final loss stays tiny until 50%, where it explodes (3.8&times;10<sup>18</sup>). Known-bully catch stays 0.997&ndash;1.000 at every level.</div>
+
+<h3>Section 5: Multi-seed check</h3>
+<div class="eli5">With the old clues, guard 2 oddly did <i>better</i> at 30% sneaky classrooms than at 20% at seed 42; seeds 43 and 44 showed that was luck (noise). We re-ran the check with the new clues: guard 2 alone scored 0.736 / 0.712 (20% / 30%) at seed 42, 0.738 / 0.734 at seed 43 and 0.623 / 0.565 at seed 44. So guard 2 alone still wobbles between seeds (0.56&ndash;0.74, was 0.19&ndash;0.42), while the main catch rate is rock-steady (0.996&ndash;0.999, was 0.83&ndash;0.89).</div>
+
+<h3>Section 6: Zero-day (leave-one-attack-class-out)</h3>
+<div class="eli5">For each of 14 bully types, hide it completely (even from the rescaling), train, then show up to 5,000 of its notes. Columns:
+<b>Boosting-only</b> (guard 1's catch rate), <b>AE-alone</b>, <b>Cascade</b> (both), <b>AE added</b> (extra caught thanks to guard 2),
+<b>Boosting's top misattribution</b> (what guard 1 thought the new bully was), <b>AE AUROC</b>, <b>Cascade FPR</b> (about 3% false alarms everywhere).
+Examples: Uploading guard 1 0.080 &rarr; both 0.716 (guard 2 added 0.636); DDoS_UDP 0.718 &rarr; 0.983; Backdoor mostly mistaken for Ransomware (99%); DDoS_ICMP mistaken for Fingerprinting (100%), but still caught as &ldquo;some attack&rdquo;;
+hardest to catch as new: MITM 0.695 and Uploading 0.716 [before: DDoS_HTTP 0.360, Password 0.443]. Guard 2&rsquo;s AUROC is now 0.97&ndash;1.00 for every type.</div>
+<figure><img src="../figures/out_pres/zero_day.png" style="width:72%"><figcaption>Guard 1 alone (blue) vs both guards (teal) on each hidden bully type.</figcaption></figure>
+
+<h3>Section 7: Real federated training and live SDN demo</h3>
+<div class="eli5">Four real-world checks: the real 11-program run (0.999 [0.889], 3.5% false alarms, guard 1 practice accuracy 0.997 [0.963], about 4 min);
+the live door demo (Backdoor, 0.997, drop rule verified; 24,669 notes judged not-friendly; 23,161 notes passed before the rule); the dashboard during a real run (round 20, all 10 classrooms trusted,
+guard 1 at version 7; watched during the old 91-clue run); and the test suite (233 passed, 2 skipped because two recordings weren't downloaded).</div>
+
+<h3>Section 8: Classifier accuracy (final)</h3>
+<div class="eli5">Every guard-1 experiment, one per row. Columns: <b>features/setting</b> (which clues; &ldquo;500,000-row sample&rdquo; = the contest-style set;
+&ldquo;trained on 5% of rows&rdquo; = only the principal-sized set; &ldquo;class weights&rdquo; = rare types count more), <b>split</b> (random or strict),
+<b>seed</b>, <b>features</b> (how many clues), <b>test rows</b>, <b>accuracy</b>, <b>macro F1</b>, <b>ambiguous rows</b> (share of notes with a twin that has a different answer:
+2.31% &rarr; 0.29% &rarr; 0.01%) and <b>ceiling macro recall</b> (the best any guard could do with those clues: 0.9692 &rarr; 0.9940 &rarr; 0.9997). Green = at least 0.95, red = below 0.9.
+The rows show the unweighted wobble (0.9808/0.9560/0.9521) and the weighted steadiness (0.9828/0.9835/0.9851).</div>
+<div class="eli5">The last table, &ldquo;Final classifier, per class&rdquo;: each type's precision, recall and F1 now, next to its F1 with the original clues.
+For example SQL_injection 0.804 &rarr; 1.000, Uploading 0.758 &rarr; 1.000, Fingerprinting 0.681 &rarr; 0.926.</div>
+
+<h3>Section 9: Original 91-feature federated results (for comparison)</h3>
+<div class="eli5">Sections 2&ndash;7 now show the system with the 130 clues. Section 9 keeps the <i>old</i> tables, made with the original 91 clues, so you can see the before-and-after side by side. These are the numbers shown in [brackets] everywhere else on the site.</div>
+
+<h3>Index: what each result is good for, and its limits</h3>
+<table>
+<tr><th>Result</th><th>Proves</th><th>Does NOT prove</th></tr>
+<tr><td>Boosting vs DL</td><td>a same-effort DL guard is worse here</td><td>that no DL guard could win; natural-mix results</td></tr>
+<tr><td>Ablation</td><td>each part helps; guard 2 mostly helps with new bullies</td><td>that it holds across seeds</td></tr>
+<tr><td>Poisoning sweep</td><td>works up to 40% sign-flip sneaks</td><td>cleverer sneaks; above 50%</td></tr>
+<tr><td>Zero-day</td><td>guard 2 catches types guard 1 never saw</td><td>bullies unlike all 14 known types</td></tr>
+<tr><td>Classifier accuracy</td><td>&ge; 95% and &ge; 0.95 on unseen conversations, steadily</td><td>networks with friendly web traffic; first-note (instead of whole-conversation) decisions</td></tr>
+<tr><td>Real Phase A/B</td><td>it all runs end to end on real programs and a real switch</td><td>note-by-note, real-time blocking</td></tr>
+</table>
+<div class="why">This index is the most honest table on the site: for each result, it says what you're allowed to claim and what you're not.</div>
+
+<!-- ====================================================== 12 -->
+<h2>12. Dictionary: the 15 kinds of traffic</h2>
+<table>
+<tr><th>Type</th><th>Like you're five</th></tr>
+<tr><td>Normal</td><td>Everyday friendly messages: sensors reporting temperature, devices chatting (MQTT), remote-screen (VNC).</td></tr>
+<tr><td>DDoS_UDP</td><td>A crowd throwing thousands of balls at one window so it can't open for anyone else.</td></tr>
+<tr><td>DDoS_ICMP</td><td>A crowd shouting &ldquo;are you there?&rdquo; (ping) nonstop until the device is too busy to answer anyone.</td></tr>
+<tr><td>DDoS_TCP</td><td>A crowd starting thousands of conversations and never finishing them (SYN flood), so no chairs are left.</td></tr>
+<tr><td>DDoS_HTTP</td><td>A crowd asking the website for its front page again and again until it's too tired to serve real visitors.</td></tr>
+<tr><td>SQL_injection</td><td>Typing secret database commands into a website's form box to trick it into revealing or changing data.</td></tr>
+<tr><td>XSS</td><td>Hiding a little script inside a web page so other visitors' browsers run the bully's code.</td></tr>
+<tr><td>Uploading</td><td>Sneaking a harmful file (like &ldquo;hack.php&rdquo;) onto the website through its upload button.</td></tr>
+<tr><td>Password</td><td>Guessing passwords over and over until one works (brute force).</td></tr>
+<tr><td>Backdoor</td><td>A secret door program left on a device so the bully can come back anytime.</td></tr>
+<tr><td>Ransomware</td><td>Locking up someone's files and demanding money to unlock them.</td></tr>
+<tr><td>Vulnerability_scanner</td><td>A tool that checks every corner of a website for weak spots.</td></tr>
+<tr><td>Port_Scanning</td><td>Knocking on every door number to see which ones open.</td></tr>
+<tr><td>Fingerprinting</td><td>Poking a device in special ways to figure out what kind it is and what software it runs.</td></tr>
+<tr><td>MITM</td><td>Man-in-the-middle: secretly standing between two people and passing (or changing) their notes, here by faking addresses (ARP spoofing) and name look-ups (DNS).</td></tr>
+</table>
+
+<h2>13. Dictionary: every score and word</h2>
+<table>
+<tr><th>Word</th><th>Like you're five</th></tr>
+<tr><td>Packet</td><td>One note on the network.</td></tr>
+<tr><td>Flow / connection</td><td>All the notes of one conversation between two devices.</td></tr>
+<tr><td>Feature</td><td>One clue about a note (its length, its door number&hellip;).</td></tr>
+<tr><td>Class / label</td><td>The right answer for a note (&ldquo;Normal&rdquo;, &ldquo;XSS&rdquo;&hellip;).</td></tr>
+<tr><td>Accuracy</td><td>Right answers &divide; all answers.</td></tr>
+<tr><td>Precision</td><td>When the guard says &ldquo;XSS&rdquo;, how often it really is XSS.</td></tr>
+<tr><td>Recall</td><td>Of all real XSS notes, how many the guard caught.</td></tr>
+<tr><td>F1</td><td>One score that is high only if precision <i>and</i> recall are both high.</td></tr>
+<tr><td>Macro F1 / macro-recall</td><td>The plain average over all types; rare types count as much as big ones.</td></tr>
+<tr><td>Weighted F1</td><td>Average where bigger types count more.</td></tr>
+<tr><td>Micro recall</td><td>Catch rate counting every bully note equally (big types dominate).</td></tr>
+<tr><td>Attack macro-recall</td><td>Catch rate averaged over the 14 bully types.</td></tr>
+<tr><td>Zero-day macro-recall</td><td>Catch rate on bully types hidden from training.</td></tr>
+<tr><td>Benign FPR</td><td>False alarms: share of friendly notes called bullies.</td></tr>
+<tr><td>Detection F1</td><td>F1 for the simpler question &ldquo;friendly or attack?&rdquo;.</td></tr>
+<tr><td>AUROC</td><td>How well a guard ranks bullies above friendly notes: 1 = perfect, 0.5 = coin flip.</td></tr>
+<tr><td>Confusion matrix</td><td>Table of real type vs guessed type; the diagonal is &ldquo;right&rdquo;.</td></tr>
+<tr><td>Ambiguity ceiling</td><td>The best possible score when some notes are identical twins with different answers.</td></tr>
+<tr><td>Reconstruction error / MSE</td><td>How badly guard 2 rebuilds a note; big = weird.</td></tr>
+<tr><td>Threshold (97th percentile)</td><td>Guard 2's alarm level, set so only 3% of friendly notes exceed it.</td></tr>
+<tr><td>Validation loss</td><td>Guard 2's mistake size on practice notes; small = healthy, huge = broken.</td></tr>
+<tr><td>Rounds to converge</td><td>The round when learning settled down.</td></tr>
+<tr><td>Seed</td><td>The shuffle number; same seed = same shuffle.</td></tr>
+<tr><td>Random vs flow-grouped split</td><td>Shuffle notes, or keep whole conversations together; grouped is stricter.</td></tr>
+<tr><td>Supervised / unsupervised</td><td>Learning from labelled answers (guard 1) vs only from what normal looks like (guard 2).</td></tr>
+<tr><td>LightGBM / boosting</td><td>Hundreds of tiny decision trees whose votes are added up.</td></tr>
+<tr><td>Deep learning / MLP</td><td>A network of layers of adjustable knobs.</td></tr>
+<tr><td>Autoencoder</td><td>Squeeze-and-rebuild network; learns &ldquo;normal&rdquo;.</td></tr>
+<tr><td>Federated learning (Flower)</td><td>Classrooms share lessons, not notes; Flower is the software that runs it.</td></tr>
+<tr><td>Client / server</td><td>Classroom / principal.</td></tr>
+<tr><td>Non-IID, Dirichlet &alpha;</td><td>Classrooms get very different notes; &alpha; controls how different (smaller = more).</td></tr>
+<tr><td>Poisoning, sign-flip</td><td>Sneaky classrooms sending harmful lessons; sign-flip = sending the exact opposite, louder.</td></tr>
+<tr><td>Cosine similarity, median, MAD</td><td>Do two changes point the same way?; the middle value; how spread out values are.</td></tr>
+<tr><td>Trust score (EMA)</td><td>A memory of how trustworthy each classroom has been (30% today, 70% history).</td></tr>
+<tr><td>Trimmed mean</td><td>Average after dropping the most extreme values at both ends.</td></tr>
+<tr><td>Cascade</td><td>Checks in a row: guard 1, then guard 2.</td></tr>
+<tr><td>SDN, OpenFlow, Open vSwitch, os-ken</td><td>Software-controlled network; the language for giving switches rules; the software switch; the controller program.</td></tr>
+<tr><td>Mininet, tcpreplay, tshark</td><td>Pretend network on one computer; replays recordings; reads notes and writes down their facts.</td></tr>
+<tr><td>Flow rule, drop, meter</td><td>A switch instruction; throw away; speed limit.</td></tr>
+<tr><td>Phase A / Phase B</td><td>Training term / on duty at the door.</td></tr>
+<tr><td>Bundle / manifest</td><td>The packed box of trained guards / its label listing what's inside.</td></tr>
+<tr><td>VM</td><td>A pretend computer running inside the real one.</td></tr>
+</table>
+
+</body>
+</html>

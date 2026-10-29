@@ -1,0 +1,4 @@
+2026-10-15 22:34:20,785 [INFO] __main__: Phase A bundle /home/aaron/FL-IDS-clean/saved_models/phase_a: 10 clients -> 10 Mininet hosts
+2026-10-15 22:34:23,316 [INFO] __main__: Controller + bridge up at http://127.0.0.1:8080 (OpenFlow port 6653)
+2026-10-15 22:34:23,320 [INFO] __main__: Running the topology as root: sudo -n /usr/bin/python3 /home/aaron/FL-IDS-clean/fl_ids/sdn/topology.py
+2026-10-15 22:35:28,985 [INFO] __main__: Phase B: h1 (client 0) -> Backdoor (confidence 0.997, boosting stage, 24669/24914 packets non-benign) -> block; flow rule: cookie=0x0, duration=0.003s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 actions=drop

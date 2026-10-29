@@ -1,0 +1,93 @@
+\chapter{Introduction}
+
+\section{Overview}
+Industrial and consumer Internet of Things (IoT/IIoT) deployments connect large numbers of low-power sensors, actuators, edge gateways and controllers. These devices speak lightweight protocols such as MQTT and Modbus/TCP, run with little or no host-based security, and are often installed in places that are physically hard to reach and slow to patch. They are therefore a common target for denial-of-service floods, scanning, injection attacks against web interfaces, malware such as backdoors and ransomware, and man-in-the-middle attacks.
+
+A network intrusion detection system (IDS) watches traffic and labels it as benign or as a particular attack type. A conventional IDS sends all traffic to one central place for training and analysis. In IoT/IIoT settings this is a problem: raw traffic can reveal how a plant or a home operates, traffic volume is high, and different sites see very different mixes of traffic.
+
+This project, \textbf{FL-IDS}, builds an intrusion detection system for IoT/IIoT traffic that combines five parts, each covering a gap left by the others:
+\begin{enumerate}
+  \item a \textbf{LightGBM gradient-boosting classifier} that names known attack types;
+  \item a \textbf{client-side autoencoder} that checks the traffic the classifier calls normal and flags anything unlike benign traffic as \emph{anomalous}, as a backstop for attacks that were never seen during training (zero-day attacks);
+  \item \textbf{federated learning} with the Flower framework, so the autoencoder is trained across many sites without raw traffic leaving any site;
+  \item a \textbf{cosine-similarity trust filter} on the server that screens the clients' model updates and excludes poisoned ones before aggregation;
+  \item \textbf{software-defined networking (SDN)} mitigation, where a verdict becomes a real OpenFlow rule (drop or rate-limit) on an Open vSwitch switch running in Mininet.
+\end{enumerate}
+The system is evaluated on the public Edge-IIoTset dataset~\cite{ferrag2022edge}, which contains about 2.2 million labelled packets across normal traffic and 14 attack types.
+
+\section{Motivation}
+Three practical problems motivated the work.
+
+\textbf{Privacy and bandwidth.} Packet captures from a factory floor or a smart building contain operational details that owners do not want to share. Federated learning lets each site train on its own data and share only model weights.
+
+\textbf{Attacks the classifier has never seen.} A supervised classifier can only output the labels it was trained on. A new attack is either forced into a wrong known class or called normal. An anomaly detector trained only on benign traffic does not need attack labels, so it can catch some of these cases.
+
+\textbf{Poisoned training.} In federated learning the server cannot see client data, so a compromised client can send a manipulated update. Without a defence, a few such clients can ruin the shared model. During this project, plain federated averaging with 30\% sign-flipping clients drove the autoencoder's validation loss to about $9.2\times10^{14}$ and its stand-alone detection to zero.
+
+Finally, detection alone does not stop an attack. Linking the detector to an SDN controller lets a verdict change how the network forwards traffic.
+
+\section{Objective}
+\begin{enumerate}
+  \item \textbf{Malicious Client Detection \& Filtering.} To develop a \textbf{malicious client detection mechanism} using anomaly-based or trust-based evaluation to identify and filter compromised participants in the federated network.
+  \item \textbf{Efficient Privacy-Aware FL Design.} To design a \textbf{lightweight and efficient federated learning framework} that balances privacy and performance while minimizing computational and communication overhead in resource-constrained IoT environments.
+  \item \textbf{Model Optimization for Scalability.} To enhance system scalability by applying \textbf{model optimization techniques such as weight pruning}, reducing computational and communication overhead.
+  \item \textbf{Semi-Supervised \& Anomaly-Based Detection.} To integrate \textbf{semi-supervised learning and Autoencoder-based anomaly detection} to effectively identify abnormal or potentially poisoned patterns without relying entirely on labeled data.
+\end{enumerate}
+
+\section{Scope}
+The project covers offline federated training and evaluation (``Phase A'') and a live mitigation demonstration on an emulated network (``Phase B''). Training uses 10 simulated clients, run either in one process for the evaluation sweeps or as 10 separate operating-system processes talking to a real Flower server. Mitigation is demonstrated by replaying real attack captures from the dataset through Mininet with \texttt{tcpreplay}.
+
+The following are outside the scope: deployment on physical IoT hardware, inline per-packet blocking of a live stream (classification happens once tshark has extracted features from a capture), adaptive attackers other than the sign-flip attacker, and a systematic literature review to establish novelty.
+
+\section{SDG Justification}
+\textbf{SDG 9: Industry, Innovation and Infrastructure.} FL-IDS enhances the security of network infrastructure and supports smart systems: IIoT networks run manufacturing, power and transport, and the system detects attacks on them, resists poisoned training and blocks attackers through SDN flow rules.
+
+\textbf{SDG 11: Sustainable Cities and Communities.} Smart cities depend on IoT systems in traffic management, healthcare and energy grids. Securing these devices helps ensure the safe and reliable operation of connected urban infrastructure.
+
+\textbf{SDG 16: Peace, Justice and Strong Institutions.} The project strengthens cybersecurity and protects sensitive digital data: raw traffic never leaves a site during training, and attacks are detected and blocked.
+
+Together, these promote \textbf{secure and resilient digital ecosystems}.
+
+\section{Existing System}
+Most IDS work on Edge-IIoTset and similar datasets trains a single centralised model, often a deep neural network or a tree ensemble, on the authors' preprocessed CSV file, and reports accuracy on a random split of packets. These systems have the following limitations:
+\begin{itemize}
+  \item all raw traffic must be collected in one place;
+  \item they can only output known attack labels, so a new attack is missed or mislabelled;
+  \item federated variants that do exist usually use plain federated averaging, which a small number of malicious clients can break;
+  \item detection is not linked to any enforcement mechanism;
+  \item the reported accuracy is often inflated, because random packet splits put packets of the same connection in both training and test sets, and because of formatting artefacts in the released CSV (Section~\ref{sec:dataquality}).
+\end{itemize}
+
+\section{Proposed System}
+FL-IDS uses a two-stage cascade. Every packet first goes to the LightGBM classifier. If it predicts an attack with probability at least 0.7, that label is final. Otherwise the packet goes to the client's autoencoder. If the reconstruction error is above that client's threshold (the 97th percentile of error on its own benign validation data), the packet is labelled \emph{anomalous}; otherwise it is benign.
+
+The autoencoder is trained with federated learning across 10 non-IID clients. On every round the server's trust filter compares each client's weight update with the coordinate-wise median update, excludes outliers, updates that point away from the consensus and clients with low running trust, clips the remaining update norms and combines them with a trimmed mean.
+
+The trained models are saved as a self-describing bundle. In Phase B they classify replayed attack traffic on a Mininet network, and the verdict is sent to an os-ken OpenFlow~1.3 controller, which installs a drop rule or a rate-limiting meter on the switch.
+
+This report also adds flow- and content-level features to the classifier (Chapter~\ref{chap:method}), which raise it from 96.4\% accuracy and 0.887 macro F1 to the levels reported in Chapter~\ref{chap:results}.
+
+\section{Work Plan}
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|c|p{9.5cm}|c|}
+\hline
+\textbf{Phase} & \textbf{Work} & \textbf{Status} \\ \hline
+0 & Project scaffolding, configuration, test framework & Done \\ \hline
+1 & Data pipeline: cleaning, encoding, Dirichlet partition, per-client normalisation; label-leak fix and MITM capture repair & Done \\ \hline
+2 & LightGBM bootstrap classifier and incremental update & Done \\ \hline
+3 & Core federated loop with the Flower framework & Done \\ \hline
+4 & Robustness layer: trust filter, trimmed mean, sign-flip attacker & Done \\ \hline
+5 & Training on the real Edge-IIoTset data & Done \\ \hline
+6 & Evaluation: ablation, poisoning sweep, zero-day experiment & Done \\ \hline
+7 & SDN mitigation with Mininet, Open vSwitch and os-ken & Done \\ \hline
+8 & Streamlit dashboard & Done \\ \hline
+9 & End-to-end Phase A $\rightarrow$ Phase B run & Done \\ \hline
+10 & Classifier accuracy improvement (flow and content features) & Done \\ \hline
+11 & Integration of the new features into the federated system and the SDN demo; full re-evaluation & Done \\ \hline
+12 & Paper writing and submission & In progress \\ \hline
+\end{tabular}
+\caption{Project work plan}
+\label{tab:workplan}
+\end{table}

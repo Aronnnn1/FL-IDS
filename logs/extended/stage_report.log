@@ -1,0 +1,27 @@
+2026-10-15 21:32:05,374 [INFO] fl_ids.data.pipeline: Loaded extended features from cache data/processed/encoded_extended.npz: (1985768, 130)
+2026-10-15 21:32:08,978 [INFO] fl_ids.models.boosting: Training boosting classifier: 99288 samples, 15 classes, 300 rounds
+2026-10-15 21:32:20,980 [INFO] fl_ids.eval.common: Evaluation setup: 99288 calibration, 60000 federated pool (subsampled), 8996 test rows across 10 clients
+2026-10-15 21:32:25,249 [INFO] fl_ids.eval.simulation: Round 1: mean_val_loss=0.2047, comm_bytes=786720
+2026-10-15 21:32:28,716 [INFO] fl_ids.eval.simulation: Round 2: mean_val_loss=0.1079, comm_bytes=786720
+2026-10-15 21:32:32,276 [INFO] fl_ids.eval.simulation: Round 3: mean_val_loss=0.0688, comm_bytes=786720
+2026-10-15 21:32:35,834 [INFO] fl_ids.eval.simulation: Round 4: mean_val_loss=0.0440, comm_bytes=786720
+2026-10-15 21:32:39,506 [INFO] fl_ids.eval.simulation: Round 5: mean_val_loss=0.0438, comm_bytes=786720
+2026-10-15 21:32:43,055 [INFO] fl_ids.eval.simulation: Round 6: mean_val_loss=0.0419, comm_bytes=786720
+2026-10-15 21:32:46,587 [INFO] fl_ids.eval.simulation: Round 7: mean_val_loss=0.0401, comm_bytes=786720
+2026-10-15 21:32:50,207 [INFO] fl_ids.eval.simulation: Round 8: mean_val_loss=0.0397, comm_bytes=786720
+2026-10-15 21:32:53,943 [INFO] fl_ids.eval.simulation: Round 9: mean_val_loss=0.0399, comm_bytes=786720
+2026-10-15 21:32:57,628 [INFO] fl_ids.eval.simulation: Round 10: mean_val_loss=0.0400, comm_bytes=786720
+2026-10-15 21:33:01,164 [INFO] fl_ids.eval.simulation: Round 11: mean_val_loss=0.0398, comm_bytes=786720
+2026-10-15 21:33:04,927 [INFO] fl_ids.eval.simulation: Round 12: mean_val_loss=0.0391, comm_bytes=786720
+2026-10-15 21:33:08,453 [INFO] fl_ids.eval.simulation: Round 13: mean_val_loss=0.0382, comm_bytes=786720
+2026-10-15 21:33:12,230 [INFO] fl_ids.eval.simulation: Round 14: mean_val_loss=0.0368, comm_bytes=786720
+2026-10-15 21:33:16,620 [INFO] fl_ids.eval.simulation: Round 15: mean_val_loss=0.0355, comm_bytes=786720
+2026-10-15 21:33:20,763 [INFO] fl_ids.eval.simulation: Round 16: mean_val_loss=0.0349, comm_bytes=786720
+2026-10-15 21:33:24,666 [INFO] fl_ids.eval.simulation: Round 17: mean_val_loss=0.0342, comm_bytes=786720
+2026-10-15 21:33:28,623 [INFO] fl_ids.eval.simulation: Round 18: mean_val_loss=0.0338, comm_bytes=786720
+2026-10-15 21:33:32,399 [INFO] fl_ids.eval.simulation: Round 19: mean_val_loss=0.0334, comm_bytes=786720
+2026-10-15 21:33:36,225 [INFO] fl_ids.eval.simulation: Round 20: mean_val_loss=0.0331, comm_bytes=786720
+2026-10-15 21:33:37,363 [INFO] __main__: boosting_alone: accuracy=0.9974 macro_f1=0.9783 weighted_f1=0.9974 benign_fpr=0.0002
+2026-10-15 21:33:37,363 [INFO] __main__: autoencoder_alone: accuracy=0.9006 macro_f1=0.8679 weighted_f1=0.8972 benign_fpr=0.0332
+2026-10-15 21:33:37,363 [INFO] __main__: cascade_combined: accuracy=0.9759 macro_f1=0.9706 weighted_f1=0.9762 benign_fpr=0.0332
+2026-10-15 21:33:37,363 [INFO] __main__: Wrote results/extended/per_class_stage_report.csv

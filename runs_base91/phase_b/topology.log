@@ -1,0 +1,107 @@
+*** Configuring hosts
+2026-09-27 13:31:10,660 [INFO] mininet: *** Configuring hosts
+
+h1 2026-09-27 13:31:10,660 [INFO] mininet: h1 
+h2 2026-09-27 13:31:10,664 [INFO] mininet: h2 
+h3 2026-09-27 13:31:10,667 [INFO] mininet: h3 
+h4 2026-09-27 13:31:10,670 [INFO] mininet: h4 
+h5 2026-09-27 13:31:10,673 [INFO] mininet: h5 
+h6 2026-09-27 13:31:10,675 [INFO] mininet: h6 
+h7 2026-09-27 13:31:10,677 [INFO] mininet: h7 
+h8 2026-09-27 13:31:10,680 [INFO] mininet: h8 
+h9 2026-09-27 13:31:10,682 [INFO] mininet: h9 
+h10 2026-09-27 13:31:10,685 [INFO] mininet: h10 
+
+2026-09-27 13:31:10,687 [INFO] mininet: 
+
+*** Starting controller
+2026-09-27 13:31:10,687 [INFO] mininet: *** Starting controller
+
+c0 2026-09-27 13:31:10,687 [INFO] mininet: c0 
+
+2026-09-27 13:31:10,687 [INFO] mininet: 
+
+*** Starting 1 switches
+2026-09-27 13:31:10,687 [INFO] mininet: *** Starting 1 switches
+
+s1 2026-09-27 13:31:10,687 [INFO] mininet: s1 
+...2026-09-27 13:31:10,697 [INFO] mininet: ...
+
+2026-09-27 13:31:10,699 [INFO] mininet: 
+
+=== LIVE DEMO RESULT ===
+{
+  "pcap": "/home/aaron/FL-IDS/data/raw/pcaps/Backdoor_attack.pcap",
+  "artifact_dir": "/home/aaron/FL-IDS/saved_models/phase_a",
+  "device_ip": "10.0.0.1",
+  "classification": {
+    "device_id": "h1",
+    "classification": "Backdoor",
+    "confidence": 0.9974257641978579,
+    "stage": "boosting",
+    "client_id": 0,
+    "num_packets": 24914,
+    "num_non_benign": 23895
+  },
+  "mitigation": {
+    "action": "block",
+    "applied": true,
+    "classification": "Backdoor",
+    "confidence": 0.9974257641978579,
+    "device_id": "h1",
+    "ip_address": "10.0.0.1",
+    "stage": "boosting",
+    "timestamp": 1790496074.6182523
+  },
+  "switch_packets_before": 17,
+  "switch_packets_after": 3512,
+  "flow_table": " cookie=0x0, duration=0.002s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 actions=drop\r\n cookie=0x0, duration=3.921s, table=0, n_packets=23586, n_bytes=5983953, priority=0 actions=NORMAL\r\n"
+}
+*** Stopping 1 controllers
+2026-09-27 13:31:34,632 [INFO] mininet: *** Stopping 1 controllers
+
+c0 2026-09-27 13:31:34,632 [INFO] mininet: c0 
+
+2026-09-27 13:31:34,632 [INFO] mininet: 
+
+*** Stopping 10 links
+2026-09-27 13:31:34,632 [INFO] mininet: *** Stopping 10 links
+
+.2026-09-27 13:31:34,632 [INFO] mininet: .
+.2026-09-27 13:31:34,659 [INFO] mininet: .
+.2026-09-27 13:31:34,677 [INFO] mininet: .
+.2026-09-27 13:31:34,688 [INFO] mininet: .
+.2026-09-27 13:31:34,699 [INFO] mininet: .
+.2026-09-27 13:31:34,709 [INFO] mininet: .
+.2026-09-27 13:31:34,717 [INFO] mininet: .
+.2026-09-27 13:31:34,725 [INFO] mininet: .
+.2026-09-27 13:31:34,735 [INFO] mininet: .
+.2026-09-27 13:31:34,745 [INFO] mininet: .
+
+2026-09-27 13:31:34,754 [INFO] mininet: 
+
+*** Stopping 1 switches
+2026-09-27 13:31:34,754 [INFO] mininet: *** Stopping 1 switches
+
+s1 2026-09-27 13:31:34,777 [INFO] mininet: s1 
+
+2026-09-27 13:31:34,777 [INFO] mininet: 
+
+*** Stopping 10 hosts
+2026-09-27 13:31:34,777 [INFO] mininet: *** Stopping 10 hosts
+
+h1 2026-09-27 13:31:34,777 [INFO] mininet: h1 
+h2 2026-09-27 13:31:34,778 [INFO] mininet: h2 
+h3 2026-09-27 13:31:34,778 [INFO] mininet: h3 
+h4 2026-09-27 13:31:34,778 [INFO] mininet: h4 
+h5 2026-09-27 13:31:34,778 [INFO] mininet: h5 
+h6 2026-09-27 13:31:34,779 [INFO] mininet: h6 
+h7 2026-09-27 13:31:34,779 [INFO] mininet: h7 
+h8 2026-09-27 13:31:34,779 [INFO] mininet: h8 
+h9 2026-09-27 13:31:34,779 [INFO] mininet: h9 
+h10 2026-09-27 13:31:34,780 [INFO] mininet: h10 
+
+*** Done
+2026-09-27 13:31:34,780 [INFO] mininet: 
+*** Done
+

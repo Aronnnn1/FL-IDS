@@ -1,0 +1,27 @@
+\chapter{Conclusion and Future Work}
+
+\section*{Conclusion}
+FL-IDS shows that the five parts of the system work together on real IoT/IIoT traffic: a boosting classifier, a federated autoencoder backstop, a cosine-similarity trust filter, Flower-based federated learning, and SDN mitigation. Each part has a measured contribution. All planned phases are complete (Table~\ref{tab:workplan}); what remains is the research paper.
+
+\begin{itemize}
+  \item \textbf{Accuracy target met.} With service-port, payload-content and flow features and square-root class weights, the LightGBM classifier reaches \textbf{99.7\% accuracy and 0.983--0.985 macro F1} when trained on 1.43 million packets and tested on 397 thousand packets from connections that never appear in training (a flow-grouped 80/20 split of all 1.99 million unique packets). That is up from 96.4\% and 0.889 with the original features. The result holds across three seeds, and it holds when the classifier is trained on only the 5\% server calibration set (99.7\% / 0.979).
+  \item \textbf{The whole federated system improves with the new features.} A real run with ten client processes reaches 0.999 attack macro-recall (was 0.889), and the cascade detects never-seen attack classes at 0.943 macro-recall (was 0.736), against 0.801 for the classifier alone. The backstop's value is now clearest on unseen attacks: on known attacks the classifier alone has the higher detection F1 (0.998 vs.\ 0.961).
+  \item \textbf{The trust filter keeps federated training usable under poisoning.} Attack detection stays at 0.997--1.000 and zero-day detection at 0.90--0.94 up to 40\% malicious clients, while plain FedAvg's autoencoder diverges at 30\%. The filter fails at 50\%, as expected for median-based defences.
+  \item \textbf{Detection drives enforcement.} Phase B derives the same features live (99.8\% of live rows match training rows exactly); a replayed Backdoor capture was classified with 0.997 confidence and produced a drop rule, confirmed from the switch's flow table.
+  \item \textbf{Data quality.} The released Edge-IIoTset CSV contains a placeholder label leak (one feature with an AUROC of 1.0) and column-shifted MITM rows. Results trained directly on it are likely inflated.
+\end{itemize}
+
+\section*{Limitations}
+The service-port feature benefits from the testbed's lack of benign HTTP traffic. Two attack classes are detected less well as zero-day attacks with the new features (MITM, and Uploading for the classifier alone), and attacker survival at 40\% rose from 24\% to 36\% in a single-seed run. Flow features are computed per 120-second flow record, so classification is not per-packet. Mitigation in Phase B is capture-level rather than inline. Only one attack model (sign-flip) was tested against the trust filter. Most federated experiments use one seed. The federated system trains on about 125{,}000 rows (the 79{,}430-row calibration set and a 60{,}000-row client pool), not on the full dataset; only the standalone classifier was trained on 1.43 million rows (Table~\ref{tab:datascale}). The classifier update ships a small number of confirmed alert rows to the server, which relaxes strict data locality.
+
+\section*{Future Work}
+\begin{enumerate}
+  \item Make mitigation streaming: classify flows incrementally (for example after the first $n$ packets) so a rule can be installed while an attack is still running.
+  \item Test adaptive attackers that stay just above the filter's thresholds, and attackers above 50\%, possibly using a small trusted root dataset as in FLTrust~\cite{cao2021fltrust}.
+  \item Repeat all federated experiments over several seeds and report confidence intervals.
+  \item Run the federated system on the full client pool instead of a 60{,}000-row sample, on a machine with more memory.
+  \item Validate on a second dataset that contains benign web traffic, to measure how much the service-port feature depends on the testbed.
+  \item Apply weight pruning to the autoencoder and its updates (Objective 3). It has not been implemented yet; the model is already small (9{,}834 parameters), and pruning would cut communication further.
+  \item Federate the classifier itself (for example with histogram-based federated boosting) so the calibration set no longer needs to be held centrally.
+  \item Deploy on physical edge hardware and a hardware OpenFlow switch.
+\end{enumerate}
