@@ -1,0 +1,55 @@
+\chapter{Literature Survey}
+This chapter reviews published work on the techniques FL-IDS combines: federated intrusion detection, robust aggregation against poisoned updates, two-stage classifier-plus-anomaly-detector designs, and coupling of learning-based detection with SDN enforcement. It then identifies the gaps this project addresses.
+
+\section{Overview}
+Federated learning (FL) was introduced by McMahan \emph{et al.}~\cite{mcmahan2017fedavg} as a way to train a shared model across many clients by averaging locally trained weights (FedAvg), so raw data stays on the clients. Intrusion detection was one of the first security applications of FL, and the area has grown to the point where Hernandez-Ramos \emph{et al.}~\cite{hernandez2025fliids} published a systematic review of FL-based IDS in \emph{ACM Computing Surveys}. Their review covers the models, datasets, aggregation functions and libraries used in this literature. It shows that a federated autoencoder or a federated deep classifier is a well-established idea in itself, and that the open problems lie in non-IID data, poisoning, and real deployment.
+
+FedAvg is fragile when some clients are malicious. Yin \emph{et al.}~\cite{yin2018trimmed} analysed coordinate-wise median and trimmed-mean aggregation and showed that they tolerate a bounded fraction of Byzantine clients, but break down once attackers reach the trimmed fraction, or 50\% for the median. Later work moved to the \emph{direction} of updates: comparing each update with a reference using cosine similarity.
+
+\section{Detailed Survey}
+
+\textbf{Mothukuri \emph{et al.}, 2022}~\cite{mothukuri2022fl}. This work proposes federated anomaly detection for IoT networks using gated recurrent unit (GRU) models trained on decentralised device data, with an ensembler that combines updates from several sources. It shows that federated training can match centralised accuracy while keeping data on devices. It uses no supervised first stage, no defence against poisoned updates, and no network-level enforcement.
+
+\textbf{Li \emph{et al.}, DeepFed, 2021}~\cite{li2021deepfed}. DeepFed builds an intrusion detection model for industrial cyber-physical systems from a convolutional neural network and a GRU, trained with FL across several industrial sites. Model parameters are protected with a Paillier-cryptosystem-based protocol. DeepFed protects updates in transit but does not filter malicious ones, and it has no zero-day backstop or SDN mitigation.
+
+\textbf{Ferrag \emph{et al.}, Edge-IIoTset, 2022}~\cite{ferrag2022edge}. This paper releases the dataset used in this project. It is collected on a seven-layer IoT/IIoT testbed with more than ten device types and covers 14 attacks in five groups (DoS/DDoS, information gathering, man-in-the-middle, injection and malware). The authors explicitly position it for both centralised and federated learning and report baseline results for both. Chapter~\ref{chap:method} shows that the released CSV has formatting artefacts which inflate results trained on it directly.
+
+\textbf{Cao \emph{et al.}, FLTrust, 2021}~\cite{cao2021fltrust}. FLTrust gives the server a small clean ``root'' dataset and computes its own reference update. Each client update gets a trust score from its cosine similarity to that reference, with negative similarity clipped to zero, and its magnitude is normalised to the reference. FL-IDS borrows the rule that an update pointing \emph{away} from the reference (cosine $<0$) is excluded. It uses the coordinate-wise median of the round's updates as the reference instead of a root dataset.
+
+\textbf{Xu \emph{et al.}, SignGuard, 2022}~\cite{xu2022signguard}. SignGuard shows that median- and distance-based defences can be circumvented by carefully crafted poisoning, and that the element-wise sign of an update together with magnitude and similarity statistics is effective for filtering malicious gradients. This supports pairing cosine similarity with a norm check, which FL-IDS does with norm clipping, against the sign-flipping attacker used in its evaluation.
+
+\textbf{Zhang \emph{et al.}, 2023}~\cite{zhang2023lgbmae}. This paper proposes a two-stage intrusion detector: LightGBM with focal loss makes a first decision, and the reconstruction residual of an autoencoder makes a second decision on samples the first stage called normal. It reports above 90\% accuracy, recall and F1 on NSL-KDD and UNSW-NB15. This is the direct precedent for the boosting-first cascade used in FL-IDS. FL-IDS differs in training the autoencoder federatedly and protecting it with a trust filter.
+
+\textbf{El Houda \emph{et al.}, MiTFed, 2023}~\cite{elhouda2023mitfed}. MiTFed lets several network domains collaboratively train an attack detector with FL, uses SDN to enforce mitigation, and uses a blockchain to make the collaboration verifiable. It is the closest precedent for the ``FL decides, SDN enforces'' structure of FL-IDS. MiTFed does not use a two-stage cascade with an anomaly backstop.
+
+\textbf{Ke \emph{et al.}, LightGBM, 2017}~\cite{ke2017lightgbm}. LightGBM is a gradient-boosted decision-tree library that uses gradient-based one-side sampling and exclusive feature bundling to train quickly on large tabular data. Tree ensembles are a strong baseline for tabular network-flow features, which FL-IDS confirms: on the same 500,000-row sample, LightGBM reached 0.887 macro F1 against 0.622 for a comparably sized neural network.
+
+\textbf{Sharafaldin \emph{et al.}, CIC-IDS2017, 2018}~\cite{sharafaldin2018cicids}. This work introduced the CIC-IDS2017 dataset, whose features are computed per flow by CICFlowMeter (packet counts, rates, durations, payload statistics). Flow features of this kind are standard in network IDS. FL-IDS adopts the same idea, including CICFlowMeter's 120-second active timeout for splitting long sessions into flow records.
+
+\section{Research Gap Identification}
+From the survey, the following gaps were identified.
+\begin{enumerate}
+  \item \textbf{No single system combines all five parts.} Federated anomaly detection, cosine-based robust aggregation, a boosting-first cascade and FL with SDN enforcement each exist in some paper, as pairs or triples. A handful of targeted searches found no system combining all five. (This is not a systematic review, so novelty is stated cautiously.)
+  \item \textbf{Zero-day detection is rarely measured per class.} Most federated IDS papers report accuracy on known classes only. The value of an anomaly-detection backstop shows up only when each attack class is held out in turn.
+  \item \textbf{Robust aggregation under non-IID data.} Cosine-similarity defences assume honest updates are similar to each other. Under strong label skew, honest clients disagree too, and the literature reports that such defences degrade. This needs to be measured, not assumed.
+  \item \textbf{Inflated results on the released Edge-IIoTset CSV.} Work that trains directly on the authors' preprocessed CSV inherits its formatting artefacts. The random packet-level split also puts packets of the same connection in both training and test sets.
+  \item \textbf{Weak detection of application-layer attacks.} With only the released packet-header features, SQL injection, XSS, file upload, password attacks and HTTP floods are hard to tell apart from each other and from benign traffic, because most of their packets are content-free TCP acknowledgements.
+  \item \textbf{Detection rarely drives verified enforcement.} Many papers stop at a classification score. Few show a detection producing a flow rule that is then read back from the switch.
+\end{enumerate}
+
+\section{Mapping of your Objective with Research Gap Identification}
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|p{6.2cm}|p{7.3cm}|}
+\hline
+\textbf{Research gap} & \textbf{Objective addressing it} \\ \hline
+1. No system combines all five parts & All four objectives together: trust-filtered federated learning (1, 2), a compact model (3) and an autoencoder backstop (4), integrated with a boosting classifier and SDN mitigation \\ \hline
+2. Zero-day detection rarely measured & Objective 4: autoencoder-based anomaly detection, measured by holding out each of the 14 attack classes \\ \hline
+3. Robust aggregation under non-IID data & Objective 1: cosine/MAD/EMA-trust filtering of client updates, tested from 0\% to 50\% malicious clients \\ \hline
+4. Inflated results on the released CSV & Supporting work for all objectives: placeholder-leak fix, MITM capture repair and a flow-grouped evaluation split \\ \hline
+5. Weak application-layer detection & Supporting work: service-port, content and flow features for the classifier (Section 4.2.3) \\ \hline
+6. Detection not linked to enforcement & Objective 2 (practical FL design): Phase B turns a verdict into an OpenFlow rule verified in the switch's flow table \\ \hline
+\end{tabular}
+\caption{Mapping of objectives to research gaps}
+\end{table}

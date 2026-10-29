@@ -1,0 +1,13 @@
+2026-10-15 21:25:53,991 [INFO] fl_ids.data.pipeline: Feature cache data/processed/encoded_extended.npz is stale; rebuilding
+2026-10-15 21:25:54,002 [INFO] fl_ids.data.pipeline: Loading 62/63 columns from data/raw/DNN-EdgeIIoT-dataset.csv (excluded 1)
+2026-10-15 21:26:12,787 [INFO] fl_ids.data.pipeline: Loading 62/63 columns from data/processed/MITM_reextracted.csv (excluded 1)
+2026-10-15 21:26:19,344 [INFO] fl_ids.data.repair: Repaired MITM: replaced 1214 dataset rows with 1229 re-extracted rows
+2026-10-15 21:27:18,591 [INFO] fl_ids.data.features: Derived extended features: 2219216 packets in 392782 flows
+2026-10-15 21:27:25,159 [INFO] fl_ids.data.pipeline: Cleaned dataframe: 2219216 -> 1985768 rows (dropped 0 NaN, 233448 duplicate)
+2026-10-15 21:27:27,385 [INFO] fl_ids.data.pipeline: Wrote feature cache data/processed/encoded_extended.npz
+2026-10-15 21:27:30,502 [INFO] fl_ids.models.boosting: Training boosting classifier: 79430 samples, 15 classes, 300 rounds
+2026-10-15 21:27:41,120 [INFO] __main__: Prepared 79430 calibration rows, 60000 federated rows across 10 clients; bootstrap boosting accuracy 0.997
+2026-10-15 21:27:43,196 [INFO] __main__: Started Flower server on 127.0.0.1:9091 and 10 clients (0 sign-flip attackers) for 20 rounds; logs in runs/phase_a
+2026-10-15 21:31:39,758 [INFO] __main__: Per-client thresholds match the 10 values clients reported in the final round
+2026-10-15 21:31:43,188 [INFO] fl_ids.orchestration.artifacts: Saved Phase A bundle to saved_models/phase_a (10 clients)
+2026-10-15 21:31:43,188 [INFO] __main__: Phase A done: cascade attack macro-recall 0.999, benign FPR 0.0350 on 10 clients' held-out test slices; bundle at saved_models/phase_a

@@ -73,3 +73,10 @@ Thumbs.db
 # Mininet / SDN runtime artifacts
 *.pcap.replay
 ovs-vsctl.log
+
+# Derived from the dataset, or duplicates of saved_models/ (results and run
+# records in results/, runs*/ and experiments/ are force-added; see README)
+runs_base91/
+experiments/accuracy/features.parquet
+# venv is a symlink here, which the venv/ pattern above does not match
+venv

@@ -1,0 +1,303 @@
+\documentclass[12pt,a4paper]{report}
+
+% Packages
+\usepackage{times}              % Times New Roman font
+\usepackage{iftex}
+\ifXeTeX % times only works under pdfLaTeX; use the same Times face under XeTeX/Tectonic
+  \usepackage{fontspec}\setmainfont{texgyretermes}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic]\setmonofont{texgyrecursor}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic]
+\fi
+\usepackage{setspace}           % Line spacing
+\usepackage[a4paper, left=1.5in, right=1in, top=1in, bottom=1in]{geometry}
+\usepackage{titlesec}           % Chapter/section formatting
+\usepackage{fancyhdr}           % Header/Footer
+\usepackage{graphicx}           % Figures
+\usepackage{hyperref}           % Hyperlinks
+\usepackage{tocloft}            % TOC formatting
+\usepackage{titlesec}
+\usepackage{etoolbox} % needed for patching TOC entries
+\usepackage{amsmath}            % Equations
+\usepackage{float}
+\usepackage{array}
+
+
+% Line spacing
+\onehalfspacing
+\setlength{\emergencystretch}{3em} % lets long \texttt words wrap instead of overflowing the margin
+
+% Title formatting
+\titleformat{\chapter}[hang]{\bfseries\centering\LARGE}{Chapter \thechapter}{1em}{}
+\titleformat{\section}[hang]{\bfseries\Large}{\thesection}{1em}{}
+
+% Fancy Header/Footer
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textit{FL-IDS: Federated Learning-Based Intrusion Detection System for IoT/IIoT}}
+\lfoot{\textit{Dept. of CSE,BMSCE}}
+\rfoot{\textit{Page \thepage}}
+
+% Make chapter pages use fancy style
+\makeatletter
+\let\ps@plain\ps@fancy
+\makeatother
+
+\begin{document}
+
+% ---------- FRONT MATTER: ROMAN NUMBERS ----------
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+% ----- Title Page -----
+\begin{titlepage}
+  \thispagestyle{empty}
+  \centering
+
+  {\Huge \textbf{FL-IDS: Federated Learning-Based Intrusion Detection System for IoT/IIoT}}\\[1.0cm]
+  \includegraphics[width=0.18\linewidth]{VTU-Logojpg.jpg}\\[0.9cm]
+  {\Large \textbf{PROJECT REPORT}}\\[0.2cm]
+  {\large \textit{Submitted by}}\\[0.5cm]
+  {\large Aaron B Ajay (1BM23CS003)}\\
+  {\large Aaryan Prakash (1BM23CS006)}\\
+  {\large Amal Roy (1BM23CS025)}\\
+  {\large Amogh Krishna JS (1BM23CS029)}\\[0.7cm]
+  {\itshape in partial fulfillment for the award of the degree of}\\[0.15cm]
+  {\Large \textbf{BACHELOR OF ENGINEERING}}\\[0.2cm]
+  {\large in}\\[0.2cm]
+  {\Large \textbf{COMPUTER SCIENCE AND ENGINEERING}}\\[0.9cm]
+  {\large Under the Guidance of}\\
+  {\large \textbf{Mr. Syed Akram}}\\
+  {\large Assistant Professor,Department of CSE, BMSCE}
+  \vfill
+  \includegraphics[width=0.18\linewidth]{bmscelogo.jpg}\\[0.5cm]
+  {\Large \textbf{B.M.S. COLLEGE OF ENGINEERING}}\\
+  {\large (Autonomous Institution under VTU)}\\
+  {\large BENGALURU - 560019}\\
+  {\large Academic Year - 2026}
+
+\end{titlepage}
+% ----- Certificate -----
+\chapter*{Certificate}
+\thispagestyle{empty}
+\vspace{2cm}
+This is to certify that the project report entitled \textbf{"FL-IDS: Federated Learning-Based Intrusion Detection System for IoT/IIoT"} is a bonafide work carried out by \textbf{Aaron B Ajay (USN: 1BM23CS003), Aaryan Prakash (USN: 1BM23CS006), Amal Roy (USN: 1BM23CS025) and Amogh Krishna JS (USN: 1BM23CS029)} in partial fulfillment of the requirements for the award of the degree of \textbf{Bachelor of Engineering} in \textbf{Computer Science and Engineering}, under my supervision during the academic year 2026.
+
+\vspace{2cm}
+\begin{flushleft}
+Guide Signature\hspace{30mm} HoD signature \hspace{25mm} Principal Signature\\
+(Mr. Syed Akram) \hspace{25mm} Dr. Kavitha Sooda \hspace{19mm} Dr. Bheemsha Arya
+\end{flushleft}
+\vspace{2cm}
+\begin{flushleft}
+Name and signature of Examiners along with date \\
+\vspace {1cm}
+Examiner 1 \\
+\vspace {1cm}
+Examiner 2 \\
+
+\end{flushleft}
+
+
+
+% ----- Abstract -----
+\chapter*{Abstract}
+\thispagestyle{empty}
+Internet of Things (IoT) and Industrial IoT (IIoT) networks connect large numbers of lightly protected devices that are frequent targets of denial-of-service floods, scanning, web injection attacks, malware and man-in-the-middle attacks. A conventional intrusion detection system (IDS) collects all traffic centrally, cannot name attacks it was never trained on, and does not stop the attack. This project presents \textbf{FL-IDS}, an intrusion detection system for IoT/IIoT traffic that combines five components: a LightGBM gradient-boosting classifier that names known attack types; a client-side autoencoder that checks the traffic the classifier passes as normal and flags unusual traffic as anomalous, as a backstop for zero-day attacks; federated learning with the Flower framework, so that the autoencoder is trained across ten non-IID clients without sharing raw traffic; a server-side cosine-similarity trust filter that excludes poisoned client updates before trimmed-mean aggregation; and software-defined networking (SDN) mitigation that turns a verdict into an OpenFlow rule.
+
+The system is evaluated on the Edge-IIoTset dataset (2.2 million packets, 15 classes). We first found and corrected two problems in the released data: a placeholder-formatting artefact that separated benign from attack traffic with an AUROC of 1.0, and column-shifted MITM rows, which we repaired from the authors' own capture. The classifier was then improved with a service-port feature, payload and URI content features, and flow features computed with CICFlowMeter's 120-second active timeout, together with square-root class weighting. Trained on 1.43 million packets and tested on 397 thousand packets from connections it never saw (a flow-grouped split of all 1.99 million unique packets), accuracy rose from 96.4\% to \textbf{99.7\%} and macro F1 from 0.889 to \textbf{0.983--0.985} across three seeds, meeting the project target of 95\% for both.
+
+The same features were integrated into the federated system and the live demo. A real run with ten separate client processes reached 0.999 attack macro-recall (previously 0.889). When each attack class was held out of training in turn, the cascade detected these unseen attacks at 0.943 macro-recall (previously 0.736), against 0.801 for the classifier alone. With the trust filter, detection stayed stable with up to 40\% poisoned clients, while plain federated averaging diverged. A replayed Backdoor capture was classified with 0.997 confidence and blocked by a drop rule confirmed from the switch's flow table. Limitations, including capture-level rather than inline mitigation, are stated openly.
+%-------------Declaration ----------
+\chapter*{DECLARATION}
+\thispagestyle{empty}
+We, hereby declare that the Major Project Phase-2 work entitled ``FL-IDS: Federated Learning-Based Intrusion Detection System for IoT/IIoT'' is a bonafide work and has been carried out  by us under the guidance of Mr. Syed Akram, Assistant Professor, Department of  Computer Science and Engineering, B.M.S. College of Engineering, Bengaluru, in partial  fulfillment of the requirements of the degree of Bachelor of Engineering in Computer Science  and Engineering of Visvesvaraya Technological University, Belagavi.
+I further declare that, to the best of my knowledge and belief, this project has not been  submitted either in part or in full to any other university for the award of any degree.
+\vspace{0.3cm}
+\begin{flushleft}
+Candidate details:
+\end{flushleft}
+\vspace{0.1cm}
+\begin{center}
+\begin{tabular}{|c|l|c|c|}
+\hline
+\textbf{SL. NO.} & \textbf{Student Name} & \textbf{USN} & \textbf{Student’s Signature} \\
+\hline
+1 & Aaron B Ajay & 1BM23CS003 & \\
+\hline
+2 & Aaryan Prakash & 1BM23CS006 & \\
+\hline
+3 & Amal Roy  & 1BM23CS025 & \\
+\hline
+4 & Amogh Krishna JS & 1BM23CS029 & \\
+\hline
+\end{tabular}
+\end{center}
+\begin{flushleft}
+Place: Bengaluru \\
+Date: \\
+\end{flushleft}
+Certified that these candidates are students of Computer Science and Engineering Department  of B.M.S. College of Engineering. They have carried out the project work of titled ``FL-IDS: Federated Learning-Based Intrusion Detection System for IoT/IIoT'' as Major Project Phase-2  work. It is in partial fulfillment for completing the requirement for the award of B.E. degree  by VTU. The works is original and duly certify the same.
+\vspace{1cm}
+\begin{flushleft}
+Guide Name: Mr. Syed Akram \\
+Date: \\
+Signature \\
+\end{flushleft}
+% ----- Acknowledgment -----
+\chapter*{Acknowledgment}
+\thispagestyle{empty}
+We thank our guide, Mr. Syed Akram, Assistant Professor, Department of Computer Science and Engineering, for his guidance, feedback and encouragement throughout this project.
+
+We thank Dr. Kavitha Sooda, Head of the Department of Computer Science and Engineering, and Dr. Bheemsha Arya, Principal, B.M.S. College of Engineering, for providing the facilities and support needed to carry out this work.
+
+We thank the faculty members and staff of the Department of Computer Science and Engineering for their help, and the authors of the Edge-IIoTset dataset for making their data and captures publicly available.
+
+Finally, we thank our families and friends for their constant support.
+\newpage
+% ----- TOC, LoF, LoT -----
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+\listoffigures
+\thispagestyle{empty}
+\newpage
+\listoftables
+\thispagestyle{empty}
+
+% ---------- MAIN MATTER: ARABIC NUMBERS ----------
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% ----- Chapters -----
+\input{ch1_intro}
+\input{ch2_lit}
+\input{ch3_srs}
+\input{ch4_method}
+\input{ch5_results}
+\input{ch6_conclusion}
+
+\clearpage
+% ----- References -----
+\renewcommand{\bibname}{REFERENCES} % report class titles thebibliography itself
+\addcontentsline{toc}{chapter}{REFERENCES}
+\begin{thebibliography}{99}
+\bibitem{ferrag2022edge} M. A. Ferrag, O. Friha, D. Hamouda, L. Maglaras and H. Janicke, ``Edge-IIoTset: A New Comprehensive Realistic Cyber Security Dataset of IoT and IIoT Applications for Centralized and Federated Learning'', \textit{IEEE Access}, vol. 10, pp. 40281--40306, 2022, doi: 10.1109/ACCESS.2022.3165809.
+\bibitem{mothukuri2022fl} V. Mothukuri, P. Khare, R. M. Parizi, S. Pouriyeh \textit{et al.}, ``Federated-Learning-Based Anomaly Detection for IoT Security Attacks'', \textit{IEEE Internet of Things Journal}, vol. 9, no. 4, 2022.
+\bibitem{li2021deepfed} B. Li, Y. Wu, J. Song, R. Lu, T. Li and L. Zhao, ``DeepFed: Federated Deep Learning for Intrusion Detection in Industrial Cyber--Physical Systems'', \textit{IEEE Transactions on Industrial Informatics}, vol. 17, no. 8, Aug. 2021.
+\bibitem{hernandez2025fliids} J. L. Hernandez-Ramos, G. Karopoulos, E. Chatzoglou, V. Kouliaridis, E. Marmol, A. Gonzalez-Vidal and G. Kambourakis, ``Intrusion Detection Based on Federated Learning: A Systematic Review'', \textit{ACM Computing Surveys}, vol. 57, no. 12, 2025, doi: 10.1145/3731596.
+\bibitem{cao2021fltrust} X. Cao, M. Fang, J. Liu and N. Z. Gong, ``FLTrust: Byzantine-robust Federated Learning via Trust Bootstrapping'', in \textit{Proc. Network and Distributed System Security Symposium (NDSS)}, 2021.
+\bibitem{xu2022signguard} J. Xu, S.-L. Huang, L. Song and T. Lan, ``Byzantine-robust Federated Learning through Collaborative Malicious Gradient Filtering'' (SignGuard), in \textit{Proc. IEEE International Conference on Distributed Computing Systems (ICDCS)}, 2022.
+\bibitem{zhang2023lgbmae} H. Zhang, L. Ge, G. Zhang, J. Fan, D. Li and C. Xu, ``A two-stage intrusion detection method based on light gradient boosting machine and autoencoder'', \textit{Mathematical Biosciences and Engineering}, vol. 20, no. 4, 2023, doi: 10.3934/mbe.2023301.
+\bibitem{elhouda2023mitfed} Z. Abou El Houda, A. S. Hafid and L. Khoukhi, ``MiTFed: A Privacy Preserving Collaborative Network Attack Mitigation Framework Based on Federated Learning Using SDN and Blockchain'', \textit{IEEE Transactions on Network Science and Engineering}, vol. 10, no. 4, pp. 1985--2001, 2023.
+\bibitem{mcmahan2017fedavg} B. McMahan, E. Moore, D. Ramage, S. Hampson and B. A. y Arcas, ``Communication-Efficient Learning of Deep Networks from Decentralized Data'', in \textit{Proc. International Conference on Artificial Intelligence and Statistics (AISTATS)}, 2017.
+\bibitem{yin2018trimmed} D. Yin, Y. Chen, K. Ramchandran and P. Bartlett, ``Byzantine-Robust Distributed Learning: Towards Optimal Statistical Rates'', in \textit{Proc. International Conference on Machine Learning (ICML)}, 2018.
+\bibitem{ke2017lightgbm} G. Ke, Q. Meng, T. Finley, T. Wang, W. Chen, W. Ma, Q. Ye and T.-Y. Liu, ``LightGBM: A Highly Efficient Gradient Boosting Decision Tree'', in \textit{Advances in Neural Information Processing Systems (NeurIPS)}, 2017.
+\bibitem{hsu2019noniid} T.-M. H. Hsu, H. Qi and M. Brown, ``Measuring the Effects of Non-Identical Data Distribution for Federated Visual Classification'', arXiv:1909.06335, 2019.
+\bibitem{sharafaldin2018cicids} I. Sharafaldin, A. H. Lashkari and A. A. Ghorbani, ``Toward Generating a New Intrusion Detection Dataset and Intrusion Traffic Characterization'', in \textit{Proc. International Conference on Information Systems Security and Privacy (ICISSP)}, 2018.
+\end{thebibliography}
+\clearpage
+
+% ----- Appendices -----
+\appendix
+\renewcommand{\thechapter}{\Alph{chapter}}
+\renewcommand{\thesection}{\Roman{section}}
+\section {Appendix A: Snapshots}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{figures/website.png}
+\caption{Project results website (\url{https://aronnnn1.github.io/FL-IDS/})}
+\end{figure}
+\noindent\textbf{Phase B result} (\texttt{runs/phase\_b/phase\_b\_result.json}, excerpt):
+\begin{verbatim}
+"classification": "Backdoor", "confidence": 0.9974,
+"stage": "boosting", "num_packets": 24914,
+"num_non_benign": 23895
+"mitigation": {"action": "block", "applied": true,
+               "ip_address": "10.0.0.1"}
+flow table:
+ priority=100,ip,nw_src=10.0.0.1 actions=drop
+ priority=0 actions=NORMAL   (n_packets=23586)
+"check": {"action": "block", "consistent": true}
+\end{verbatim}
+\noindent\textbf{Automated test suite:}
+\begin{verbatim}
+224 passed, 2 skipped, 2 warnings in 374.08s (0:06:14)
+\end{verbatim}
+\clearpage
+\section {Appendix B: Details of list of publications related to this project}
+{\large Author Names: } Aaron B Ajay, Aaryan Prakash, Amal Roy, Amogh Krishna JS, Syed Akram \\
+{\large Paper Title: } FL-IDS: Federated Learning-Based Intrusion Detection System for IoT/IIoT (working title) \\
+{\large Name of the Conference or Journal:} Paper in preparation (draft in progress) \\
+{\large Place of the conference:} -- \\
+{\large Date of Conference:} --
+\clearpage
+\section {Appendix C: Details of Patent}
+No patent has been filed for this work.
+\clearpage
+\section {Appendix D: Details of Funding}
+This project did not receive external funding.
+\clearpage
+\section {Appendix E:POs and PSOs Mapped}
+\begin{table}[h!]
+\centering
+\small
+\renewcommand{\arraystretch}{1.05} % Row height
+\setlength{\tabcolsep}{6pt}       % Column spacing
+\begin{tabular}{|>{\raggedright\arraybackslash}p{3.6cm}|c|p{7.9cm}|}
+\hline
+\textbf{PROGRAMME OUTCOMES} & \textbf{Level (1/2/3)} & \textbf{Justification if addressed} \\
+\hline
+PO1 (Engineering knowledge) & 3 & Applies mathematics (cosine similarity, robust statistics, gradient boosting) and networking and machine-learning fundamentals to detecting attacks in IoT/IIoT traffic. \\
+\hline
+PO2 (Problem analysis) & 3 & Reviews the literature to identify gaps, and analyses why accuracy was stuck (content-free packets, ambiguity ceiling) and why aggregation fails under poisoning, with measured evidence. \\
+\hline
+PO3 (Design/development of solutions) & 3 & Designs a two-stage cascade, a trust-filtered federated aggregation scheme and an SDN mitigation path; keeps raw traffic on each site for privacy, which protects the safety of critical infrastructure. \\
+\hline
+PO4 (Conduct investigations) & 3 & Designs controlled experiments (ablation, poisoning sweep, zero-day tests, flow-grouped and multi-seed evaluation) and interprets the data to reach valid conclusions. \\
+\hline
+PO5 (Modern tool usage) & 3 & Uses LightGBM, PyTorch, Flower, Mininet, Open vSwitch, os-ken, TShark and Streamlit, and states each tool's limitations (for example, capture-level rather than inline mitigation). \\
+\hline
+PO6 (The engineer and society) & 2 & Addresses the security of IoT/IIoT systems society depends on, and the privacy concerns of sharing raw network traffic. \\
+\hline
+PO7 (Environment and sustainability) & 1 & Supports resilient, sustainable infrastructure (SDG 9); federated training avoids moving bulk traffic to a central site, and the system runs on existing hardware with open-source software. \\
+\hline
+PO8 (Ethics) & 3 & Keeps raw traffic on clients, uses a public dataset, reports dataset errors and limitations openly, and reports only numbers produced by logged runs. \\
+\hline
+PO9 (Individual and team work) & 3 & Developed by a four-member team, with each member owning components. \\
+\hline
+PO10 (Communication) & 2 & Documents the work in this report, a public repository with detailed notes, a results website, a presentation and a paper draft. \\
+\hline
+PO11 (Project management and finance) & 2 & Planned and delivered in phases with milestones tracked in version control, at zero cost using free and open-source software and existing hardware. \\
+\hline
+PO12 (Life-long learning) & 2 & Required independent learning of federated learning, adversarial robustness and SDN, which are beyond the regular curriculum. \\
+\hline
+\end{tabular}
+\caption{Programme Outcomes Mapping with Project}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\small
+\renewcommand{\arraystretch}{1.05} % Row height
+\setlength{\tabcolsep}{6pt}       % Column spacing
+\begin{tabular}{|>{\raggedright\arraybackslash}p{3.6cm}|c|p{7.9cm}|}
+\hline
+\textbf{PROGRAMME SPECIFIC OUTCOMES} & \textbf{Level (1/2/3)} & \textbf{Justification if addressed} \\
+\hline
+PSO1 (Software engineering) & 3 & Applies software engineering practice: modular design by component, a single configuration file, 224 automated unit and integration tests, version control and reproducible, seeded runs. \\
+\hline
+PSO2 (Network, mobile and web-based systems) & 3 & Designs and builds a networked system under realistic constraints: a federated client--server system, an SDN-controlled emulated network, and a web dashboard, all running within the memory limits of a 4-vCPU virtual machine. \\
+\hline
+PSO3 (Efficient algorithms and code) & 3 & Designs efficient algorithms (trust filter on weight deltas, trimmed-mean aggregation, flow grouping of 2.2 million packets in about a minute) and effective code, such as one shared cascade implementation used by evaluation, dashboard and SDN. \\
+\hline
+\end{tabular}
+\caption{Programme Specific Outcomes Mapping with Project}
+\end{table}
+\clearpage
+
+\section {Appendix F: Similarity report, AI Generated report}
+To be attached after the similarity check.
+\clearpage
+
+
+
+\end{document}

@@ -1,0 +1,150 @@
+\chapter{Results and Discussion}\label{chap:results}
+All numbers below come from logged runs on the hardware in Chapter~3. Unless stated otherwise, the seed is 42.
+
+\section{Classifier accuracy}
+The project requirement was at least 95\% accuracy and at least 0.95 macro F1. The earlier classifier comparison, on a 500{,}000-row class-balanced sample of the base features, gave 0.891 accuracy and 0.887 macro F1. On all 1.9 million rows with the natural class distribution, the same base features give 0.964 accuracy but still only 0.887 macro F1, because the application-layer attacks are confused with each other.
+
+The final classifier is trained on 1{,}429{,}825 packets and tested on 397{,}073 packets from connections it never saw (Table~\ref{tab:datascale}).
+
+\subsection{Ambiguity ceiling}
+Before tuning the model, we measured how many rows are impossible to separate with each feature set (Table~\ref{tab:ceiling}). With the 91 base features, 2.31\% of rows share an identical feature vector with a row of a different class, which caps macro recall at 0.969 for \emph{any} per-packet classifier. The new features bring the ambiguous share down to 0.01\%.
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Feature set} & \textbf{Features} & \textbf{Ambiguous} & \textbf{Ceiling acc.} & \textbf{Ceiling macro rec.} \\ \hline
+Base & 91 & 2.31\% & 0.9875 & 0.9692 \\ \hline
++ service port & 92 & 0.29\% & 0.9985 & 0.9940 \\ \hline
++ content + flow & 130 & 0.01\% & 0.9999 & 0.9997 \\ \hline
+\end{tabular}
+\caption{Ambiguity ceiling per feature set (all rows, after de-duplication)}
+\label{tab:ceiling}
+\end{table}
+
+\subsection{Effect of each feature group}
+Table~\ref{tab:progression} and Figure~\ref{fig:progression} add the feature groups one at a time, on the strict flow-grouped split. The service port mainly fixes Normal versus attack traffic. The content features add little on their own, because only a small share of packets carries content. The flow features give the largest jump, because they pass a connection's content and behaviour on to its content-free packets. Class weighting then stabilises the rare Fingerprinting class.
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+ & \multicolumn{2}{c|}{\textbf{Random split}} & \multicolumn{2}{c|}{\textbf{Flow-grouped split}} \\ \hline
+\textbf{Features} & \textbf{Accuracy} & \textbf{Macro F1} & \textbf{Accuracy} & \textbf{Macro F1} \\ \hline
+Base (91) & 0.9638 & 0.8868 & 0.9637 & 0.8892 \\ \hline
++ service port (92) & 0.9802 & 0.9245 & 0.9803 & 0.9236 \\ \hline
++ content (110) & 0.9802 & 0.9268 & 0.9802 & 0.9232 \\ \hline
++ flow (130) & 0.9977 & 0.9879 & 0.9975 & 0.9808 \\ \hline
+\textbf{+ class weights (final)} & \textbf{0.9976} & \textbf{0.9867} & \textbf{0.9972} & \textbf{0.9828} \\ \hline
+\end{tabular}
+\caption{Accuracy and macro F1 as feature groups are added (LightGBM, all rows, 80/20)}
+\label{tab:progression}
+\end{table}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\linewidth]{figures/accuracy_progression.png}
+\caption{Accuracy and macro F1 on held-out flows as each feature group is added}
+\label{fig:progression}
+\end{figure}
+
+\subsection{Robustness across seeds, splits and training size}
+Table~\ref{tab:seeds} repeats the final configuration with three seeds on both splits. Accuracy stays between 0.9970 and 0.9977, and macro F1 between 0.9828 and 0.9868. Without class weights, the flow-grouped macro F1 was less stable (0.9808, 0.9560, 0.9521), because the Fingerprinting score depended on which of its 156 flows landed in test. Weighting removes that sensitivity.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Split / seed} & \textbf{42} & \textbf{43} & \textbf{44} \\ \hline
+Random: accuracy & 0.9976 & 0.9977 & 0.9976 \\ \hline
+Random: macro F1 & 0.9867 & 0.9868 & 0.9866 \\ \hline
+Flow-grouped: accuracy & 0.9972 & 0.9971 & 0.9970 \\ \hline
+Flow-grouped: macro F1 & 0.9828 & 0.9835 & 0.9851 \\ \hline
+\end{tabular}
+\caption{Final classifier across seeds}
+\label{tab:seeds}
+\end{table}
+
+Two further checks were run. \textbf{(a) Same sampling as before:} on a 500{,}000-row capped sample drawn the same way as in the earlier boosting-versus-DL comparison, and with the same training settings for both feature sets, accuracy rises from 0.8902 to 0.9919 and macro F1 from 0.8827 to 0.9900. \textbf{(b) Calibration-set size:} in FL-IDS the server trains LightGBM on only a 5\% calibration set. Trained on 5\% of the rows and tested on held-out flows, the new features give 0.9968 accuracy and 0.9791 macro F1, against 0.9624 and 0.8807 for the base features. The gain therefore carries over to the classifier as the federated system actually trains it.
+
+\subsection{Per-class results}
+Figure~\ref{fig:perclass} compares per-class F1 before and after. The biggest gains are on exactly the classes that were weak: Uploading (0.76 to 1.00), DDoS\_HTTP (0.76 to 0.97), SQL\_injection (0.80 to 1.00), Password (0.84 to 0.97), XSS (0.85 to 0.98) and Fingerprinting (0.68 to 0.93). Figure~\ref{fig:cm} shows the remaining confusion: Password and DDoS\_HTTP traffic (both HTTP requests to the same server) and Ransomware versus Backdoor (both on port 4321). MITM is a single ARP flow, so it cannot be scored on the flow-grouped split; on the random split its F1 is 0.994.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\linewidth]{figures/per_class_f1.png}
+\caption{Per-class F1, base features vs.\ final classifier (flow-grouped split)}
+\label{fig:perclass}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{figures/confusion_final.png}
+\caption{Row-normalised confusion matrix of the final classifier (flow-grouped split)}
+\label{fig:cm}
+\end{figure}
+
+\subsection{Discussion and caveats}
+\begin{itemize}
+  \item \textbf{Why a flow-grouped split matters.} A random split of packets puts packets of the same connection in both training and test sets. Reporting the stricter split shows that the improvement does not come from memorising connections.
+  \item \textbf{The service port is partly a testbed effect.} In Edge-IIoTset, benign traffic is MQTT (port 1883) and VNC (5900) and never HTTP. In a real network with benign web traffic, the port alone would separate much less.
+  \item \textbf{Flow features are computed over the whole flow record} (up to 120\,s), the same way as CICFlowMeter. The classifier therefore labels flow records rather than making a decision on the first packet.
+  \item The same features are used by the whole federated pipeline and by Phase B. The following sections report the system-level results with them, next to the original 91-feature results.
+\end{itemize}
+
+\section{Ablation of the federated pipeline}
+Figure~\ref{fig:ablation} and Table~\ref{tab:ablation} compare five variants with 30\% sign-flip attackers (clients 0, 6 and 9), 20 rounds, with the 130-feature pipeline; the original 91-feature results are given in brackets. Known-attack detection is now close to perfect for every variant that includes the classifier (0.996--1.000 macro-recall), so the backstop's value is on \emph{zero-day} attacks: 0.930 macro-recall for the full pipeline against 0.795 for boosting alone. Without the trust filter (plain FedAvg, trimmed mean only) the autoencoder is poisoned again: its stand-alone recall drops to about 0, its validation loss diverges, and zero-day recall falls back to boosting's level (0.795 and 0.799).
+\begin{table}[H]
+\centering
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Variant} & \textbf{Attack MR} & \textbf{Benign FPR} & \textbf{Detection F1} & \textbf{Zero-day MR} & \textbf{AE-alone MR} \\ \hline
+Full pipeline & 1.000 [0.887] & 0.031 & 0.961 & 0.930 [0.731] & 0.712 [0.421] \\ \hline
+Plain FedAvg & 0.998 [0.879] & 0.035 & 0.955 & 0.795 [0.595] & 0.002 [0.000] \\ \hline
+Trimmed mean only & 0.997 [0.878] & 0.033 & 0.957 & 0.799 [0.539] & 0.000 [0.000] \\ \hline
+Autoencoder only & 0.372 [0.191] & 0.030 & 0.465 & 0.577 [0.325] & 0.372 [0.191] \\ \hline
+Boosting only & 0.996 [0.875] & 0.000 & 0.998 & 0.795 [0.518] & n/a \\ \hline
+\end{tabular}
+\caption{Ablation at 30\% malicious clients, 130 features [91 features] (MR = macro-recall)}
+\label{tab:ablation}
+\end{table}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{figures/ablation.png}
+\caption{Ablation: known-attack and zero-day macro-recall, original vs.\ current features}
+\label{fig:ablation}
+\end{figure}
+One trade-off is worth stating. On known attacks, boosting alone now has a higher detection F1 than the full cascade (0.998 vs.\ 0.961). The autoencoder's threshold is set to flag about 3\% of benign traffic, and that cost now outweighs the little it adds when the classifier already catches 99.6\% of known attacks. Final validation losses: full pipeline 0.028; plain FedAvg $5.0\times10^{20}$ and trimmed mean $1.3\times10^{4}$ (diverged). Communication: 15.7\,MB over 20 rounds (the autoencoder now has 9{,}834 parameters, up from 7{,}299).
+
+\section{Poisoning resistance}
+Figure~\ref{fig:poison} sweeps the share of sign-flip attackers from 0 to 50\%. Attack macro-recall stays between 0.997 and 1.000 at every fraction [0.878--0.887], and zero-day macro-recall between 0.901 and 0.943 up to 40\% [0.724--0.736]. Attackers got past the filter in 10\%, 12\% and 36\% of attacker-rounds at 20\%, 30\% and 40\% [28\%, 32\%, 24\%]: lower at the first two fractions but higher at 40\%, although the autoencoder still held there (stand-alone recall 0.691). At 50\% the coordinate-wise median reference becomes the attackers' direction again: every attacker update passes, the autoencoder collapses, and zero-day detection falls back to the classifier (0.803). This is the known limit of median-based defences~\cite{yin2018trimmed}. A repeat with seeds 43 and 44 at 20\% and 30\% gave 0.996--0.999 attack macro-recall for every seed, while stand-alone autoencoder recall varied by seed (0.56--0.74), as it did with the original features.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{figures/poisoning_sweep.png}
+\caption{Detection and malicious-client survival vs.\ share of malicious clients (130 features)}
+\label{fig:poison}
+\end{figure}
+
+\section{Zero-day detection}
+Each of the 14 attack classes was removed in turn from all training data (including scaler statistics) and then scored as unseen traffic (Figures~\ref{fig:zeroday} and~\ref{fig:zerodaycmp}). The cascade's average detection rose from 0.736 to \textbf{0.943}; boosting alone from 0.533 to 0.801 and the autoencoder alone from 0.493 to 0.757. The autoencoder separates unseen attacks from benign traffic far better than before (AUROC 0.968--1.000 for every class, against 0.59--0.70 for the HTTP-family attacks with the original features). The largest gains are on the attacks that were hardest before: Password 0.44$\rightarrow$0.97, Ransomware 0.54$\rightarrow$1.00, SQL\_injection 0.61$\rightarrow$1.00, XSS 0.52$\rightarrow$0.99 and DDoS\_HTTP 0.36$\rightarrow$0.88.
+
+Two classes got worse and are reported rather than hidden. MITM fell from 0.89 to 0.69: its single ARP connection gets ordinary-looking connection features, so the autoencoder finds it less unusual. Unseen Uploading traffic now looks normal to the classifier (boosting-only 0.49$\rightarrow$0.08); the autoencoder catches most of it, so the cascade still improves (0.52$\rightarrow$0.72). The benign false-positive rate stays about 3\%, as set by the 97th-percentile threshold.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\linewidth]{figures/zero_day.png}
+\caption{Zero-day detection per held-out class: boosting alone vs.\ cascade (130 features)}
+\label{fig:zeroday}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\linewidth]{figures/zero_day_compare.png}
+\caption{Cascade zero-day detection per held-out class: original 91 features vs.\ 130 features}
+\label{fig:zerodaycmp}
+\end{figure}
+
+\section{Real multi-process run and SDN mitigation}
+\textbf{Phase A, real run.} A real Flower server and 10 separate client processes completed 20 rounds in about 4 minutes. The bootstrap classifier reached 0.997 accuracy on the calibration hold-out [0.963]. The final cascade gave \textbf{0.999} attack macro-recall [0.889] and a 0.035 benign false-positive rate [0.035] on the clients' test slices. A separate full-pipeline run scored per class gave 0.976 accuracy and 0.971 macro F1 for the cascade [0.944 / 0.931], and an autoencoder AUROC of 0.982 [0.805].
+
+\textbf{Phase B.} Live extraction now derives the same 130 features from the capture with the same code as training: for \texttt{Backdoor\_attack.pcap}, 99.8\% of the live rows are identical to that capture's training rows. Replayed through Mininet with the new bundle, the capture was classified as \textbf{Backdoor with 0.997 confidence} by the boosting stage, 24{,}669 of its 24{,}914 packets were flagged [23{,}895], the bridge chose \emph{block}, and the rule \texttt{priority=100,ip,nw\_src=10.0.0.1 actions=drop} was confirmed in the switch's flow table. Because classification happens once features have been extracted from the whole capture, 23{,}161 replayed packets had already been forwarded when the rule appeared. The mitigation is therefore capture-level, not inline per-packet blocking.
+
+\section{Boosting vs.\ a deep-learning classifier}
+On the same 500{,}000-row sample, LightGBM (base features) reached 0.887 macro F1 and a dense MLP of comparable effort (8{,}271 parameters, 15 epochs) reached 0.622. The gap was largest on the application-layer attacks (XSS 0.761 vs.\ 0.072 recall; SQL\_injection 0.767 vs.\ 0.183). This supports the boosting-first design. It is a comparison against a modest baseline, not a claim that deep learning cannot work here.

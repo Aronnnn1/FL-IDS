@@ -1,0 +1,31 @@
++ source /home/aaron/FL-IDS/venv/bin/activate
+++ deactivate nondestructive
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ hash -r
+++ '[' -n '' ']'
+++ unset VIRTUAL_ENV
+++ unset VIRTUAL_ENV_PROMPT
+++ '[' '!' nondestructive = nondestructive ']'
+++ case "$(uname)" in
++++ uname
+++ export VIRTUAL_ENV=/home/aaron/FL-IDS/venv
+++ VIRTUAL_ENV=/home/aaron/FL-IDS/venv
+++ _OLD_VIRTUAL_PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ PATH=/home/aaron/FL-IDS/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ export PATH
+++ VIRTUAL_ENV_PROMPT=venv
+++ export VIRTUAL_ENV_PROMPT
+++ '[' -n '' ']'
+++ '[' -z '' ']'
+++ _OLD_VIRTUAL_PS1=
+++ PS1='(venv) '
+++ export PS1
+++ hash -r
++ export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
++ OMP_NUM_THREADS=1
++ MKL_NUM_THREADS=1
++ OPENBLAS_NUM_THREADS=1
++ NUMEXPR_NUM_THREADS=1
++ python -m fl_ids.eval.ablation --num-rounds 20 --output-dir results/extended
+SWEEP_DONE

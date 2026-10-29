@@ -1,0 +1,60 @@
+{
+  "seed": 42,
+  "sample_size_target": 500000,
+  "sample_size_actual": 500000,
+  "full_dataset_rows": 1909671,
+  "full_dataset_class_counts": {
+    "Backdoor": 24026,
+    "DDoS_HTTP": 48544,
+    "DDoS_ICMP": 67939,
+    "DDoS_TCP": 50062,
+    "DDoS_UDP": 121567,
+    "Fingerprinting": 853,
+    "MITM": 358,
+    "Normal": 1363998,
+    "Password": 49933,
+    "Port_Scanning": 19977,
+    "Ransomware": 9689,
+    "SQL_injection": 50826,
+    "Uploading": 36807,
+    "Vulnerability_scanner": 50026,
+    "XSS": 15066
+  },
+  "sample_class_counts": {
+    "Backdoor": 24026,
+    "DDoS_HTTP": 48544,
+    "DDoS_ICMP": 49240,
+    "DDoS_TCP": 49240,
+    "DDoS_UDP": 49240,
+    "Fingerprinting": 853,
+    "MITM": 358,
+    "Normal": 49240,
+    "Password": 49240,
+    "Port_Scanning": 19977,
+    "Ransomware": 9689,
+    "SQL_injection": 49240,
+    "Uploading": 36807,
+    "Vulnerability_scanner": 49240,
+    "XSS": 15066
+  },
+  "train_rows": 400000,
+  "test_rows": 100000,
+  "boosting": {
+    "accuracy": 0.89079,
+    "macro_f1": 0.8872366432869334,
+    "weighted_f1": 0.8923551816764677,
+    "benign_fpr": 0.15993095044679123,
+    "train_seconds": 55.476872360000016,
+    "model_size_bytes": 12825703
+  },
+  "dl_classifier": {
+    "accuracy": 0.67793,
+    "macro_f1": 0.621797678589268,
+    "weighted_f1": 0.6681473665245045,
+    "benign_fpr": 0.5341186027619821,
+    "train_seconds": 10.186667446000683,
+    "num_parameters": 8271,
+    "final_epoch_loss": 0.8423830450381976
+  },
+  "note_mitm_capture_repair_skipped": "This run used DNN-EdgeIIoT-dataset.csv's MITM rows without the pcap-based repair (fl_ids.data.repair skipped -- needs tshark + the raw .pcap, not pulled for this comparison). MITM's own per-class numbers should be read with that caveat (see PAPER_NOTES.md sect. 5.3.2); it's a tiny class either way (~0.02% of the cleaned dataset)."
+}

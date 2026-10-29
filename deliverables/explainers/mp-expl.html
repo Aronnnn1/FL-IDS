@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FL-IDS explained simply</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+  :root { --navy:#1E2761; --teal:#0A9396; --coral:#D64550; --gold:#C98A0B; --ink:#1b1b1b; --muted:#5B6770;
+          --tn:#E3E7F4; --tt:#DDF1F2; --tc:#F9E1E3; --tg:#FBF0D9; --grey:#F1F2F4; }
+  * { box-sizing: border-box; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; color: var(--ink); font-size: 11.5pt; line-height: 1.5; margin: 0; background:#fff; }
+  h1 { font-size: 26pt; color: var(--navy); margin: 0 0 4px; line-height: 1.15; }
+  h2, h3 { break-after: avoid; }
+  h2 { font-size: 16pt; color: var(--navy); margin: 22px 0 6px; padding-top: 4px; }
+  h3 { font-size: 12.5pt; margin: 14px 0 4px; }
+  p { margin: 6px 0; }
+  .lead { font-size: 13pt; color: var(--muted); margin-bottom: 14px; }
+  .cover { border-radius: 14px; background: var(--tn); padding: 22px 24px; margin-bottom: 16px; }
+  .cover .who { color: var(--muted); font-size: 10.5pt; margin-top: 10px; }
+  .box { border-radius: 12px; padding: 12px 16px; margin: 10px 0; break-inside: avoid; }
+  .navy { background: var(--tn); } .teal { background: var(--tt); } .coral { background: var(--tc); }
+  .gold { background: var(--tg); } .grey { background: var(--grey); }
+  .box b.h { display:block; font-size: 12pt; margin-bottom: 2px; }
+  .navy b.h { color: var(--navy); } .teal b.h { color: var(--teal); } .coral b.h { color: var(--coral); } .gold b.h { color: var(--gold); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .grid2 .box, .grid3 .box { margin: 0; }
+  .num { display:inline-flex; align-items:center; justify-content:center; width: 22px; height: 22px; border-radius: 50%;
+         color:#fff; font-weight: 700; font-size: 10.5pt; margin-right: 6px; vertical-align: 1px; }
+  .navy .num { background: var(--navy); } .teal .num { background: var(--teal); } .coral .num { background: var(--coral); } .gold .num { background: var(--gold); } .grey .num { background: var(--muted); }
+  .eli5 { border-left: none; background: var(--tg); border-radius: 12px; padding: 10px 16px; margin: 10px 0; break-inside: avoid; }
+  .eli5::before { content: "Like you're five: "; font-weight: 700; color: var(--gold); }
+  .real { font-size: 10.5pt; color: var(--muted); }
+  .real::before { content: "The grown-up version: "; font-weight: 700; color: var(--muted); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 10px 0; }
+  .stat { background: var(--grey); border-radius: 12px; padding: 10px 12px; text-align: center; break-inside: avoid; }
+  .stat .v { font-size: 22pt; font-weight: 800; color: var(--navy); line-height: 1.1; }
+  .stat .l { font-size: 9.5pt; color: var(--muted); }
+  .stat.t .v { color: var(--teal); } .stat.c .v { color: var(--coral); } .stat.g .v { color: var(--gold); }
+  figure { margin: 10px 0; break-inside: avoid; text-align: center; }
+  figure img { max-width: 100%; }
+  figcaption { font-size: 9.5pt; color: var(--muted); margin-top: 2px; }
+  table { border-collapse: collapse; width: 100%; font-size: 10.5pt; margin: 8px 0; break-inside: avoid; }
+  th { background: var(--navy); color: #fff; text-align: left; padding: 5px 8px; font-weight: 600; }
+  td { padding: 5px 8px; border-bottom: 1px solid #e3e5e8; vertical-align: top; }
+  tr.final td { font-weight: 700; background: var(--tt); }
+  .flow { display: flex; align-items: stretch; gap: 0; margin: 10px 0; break-inside: avoid; }
+  .flow .step { flex: 1; border-radius: 10px; padding: 8px 10px; font-size: 10pt; }
+  .flow .arr { width: 18px; display:flex; align-items:center; justify-content:center; color: var(--muted); font-weight: 700; }
+  .flow .step b { display: block; font-size: 10.5pt; }
+  .pb { break-before: page; }
+  ul { margin: 6px 0 6px 0; padding-left: 20px; } li { margin: 3px 0; }
+  .small { font-size: 9.5pt; color: var(--muted); }
+  dl { display: grid; grid-template-columns: 150px 1fr; gap: 4px 12px; font-size: 10.5pt; }
+  dt { font-weight: 700; color: var(--navy); }
+  dd { margin: 0; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>FL-IDS, explained simply</h1>
+  <div class="lead">What we built, why it matters, how we pushed accuracy past 95%, and what is new about it.</div>
+  <p>Our project is a <b>security guard for networks of smart devices</b>. It learns from many places at once without
+  peeking at their private data, it can't easily be tricked during training, it notices troublemakers it has never seen
+  before, and when it spots one it locks the door on them automatically.</p>
+  <div class="who">FL-IDS: Federated Learning-Based Intrusion Detection System for IoT/IIoT &middot; Aaron B Ajay, Aaryan Prakash,
+  Amal Roy, Amogh Krishna JS &middot; Guide: Mr. Syed Akram &middot; Dept. of CSE, BMSCE</div>
+</div>
+
+<h2>1. The problem</h2>
+<p>Factories, hospitals, power plants and smart buildings are full of small connected gadgets: temperature sensors,
+water-level meters, smart controllers. This is the <b>Internet of Things (IoT)</b>, and in factories, <b>Industrial IoT
+(IIoT)</b>. These gadgets talk to each other all day by sending tiny messages called <b>packets</b>.</p>
+<p>Bad people attack these networks: they flood them with junk (DDoS), sneak into web pages (SQL injection, XSS), guess
+passwords, plant hidden back doors and ransomware, or listen in the middle of conversations (MITM). An <b>intrusion
+detection system (IDS)</b> watches the packets and shouts when something is wrong.</p>
+
+<div class="eli5">Imagine a school with many classrooms. Lots of notes get passed around all day. Most are normal
+(&ldquo;see you at lunch&rdquo;), but a few are from bullies. We want a hall monitor who can read the notes and catch
+the bullies.</div>
+
+<p>Ordinary hall monitors have four problems:</p>
+<div class="grid2">
+  <div class="box navy"><b class="h">Privacy</b>To learn, they collect every note from every classroom into one big pile. Schools don't want to hand over private notes.</div>
+  <div class="box teal"><b class="h">New bullies</b>They only know the bullies in their photo book. A brand-new bully walks right past.</div>
+  <div class="box coral"><b class="h">Sabotage</b>If many classrooms help train the monitor, one sneaky classroom can teach it wrong things on purpose.</div>
+  <div class="box gold"><b class="h">Shouting isn't stopping</b>Spotting a bully is not enough. Someone still has to close the door.</div>
+</div>
+
+<h2>2. Our solution: five helpers working together</h2>
+
+<div class="box navy"><b class="h"><span class="num">1</span>The guard with a photo book (LightGBM classifier)</b>
+It has studied photos of 14 kinds of known troublemakers. When a packet comes in, it says &ldquo;that's a password
+attack&rdquo; or &ldquo;that's an HTTP flood&rdquo;. If it is at least 70% sure, that's the answer.
+<p class="real">LightGBM builds hundreds of small yes/no decision trees and adds up their votes. It is very good at
+tables of numbers like packet fields.</p></div>
+
+<div class="box teal"><b class="h"><span class="num">2</span>The guard who knows what &ldquo;normal&rdquo; looks like (autoencoder)</b>
+This guard has never seen a bully's photo. Instead it has watched normal notes so much that it can tell when something
+looks <i>weird</i>. If a note is too different from normal, it says &ldquo;suspicious!&rdquo;, even for a bully nobody has
+seen before. These brand-new attacks are called <b>zero-day attacks</b>.
+<p class="real">An autoencoder squeezes each packet's 91 numbers down to 8 and tries to rebuild them. It rebuilds normal
+traffic well and strange traffic badly; a big rebuilding error means &ldquo;anomalous&rdquo;. It only checks what guard 1
+was not sure about.</p></div>
+
+<div class="box gold"><b class="h"><span class="num">3</span>Learning together without sharing secrets (federated learning)</b>
+Each classroom trains its own copy of guard 2 using only its own notes. Then it sends just <i>what it learned</i> (not
+the notes!) to the principal, who combines everyone's lessons into one better guard and sends it back. Repeat 20 times.
+<p class="real">Federated learning with the Flower framework: 10 &ldquo;clients&rdquo; (sites) and one server. Only
+model weight changes travel; raw traffic stays on each site.</p></div>
+
+<div class="box coral"><b class="h"><span class="num">4</span>The fair principal (trust filter)</b>
+What if one classroom is sneaky and sends wrong lessons on purpose? The principal compares every classroom's lesson with
+what most classrooms said. A lesson pointing in the <i>opposite</i> direction, a very odd one, or one from a classroom that
+keeps disagreeing round after round is thrown away. Very loud lessons are turned down so no one dominates, and the
+principal averages the rest while ignoring the most extreme answers.
+<p class="real">Cosine similarity of each update against the median update, a MAD outlier test, a running trust score,
+norm clipping and a trimmed mean.</p></div>
+
+<div class="box navy"><b class="h"><span class="num">5</span>The automatic door (software-defined networking, SDN)</b>
+When a bully is caught, the system tells the network switch, which is like the school's door controller: &ldquo;don't let
+this one in any more.&rdquo; The door locks by itself.
+<p class="real">An OpenFlow controller (os-ken) installs a &ldquo;drop&rdquo; rule on an Open vSwitch switch inside an
+emulated network (Mininet). We read the rule back from the switch to prove it was really installed.</p></div>
+
+<h3>How a packet is judged</h3>
+<div class="flow">
+  <div class="step grey"><b>Packet arrives</b>plus clues about its whole conversation</div><div class="arr">&rarr;</div>
+  <div class="step navy"><b>Guard 1</b>&ldquo;Known attack, and I'm sure?&rdquo; &rarr; name it</div><div class="arr">&rarr;</div>
+  <div class="step teal"><b>Guard 2</b>not sure? &ldquo;Does it look normal?&rdquo;</div><div class="arr">&rarr;</div>
+  <div class="step gold"><b>Verdict</b>attack type, &ldquo;suspicious&rdquo;, or normal</div><div class="arr">&rarr;</div>
+  <div class="step coral"><b>Door</b>attacker blocked on the switch</div>
+</div>
+
+<h2>3. The big problem we had: accuracy</h2>
+<p>Our goal was <b>at least 95% accuracy and at least 0.95 macro F1</b>. Before this semester's work we had
+<b>96.4% accuracy</b> but only <b>0.889 macro F1</b>. So why wasn't 96.4% good enough?</p>
+
+<div class="eli5">Imagine 100 notes, and 71 of them are normal. A lazy monitor who says &ldquo;everything is fine&rdquo;
+to every single note is already right 71 times out of 100, yet catches zero bullies! So &ldquo;accuracy&rdquo; can look
+good while the important part is bad. <b>Macro F1</b> fixes this: it gives each kind of bully its own score and averages
+them, so rare bullies count just as much as common ones.</div>
+
+<h3>Why it was stuck: the empty envelopes</h3>
+<p>The attacks we kept mixing up were the <b>web attacks</b>: SQL injection, XSS (sneaking scripts into web pages),
+uploading bad files, password guessing and HTTP floods. When we looked closely, we found something surprising:</p>
+<div class="eli5">Most of the notes in these attacks were <b>empty envelopes</b> that just said &ldquo;got it&rdquo;. Only 5 to
+17 out of every 100 notes actually had a message inside. An empty &ldquo;got it&rdquo; envelope looks exactly the same
+whichever bully sent it, so <i>nobody</i> could tell them apart, however clever.</div>
+<p class="real">In those classes only 5&ndash;17% of packets carry HTTP content; the rest are TCP acknowledgements to port 80
+on the same web server. With the original 91 features, 2.31% of all rows had an identical twin with a <i>different</i>
+label. That caps macro recall at 0.969 for any per-packet model. The useful information was in columns the dataset's
+standard recipe throws away.</p>
+
+<h2>4. What we changed, and why each change helps</h2>
+<div class="grid3">
+  <div class="box navy"><b class="h"><span class="num">1</span>Which door?</b>Which service the conversation is for:
+  the website door (port 80), the sensor-messaging door (1883), and so on.<p class="small">Why: tells web traffic apart from sensor traffic.</p></div>
+  <div class="box teal"><b class="h"><span class="num">2</span>What's in the letter?</b>For notes that do have a message:
+  how long it is, how jumbled, and whether it contains tell-tale words like &ldquo;SELECT&rdquo; (database trick),
+  &ldquo;&lt;script&gt;&rdquo; (web trick), file uploads or logins.<p class="small">Why: each web attack writes different things.</p></div>
+  <div class="box coral"><b class="h"><span class="num">3</span>The whole conversation</b>We group notes into
+  conversations, and every note, even an empty envelope, gets told what its whole conversation looked like: how many
+  notes, how fast, what words appeared.<p class="small">Why: now each empty envelope carries its conversation's story.</p></div>
+</div>
+<div class="box grey" style="margin-top:10px"><b class="h"><span class="num">+</span>Rare bullies count more</b>
+Some attacks are very rare (Fingerprinting has only about 1,000 packets out of 2 million). We told the model to pay a bit
+more attention to rare kinds (square-root class weights), so it doesn't ignore them.</div>
+
+<figure><img src="../figures/out_pres/accuracy_progression.png" style="width:88%">
+<figcaption>Each change, measured on conversations the model never saw. The big jump comes from the conversation clues.</figcaption></figure>
+
+<table>
+  <tr><th>What the model knew</th><th>Accuracy</th><th>Macro F1</th></tr>
+  <tr><td>Original 91 features</td><td>96.4%</td><td>0.889</td></tr>
+  <tr><td>+ which door (service port)</td><td>98.0%</td><td>0.924</td></tr>
+  <tr><td>+ what's in the letter (content)</td><td>98.0%</td><td>0.923</td></tr>
+  <tr><td>+ the whole conversation (flow)</td><td>99.75%</td><td>0.981</td></tr>
+  <tr class="final"><td>+ rare classes weighted (final)</td><td>99.7%</td><td>0.983</td></tr>
+</table>
+<p class="small">Strict test, seed 42. The content clues add little on their own because few packets carry content,
+but they become powerful once they are shared across the whole conversation.</p>
+
+<h2>5. How we made sure we weren't cheating</h2>
+<p>A model can get high scores by &ldquo;cheating&rdquo;, for example by memorising answers instead of learning. We checked
+for this carefully.</p>
+<div class="box navy"><b class="h">A strict test</b>Normally people test on random notes, so notes from the same
+conversation end up in both the study pile and the exam. That's like seeing half the exam answers while studying. We
+kept <b>whole conversations</b> out of studying, so the exam is truly new. We also ran it three times with different random
+shuffles: macro F1 was 0.983, 0.983 and 0.985 every time.</div>
+<div class="box coral"><b class="h">We found a cheat sheet hidden in the public dataset</b>In the dataset everyone uses,
+&ldquo;nothing here&rdquo; was written as <code>0</code> in normal traffic and as <code>0.0</code> in attack traffic. That
+tiny spelling difference gave away the answer perfectly! We made both spellings the same. We also found that the MITM
+attack rows were in the wrong columns, and rebuilt them from the original recordings.</div>
+<div class="box gold"><b class="h">No peeking at name tags</b>We never let the model see IP addresses or times. In this
+dataset each attack was recorded separately, so those would tell the model the answer without it learning anything.</div>
+<div class="box teal"><b class="h">A mistake we caught</b>Our first strict test went wrong: all the normal &ldquo;remote screen&rdquo;
+(VNC) traffic was <i>one</i> hour-long conversation, so it landed entirely in the exam and the model had never seen anything
+like it. We fixed this the standard way network tools do: very long conversations are cut into 2-minute pieces.</div>
+<div class="box grey"><b class="h">Fair with less data too</b>In our real system, the principal only keeps a small labelled
+set, 5% of the data. Trained on just that 5%, the classifier still scores 99.7% accuracy and 0.979 macro F1.</div>
+
+<h2>6. Results, in plain words</h2>
+<div class="stats">
+  <div class="stat"><div class="v">99.7%</div><div class="l">accuracy (target 95%)</div></div>
+  <div class="stat t"><div class="v">0.983</div><div class="l">macro F1 (target 0.95)</div></div>
+  <div class="stat g"><div class="v">0.94</div><div class="l">catches brand-new attacks (0.80 without guard 2)</div></div>
+  <div class="stat c"><div class="v">40%</div><div class="l">bad classrooms it can survive</div></div>
+</div>
+
+<h3>The confusion matrix: a scoreboard of who got mistaken for whom</h3>
+<div class="grid2" style="align-items:center">
+  <figure style="margin:0"><img src="../figures/out_pres/confusion_final.png"></figure>
+  <div>
+    <p>Each <b>row</b> is the real kind of traffic; each <b>column</b> is what the model guessed. If the model were
+    perfect, only the diagonal squares (top-left to bottom-right) would be dark.</p>
+    <p>Ours is almost all diagonal. 11 of the 14 kinds score 0.98&ndash;1.00. The only small mix-ups:</p>
+    <ul><li><b>Password &harr; HTTP flood</b>: both knock on the same website door.</li>
+    <li><b>Ransomware &rarr; Backdoor</b>: both use the same door number.</li></ul>
+    <p class="small">MITM is missing here because all of it is a single conversation, so it can't be split between
+    studying and the exam. On the normal test it scores 0.99.</p>
+  </div>
+</div>
+
+<h3>Catching bullies nobody has seen before</h3>
+<p>We hid each attack type completely from training, one at a time, then checked if it was still caught. With the new
+clues, guard 1 alone caught 80% on average, and with guard 2 helping, <b>94%</b>. Before the new clues it was 53% and 74%.
+The web bullies improved the most: Password went from 44% to 97%, XSS from 52% to 99%. One got worse: MITM dropped from 89%
+to 69%, because its single conversation now looks quite ordinary to guard 2. We report that instead of hiding it.</p>
+
+<h3>Surviving sabotage</h3>
+<p>We made some classrooms send poisoned lessons on purpose. With the fair principal, known bullies were still caught
+almost 100% of the time, and brand-new bullies over 90% of the time, even with <b>40%</b> bad classrooms. Without the
+principal, plain averaging broke at 30%. At 50% the bad classrooms are the majority, so
+&ldquo;what most classrooms say&rdquo; becomes their lie. That is a known limit of this kind of defence.</p>
+
+<h3>The live demo</h3>
+<div class="flow">
+  <div class="step grey"><b>Replay</b>a real recorded backdoor attack (24,914 packets)</div><div class="arr">&rarr;</div>
+  <div class="step navy"><b>Detect</b>&ldquo;Backdoor&rdquo;, 99.7% sure</div><div class="arr">&rarr;</div>
+  <div class="step gold"><b>Decide</b>sure enough &rarr; block</div><div class="arr">&rarr;</div>
+  <div class="step coral"><b>Block</b>drop rule on the switch, checked on the switch itself</div>
+</div>
+<p>We also ran the real thing with ten separate programs as ten sites: it caught 0.999 of attacks (0.889 before the new clues) with 3.5% false alarms,
+the same as our faster simulations.</p>
+
+<h2>7. What is new (novel) about this project?</h2>
+<div class="box navy"><b class="h">All five helpers in one system</b>Other researchers have built pieces: federated
+anomaly detectors, trust filters, two-stage classifiers, or federated learning with SDN. In our searches we found no
+published system combining all five: the photo-book guard, the &ldquo;looks normal?&rdquo; guard, learning together,
+the fair principal and the automatic door. We measured exactly how much each part adds.
+<p class="small">Honest note: this is based on targeted searches, not a full systematic review, so we say &ldquo;we found
+none&rdquo;, not &ldquo;none exist&rdquo;.</p></div>
+<div class="box teal"><b class="h">We found errors in a popular public dataset</b>The &ldquo;0 vs 0.0&rdquo; cheat sheet
+and the broken MITM rows mean other papers using this dataset may report scores that are too high. That is a useful
+finding for the whole research community.</div>
+<div class="box coral"><b class="h">Accuracy reached the honest way</b>We reached 99.7% / 0.983 by giving the model
+information that really describes attacks (which door, what was sent, how the conversation behaved), tested on
+conversations it never saw, without using names, times or the dataset's hidden cheat.</div>
+
+<h2>8. What it can't do yet (honest limits)</h2>
+<ul>
+  <li><b>The door locks after the recording is analysed</b>, not packet by packet while the attack is happening.</li>
+  <li><b>The &ldquo;which door&rdquo; clue is partly a testbed effect.</b> In this dataset, normal traffic never uses the
+  website door, so &ldquo;website door&rdquo; already hints at an attack. In a real office with normal web browsing this clue
+  would help less.</li>
+  <li><b>Guard 2 makes a few false alarms on purpose</b> (about 3 in 100 friendly notes). For bullies guard 1 already
+  knows, that costs a little; guard 2 earns its place on brand-new bullies.</li>
+  <li>Only one kind of saboteur was tested, and the defence fails at 50% bad sites.</li>
+</ul>
+
+<h2>9. Mini glossary</h2>
+<dl>
+  <dt>Packet</dt><dd>One small message on a network, like one note.</dd>
+  <dt>Flow / connection</dt><dd>All the packets of one conversation between two devices.</dd>
+  <dt>Classifier</dt><dd>A model that puts things into named groups (&ldquo;SQL injection&rdquo;, &ldquo;normal&rdquo;&hellip;).</dd>
+  <dt>Autoencoder</dt><dd>A model that learns what normal looks like and flags things it can't rebuild well.</dd>
+  <dt>Zero-day attack</dt><dd>An attack type the system was never trained on.</dd>
+  <dt>Federated learning</dt><dd>Training one model across many sites by sharing what was learned, not the data.</dd>
+  <dt>Poisoning</dt><dd>A bad participant sending harmful updates on purpose during training.</dd>
+  <dt>Trust filter</dt><dd>Our check that drops updates pointing against the group's consensus.</dd>
+  <dt>SDN / OpenFlow</dt><dd>Networks whose switches can be told new rules by software, e.g. &ldquo;drop this sender&rdquo;.</dd>
+  <dt>Accuracy</dt><dd>Share of all answers that are right.</dd>
+  <dt>Macro F1</dt><dd>Average score over every class, so rare attacks count as much as common ones.</dd>
+  <dt>Confusion matrix</dt><dd>A table of real class vs. predicted class; the diagonal is &ldquo;right&rdquo;.</dd>
+</dl>
+
+</body>
+</html>

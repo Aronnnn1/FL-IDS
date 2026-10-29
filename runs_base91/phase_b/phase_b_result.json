@@ -1,0 +1,33 @@
+{
+  "pcap": "/home/aaron/FL-IDS/data/raw/pcaps/Backdoor_attack.pcap",
+  "artifact_dir": "/home/aaron/FL-IDS/saved_models/phase_a",
+  "device_ip": "10.0.0.1",
+  "classification": {
+    "device_id": "h1",
+    "classification": "Backdoor",
+    "confidence": 0.9974257641978579,
+    "stage": "boosting",
+    "client_id": 0,
+    "num_packets": 24914,
+    "num_non_benign": 23895
+  },
+  "mitigation": {
+    "action": "block",
+    "applied": true,
+    "classification": "Backdoor",
+    "confidence": 0.9974257641978579,
+    "device_id": "h1",
+    "ip_address": "10.0.0.1",
+    "stage": "boosting",
+    "timestamp": 1790496074.6182523
+  },
+  "switch_packets_before": 17,
+  "switch_packets_after": 3512,
+  "flow_table": " cookie=0x0, duration=0.002s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 actions=drop\r\n cookie=0x0, duration=3.921s, table=0, n_packets=23586, n_bytes=5983953, priority=0 actions=NORMAL\r\n",
+  "check": {
+    "action": "block",
+    "expected_rule": true,
+    "observed_rule": "cookie=0x0, duration=0.002s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 actions=drop",
+    "consistent": true
+  }
+}

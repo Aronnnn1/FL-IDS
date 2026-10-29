@@ -1,0 +1,36 @@
+2026-10-15 13:40:02,081 full: 130 features, 2219216 -> 1984990 rows after dedup
+2026-10-15 13:40:09,185 ceiling: {'ceiling_accuracy': 0.9999289668965586, 'ceiling_macro_recall': 0.9997260919034641, 'ambiguous_rows': 272, 'ambiguous_share': 0.00013702839812795026}
+[100]	valid_0's multi_logloss: 0.00505838
+[200]	valid_0's multi_logloss: 0.00458197
+Traceback (most recent call last):
+  File "/home/aaron/FL-IDS-clean/experiments/accuracy/train_eval.py", line 178, in <module>
+    main()
+    ~~~~^^
+  File "/home/aaron/FL-IDS-clean/experiments/accuracy/train_eval.py", line 140, in main
+    report = classification_report(yt, pred, target_names=classes, output_dict=True, zero_division=0)
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/sklearn/utils/_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/sklearn/metrics/_classification.py", line 3112, in classification_report
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Number of classes, 14, does not match size of target_names, 15. Try specifying the labels parameter
+2026-10-15 13:41:05,945 base_svc: 92 features, 2219216 -> 1909980 rows after dedup
+2026-10-15 13:41:11,972 ceiling: {'ceiling_accuracy': 0.9985209269207007, 'ceiling_macro_recall': 0.993957737444488, 'ambiguous_rows': 5468, 'ambiguous_share': 0.002862857202693222}
+2026-10-15 13:41:36,705 RESULT base_svc_grouped_s42 acc=0.9607 macroF1=0.7813 (ceiling acc=0.9985 macroRecall=0.9940) iters=70 34s
+2026-10-15 13:41:36,705   Backdoor               P=0.981 R=0.530 F1=0.688 n=12778
+2026-10-15 13:41:36,705   DDoS_HTTP              P=0.743 R=0.899 F1=0.814 n=9518
+2026-10-15 13:41:36,705   DDoS_ICMP              P=0.990 R=1.000 F1=0.995 n=13523
+2026-10-15 13:41:36,705   DDoS_TCP               P=1.000 R=1.000 F1=1.000 n=9942
+2026-10-15 13:41:36,705   DDoS_UDP               P=1.000 R=1.000 F1=1.000 n=24299
+2026-10-15 13:41:36,705   Fingerprinting         P=1.000 R=0.742 F1=0.852 n=532
+2026-10-15 13:41:36,705   MITM                   P=0.000 R=0.000 F1=0.000 n=0
+2026-10-15 13:41:36,705   Normal                 P=1.000 R=1.000 F1=1.000 n=227327
+2026-10-15 13:41:36,705   Password               P=0.806 R=0.826 F1=0.816 n=10142
+2026-10-15 13:41:36,705   Port_Scanning          P=1.000 R=1.000 F1=1.000 n=4030
+2026-10-15 13:41:36,705   Ransomware             P=0.014 R=0.403 F1=0.028 n=216
+2026-10-15 13:41:36,705   SQL_injection          P=0.799 R=0.782 F1=0.791 n=10170
+2026-10-15 13:41:36,705   Uploading              P=0.994 R=0.848 F1=0.915 n=7199
+2026-10-15 13:41:36,705   Vulnerability_scanner  P=0.995 R=0.947 F1=0.971 n=8089
+2026-10-15 13:41:36,705   XSS                    P=0.967 R=0.760 F1=0.851 n=2737
+[100]	valid_0's multi_logloss: 0.0462537

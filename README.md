@@ -48,6 +48,28 @@ configs/config.yaml   Every tunable parameter
 tests/                pytest unit and integration tests
 ```
 
+Results and artefacts (committed, although `.gitignore` excludes these
+folders by default):
+
+```
+results/                  Federated results with the original 91 features (CSV, PNG, logs)
+results/extended/         The same experiments with the current 130 features
+experiments/accuracy/     Classifier-accuracy experiment: train_eval.py, build_features.py,
+                          results/ (metrics JSON, LightGBM models, test-set predictions),
+                          results_v1/ (first, superseded round), run logs
+logs/                     Logs of the experiment runs (logs/extended/ = 130 features)
+saved_models/phase_a/     Phase A model bundle (130 features); phase_a_base91/ = 91 features
+runs/, runs_base91/       Real Phase A / Phase B run records: server and client logs, history,
+                          config, Phase B result (client data slices not included)
+scripts/reruns/           Queue scripts used to re-run every experiment (run from the repo root)
+deliverables/             Presentation, project report (LaTeX + PDF), plain-language explainers
+docs/                     The results website (GitHub Pages)
+```
+
+Not committed: the Edge-IIoTset dataset (`data/raw/`, see Setup), anything
+derived from it (`data/processed/`, `experiments/accuracy/features.parquet`,
+the per-client `.npz` slices in `runs*/`), and the virtual environment.
+
 ## Setup
 
 ```bash

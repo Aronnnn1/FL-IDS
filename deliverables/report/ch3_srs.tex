@@ -1,0 +1,76 @@
+\chapter{Software and Hardware Requirement Specification}
+This chapter lists what the system must do, the qualities it must have, and the hardware and software it was built and tested on.
+
+\section{Functional Requirements}
+\begin{enumerate}
+  \item[FR1] \textbf{Data preparation.} Load the Edge-IIoTset CSV, repair the column-shifted MITM rows from the authors' own capture, canonicalise the categorical placeholder values, remove duplicate rows, one-hot encode the categorical fields, and derive service-port, content and flow features.
+  \item[FR2] \textbf{Non-IID partitioning.} Hold out a stratified 5\% server calibration set and split the rest across $N=10$ clients with a Dirichlet($\alpha=0.3$) label-skew partition. Each client gets its own training, benign-validation and test slices, normalised with a scaler fitted only on that client's training data.
+  \item[FR3] \textbf{First-stage classification.} Train a LightGBM multi-class classifier on the server's calibration set, broadcast it to clients every round, and update it every 3 rounds with up to 50 analyst-confirmed alerts per surviving client.
+  \item[FR4] \textbf{Second-stage anomaly detection.} On each client, train an autoencoder only on traffic the classifier passes as normal, and set a per-client threshold at the 97th percentile of benign validation reconstruction error, recomputed every round.
+  \item[FR5] \textbf{Federated training.} Run a Flower server and 10 client processes for 20 rounds; clients send only weight updates and error histograms, never raw traffic.
+  \item[FR6] \textbf{Poisoning defence.} On every round, exclude client updates that are cosine-similarity MAD outliers, that point away from the median update, or that come from clients with EMA trust below 0.5. Clip surviving update norms to $2\times$ the median and aggregate them with a 15\% trimmed mean.
+  \item[FR7] \textbf{Cascade decision.} Label each record as a known attack type, \emph{anomalous} or benign using one shared decision rule for evaluation, dashboard and SDN.
+  \item[FR8] \textbf{Model bundle.} Save the classifier, autoencoder weights, per-client scalers and thresholds, cascade settings, metrics and provenance as a self-describing bundle, and reject inconsistent bundles on load.
+  \item[FR9] \textbf{SDN mitigation.} Replay a capture through Mininet, extract features with tshark, classify, and send the verdict to an os-ken controller, which installs a drop rule (confidence $\geq0.85$) or an OpenFlow meter (confidence $\geq0.5$). Verify the rule from the switch's own flow table.
+  \item[FR10] \textbf{Evaluation.} Produce the ablation table, poisoning-resistance sweep, zero-day leave-one-class-out results and classifier accuracy results as CSV/JSON files and figures.
+  \item[FR11] \textbf{Dashboard.} Show live training state (rounds, trust scores, surviving clients, reconstruction error, classifier version) and the live mitigation state in a Streamlit web dashboard.
+\end{enumerate}
+
+\section{Non-functional Requirements}
+\begin{itemize}
+  \item \textbf{Privacy:} raw traffic must not leave a client during federated training. The only exception is the capped, analyst-confirmed alerts used for the classifier update, which is documented as a trade-off.
+  \item \textbf{Accuracy:} the classifier must reach at least 95\% accuracy and at least 0.95 macro F1 on held-out data, under an evaluation that keeps whole flows out of training.
+  \item \textbf{Robustness:} attack macro-recall must stay stable when up to 40\% of clients are malicious.
+  \item \textbf{Reproducibility:} every run is seeded (seed 42 by default); LightGBM runs deterministically; all tunable values live in one configuration file (\texttt{configs/config.yaml}).
+  \item \textbf{Resource limits:} a full 10-client Phase A run must complete on a virtual machine with about 7--12 GB of RAM.
+  \item \textbf{Maintainability:} the code is split into modules by component, with 224 automated tests.
+  \item \textbf{Honesty of reporting:} every number in this report comes from an actual logged run; superseded numbers are not reused.
+\end{itemize}
+
+\section{Hardware Requirements}
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|p{4cm}|p{9.5cm}|}
+\hline
+\textbf{Item} & \textbf{Specification used} \\ \hline
+Host machine & Apple MacBook Pro (M5) \\ \hline
+Virtual machine & UTM, Ubuntu 26.04 LTS guest \\ \hline
+vCPUs & 4 \\ \hline
+RAM & 7.2 GB (raised to 12 GB for the real 10-process Phase A run) \\ \hline
+Swap & 4 GB \\ \hline
+Disk & 62 GB virtual disk (dataset 1.2 GB CSV plus captures) \\ \hline
+Network & Emulated: Mininet hosts and one Open vSwitch switch \\ \hline
+\end{tabular}
+\caption{Hardware used for development and evaluation}
+\end{table}
+
+\section{Software Requirements}
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|p{4.5cm}|p{3cm}|p{6cm}|}
+\hline
+\textbf{Software} & \textbf{Version} & \textbf{Purpose} \\ \hline
+Python & 3.14.4 & Implementation language \\ \hline
+LightGBM & 4.7.0 & First-stage classifier \\ \hline
+PyTorch (CPU) & 2.14.0 & Autoencoder and DL baseline \\ \hline
+Flower (\texttt{flwr}) & 1.38.0 & Federated learning server and clients \\ \hline
+scikit-learn & 1.9.1 & Splits, scaling, metrics \\ \hline
+pandas / NumPy / PyArrow & 3.0.6 / 2.5.3 / 25.0.1 & Data handling \\ \hline
+os-ken & 4.2.2 & OpenFlow 1.3 SDN controller \\ \hline
+Mininet & 2.3.0 & Network emulation \\ \hline
+Open vSwitch & 3.7.1 & Software switch \\ \hline
+TShark (Wireshark) & 4.6.4 & Live feature extraction \\ \hline
+tcpreplay & -- & Replaying attack captures \\ \hline
+Flask & 3.1.3 & Mitigation REST bridge \\ \hline
+Streamlit & 1.64.0 & Dashboard \\ \hline
+pytest & -- & Automated tests \\ \hline
+\end{tabular}
+\caption{Software used}
+\end{table}
+
+\section{Cost Estimation}
+All software used in the project is free and open-source (Python, LightGBM, PyTorch, Flower, scikit-learn, os-ken, Mininet, Open vSwitch, Wireshark/TShark, tcpreplay, Flask, Streamlit, Ubuntu and UTM), so there is no licence cost. The Edge-IIoTset dataset is publicly available on Kaggle at no charge. All development and experiments ran on a team member's existing laptop inside a virtual machine, so no extra hardware, cloud compute or paid service was purchased. The network is emulated in Mininet, so no physical switches or IoT devices were bought.
+
+A real deployment would need, per site, an edge device able to run the client (the measured per-client footprint was about 0.4--0.8 GB of RAM), and an OpenFlow-capable switch or a host running Open vSwitch.
