@@ -30,10 +30,20 @@ from pathlib import Path
 import requests
 
 from fl_ids.orchestration.artifacts import load_phase_a_artifacts
+from fl_ids.utils.journey import Journey
 from fl_ids.sdn.demo_io import DEMO_CONFIG_PATH, DEMO_RESULT_PATH
 from fl_ids.utils.config import Config, write_config_yaml
 
 logger = logging.getLogger(__name__)
+
+# Stages timed by run_phase_b (run_dir/journey.json, see fl_ids.utils.journey);
+# the root topology process times its own steps as substages of the third.
+PHASE_B_STAGES = [
+    "Load the model bundle",
+    "Start the SDN bridge and controller",
+    "Network, replay, classify and block (root process)",
+    "Check the switch's flow table",
+]
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TOPOLOGY_SCRIPT = REPO_ROOT / "fl_ids" / "sdn" / "topology.py"
@@ -157,12 +167,15 @@ def run_phase_b(
     if not pcap_path.exists():
         raise FileNotFoundError(pcap_path)
 
-    artifacts = load_phase_a_artifacts(artifact_dir, config.boosting)
+    journey = Journey("phase_b", PHASE_B_STAGES, run_dir / "journey.json")
+    with journey.stage(PHASE_B_STAGES[0]):
+        artifacts = load_phase_a_artifacts(artifact_dir, config.boosting)
     num_hosts = len(artifacts.client_ids)
     logger.info("Phase A bundle %s: %d clients -> %d Mininet hosts", artifact_dir, num_hosts, num_hosts)
 
     config_path = write_config_yaml(config, run_dir / "config.yaml")
-    bridge = _start_bridge(config, config_path, run_dir / "bridge.log")
+    with journey.stage(PHASE_B_STAGES[1]):
+        bridge = _start_bridge(config, config_path, run_dir / "bridge.log")
     try:
         DEMO_RESULT_PATH.unlink(missing_ok=True)
         DEMO_CONFIG_PATH.write_text(json.dumps({
@@ -177,7 +190,7 @@ def run_phase_b(
             "hold_seconds": hold_seconds,
         }))
         logger.info("Running the topology as root: sudo -n %s %s", SYSTEM_PYTHON, TOPOLOGY_SCRIPT)
-        with open(run_dir / "topology.log", "w") as topology_log:
+        with journey.stage(PHASE_B_STAGES[2]) as topology_stage, open(run_dir / "topology.log", "w") as topology_log:
             completed = subprocess.run(
                 ["sudo", "-n", SYSTEM_PYTHON, str(TOPOLOGY_SCRIPT)],
                 cwd=REPO_ROOT, stdout=topology_log, stderr=subprocess.STDOUT,
@@ -188,16 +201,21 @@ def run_phase_b(
         if not DEMO_RESULT_PATH.exists():
             raise RuntimeError(f"Topology finished without writing {DEMO_RESULT_PATH}; see {run_dir / 'topology.log'}")
         result = json.loads(DEMO_RESULT_PATH.read_text())
+        # The root process times its own steps; keep them as this stage's substages.
+        topology_stage["substages"] = result.get("journey", {}).get("stages", [])
     finally:
         _stop_bridge(bridge)
 
-    result["check"] = check_mitigation(result)
+    with journey.stage(PHASE_B_STAGES[3]):
+        result["check"] = check_mitigation(result)
+    result["journey"] = journey.to_dict()
     (run_dir / "phase_b_result.json").write_text(json.dumps(result, indent=2))
 
     verdict = result["classification"]
     logger.info(
-        "Phase B: %s (client %d) -> %s (confidence %.3f, %s stage, %d/%d packets non-benign) -> %s; flow rule: %s",
-        verdict["device_id"], verdict["client_id"], verdict["classification"], verdict["confidence"],
+        "Phase B done in %.1fs: %s (client %d) -> %s (confidence %.3f, %s stage, %d/%d packets non-benign) -> %s; "
+        "flow rule: %s",
+        journey.elapsed(), verdict["device_id"], verdict["client_id"], verdict["classification"], verdict["confidence"],
         verdict["stage"], verdict["num_non_benign"], verdict["num_packets"], result["check"]["action"],
         result["check"]["observed_rule"] or "none",
     )

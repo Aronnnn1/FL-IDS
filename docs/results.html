@@ -43,7 +43,7 @@
 <section id="provenance">
   <h2>Run provenance</h2>
   <div class="table-wrap"><table class="ptable"><tbody>
-    <tr><td>Dataset</td><td style="white-space:normal">Edge-IIoTset <code>DNN-EdgeIIoT-dataset.csv</code>: 2,219,216 rows &rarr; 1,909,719 after cleaning and MITM repair, 91 features, 15 classes (1,909,671 rows in the boosting-vs-DL comparison, which skipped the MITM repair)</td></tr>
+    <tr><td>Dataset</td><td style="white-space:normal">Edge-IIoTset <code>DNN-EdgeIIoT-dataset.csv</code>: 2,219,201 rows (2,219,216 after the MITM repair) &rarr; 1,909,719 after cleaning and MITM repair, 91 features, 15 classes (1,909,671 rows in the boosting-vs-DL comparison, which skipped the MITM repair)</td></tr>
     <tr><td>Feature set</td><td style="white-space:normal">Sections 2&ndash;7 use the current pipeline: 130 features (<code>data.extended_features</code>), 1,985,768 rows, LightGBM with square-root class weights, results in <code>results/extended/</code>. Section 9 keeps the same experiments with the original 91 features (<code>results/</code>) for comparison. Section 1 (boosting vs. DL) used the 91 features.</td></tr>
     <tr><td>Classifier-accuracy runs</td><td style="white-space:normal">Section 8 only: 130 features (91 original + service port + 18 content + 20 flow), 2,219,216 rows &rarr; 1,985,768 after de-duplication on that feature set; all rows, natural class distribution, 80/20 random and flow-grouped splits</td></tr>
     <tr><td>Seed</td><td style="white-space:normal">42 for everything, except the multi-seed check (43, 44)</td></tr>

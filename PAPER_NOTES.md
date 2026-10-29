@@ -1224,6 +1224,27 @@ bar; the test now uses the production (extended) feature set.
 
 ---
 
+### 8.12 20 clients, the timed journey, class split (2026-10-30)
+- **20 clients** (`configs/config_20clients.yaml`, in-process simulation via
+  `fl_ids.eval.stage_report`, 20 rounds, seed 42, `results/clients20/`):
+  classifier alone 0.9983 acc / 0.9952 macro F1; AE alone attack recall
+  0.685, AUROC 0.977; cascade attack recall 0.9960, acc 0.9721, macro F1
+  0.9662, benign FPR 0.0372 (10 clients: 0.728 / 0.982 / 0.9996 / 0.9759 /
+  0.9706 / 0.0332). 3 of 20 clients (0, 2, 13) get no benign validation
+  rows -> threshold inf, AE never flags. ~4.3 s/round. A **real**
+  20-process run exhausted the VM's 7.4 GB RAM (swap full, round 1 took
+  78 s) and was stopped: it needs more memory.
+- **Journey timing** (`fl_ids/utils/journey.py`; Phase A, Phase B and the
+  live demo log each stage and keep `journey.json` current). One real run
+  (`scripts/reruns/run_journey.sh`, 10 client processes, feature cache
+  warm): Phase A 210.6 s (training 191.2 s; rounds with a boosting update
+  are the slow ones), Phase B 8.6 s (tshark extraction 2.6 s, classify
+  0.6 s, drop rule 0.007 s); total 219 s. Same results as 8.11 (0.999,
+  FPR 0.0350; Backdoor 0.997, 24,669/24,914, block). `results/journey/`.
+- **Class split** (`results/class_split/`): per class, raw / cleaned /
+  classifier train-test / federated calibration / 20-client pool. The CSV
+  has 2,219,201 rows; 2,219,216 after the MITM repair (1,214 -> 1,229).
+
 ## 9. Do not cite (superseded numbers, with reason)
 
 - Every real-data number from before `c1cc656` (label leak): Phase 5

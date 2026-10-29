@@ -202,7 +202,7 @@
     FL.diagram($("diagram-a"), {
       id: "a", aria: "Phase A training pipeline",
       nodes: [
-        { id: "n1", col: 0, row: 0, cls: "data", title: "1 · Raw dataset", lines: ["Edge-IIoTset CSV", "2,219,216 rows × 63 columns", "15 attack / normal classes"] },
+        { id: "n1", col: 0, row: 0, cls: "data", title: "1 · Raw dataset", lines: ["Edge-IIoTset CSV", "2,219,201 rows × 63 columns", "15 attack / normal classes"] },
         { id: "n2", col: 1, row: 0, cls: "data", title: "2 · Clean & encode", lines: ["fix label leak · repair MITM", "+39 port/content/flow features", "(IPs/times only group flows)", "dedupe · one-hot → 1.99M × 130"] },
         { id: "n3", col: 2, row: 0, cls: "data", title: "3 · Split", lines: ["Server calibration set: 5%", "(stratified, labelled)", "Federated pool: the rest,", "subsampled to 60,000 rows"] },
         { id: "n4", col: 3, row: 0, cls: "model", title: "4 · Boosting bootstrap", lines: ["LightGBM on raw features", "300 rounds · sqrt class weights", "trained BEFORE round 1", "held-out accuracy 0.997"] },

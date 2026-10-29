@@ -38,6 +38,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 from fl_ids.data.pipeline import load_and_encode, partition_and_normalize_clients
+from fl_ids.utils.journey import Journey
 from fl_ids.eval.common import concat_client_test_slices, per_row_thresholds, select_malicious_clients
 from fl_ids.eval.metrics import detection_metrics, evaluate_boosting_alone, flag_attacks, stage_report_summary
 from fl_ids.fl.data_io import save_client_data
@@ -52,6 +53,16 @@ logger = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PROCESS_POLL_SECONDS = 0.5
+
+# Stages timed by run_phase_a (runs/.../journey.json, see fl_ids.utils.journey).
+PHASE_A_STAGES = [
+    "Load, clean and encode the dataset",
+    "Calibration split, bootstrap classifier, client partition",
+    "Federated training",
+    "Calibrate client anomaly thresholds",
+    "Evaluate on the clients' test slices",
+    "Save the model bundle",
+]
 
 
 @dataclass
@@ -130,6 +141,7 @@ def run_federated_training(
     run_dir: Path,
     num_rounds: int,
     malicious_client_ids: set[int],
+    journey: Journey | None = None,
 ) -> tuple[list[np.ndarray], BoostingClassifier, list[dict]]:
     """Run a real multi-process Flower training; return its final models and per-round state.
 
@@ -138,6 +150,8 @@ def run_federated_training(
         config: Full project config (written to `run_dir` for the child processes).
         run_dir: Working directory for data files, logs and server outputs.
         num_rounds: FL rounds.
+        journey: If given, its running stage is updated with the round the
+            server has finished (read from the live state file).
         malicious_client_ids: Clients launched as sign-flip attackers.
 
     Returns:
@@ -240,6 +254,8 @@ def run_federated_training(
                 raise RuntimeError(
                     f"Phase A exceeded {config.orchestration.fl_timeout_seconds}s; still running: {running}"
                 )
+            if journey is not None:
+                journey.progress(f"round {_rounds_done(live_state_path)}/{num_rounds} finished")
             time.sleep(PROCESS_POLL_SECONDS)
     finally:
         for _name, proc in processes:
@@ -257,6 +273,14 @@ def run_federated_training(
     )
     round_history = json.loads(live_state_path.read_text()) if live_state_path.exists() else []
     return final_weights, final_boosting, round_history
+
+
+def _rounds_done(live_state_path: Path) -> int:
+    """Rounds the server has recorded so far (0 while the file is missing or mid-write)."""
+    try:
+        return len(json.loads(live_state_path.read_text()))
+    except (OSError, ValueError):
+        return 0
 
 
 def calibrate_thresholds(
@@ -358,10 +382,13 @@ def run_phase_a(
     artifact_dir = Path(artifact_dir or config.orchestration.artifact_dir)
     run_dir = Path(run_dir or config.orchestration.run_dir)
 
-    X, y, label_encoder, feature_names, benign_class = load_and_encode(
-        csv_path, config.data.capture_repairs, config.data.extended_features, config.data.feature_cache
-    )
-    prepared = prepare_data(X, y, list(label_encoder.classes_), benign_class, feature_names, config)
+    journey = Journey("phase_a", PHASE_A_STAGES, run_dir / "journey.json")
+    with journey.stage(PHASE_A_STAGES[0]):
+        X, y, label_encoder, feature_names, benign_class = load_and_encode(
+            csv_path, config.data.capture_repairs, config.data.extended_features, config.data.feature_cache
+        )
+    with journey.stage(PHASE_A_STAGES[1]):
+        prepared = prepare_data(X, y, list(label_encoder.classes_), benign_class, feature_names, config)
     # Everything later uses `prepared`. The full matrix (1.9M x 91 float64,
     # ~1.4 GB) held through training pushed the 11-process run into swap on
     # a 7 GB machine, so let it go before the server and clients start.
@@ -370,16 +397,19 @@ def run_phase_a(
     malicious = select_malicious_clients(
         list(prepared.client_data), config.orchestration.malicious_fraction, config.seed
     )
-    final_weights, final_boosting, round_history = run_federated_training(
-        prepared, config, run_dir, num_rounds, malicious
-    )
+    with journey.stage(PHASE_A_STAGES[2]):
+        final_weights, final_boosting, round_history = run_federated_training(
+            prepared, config, run_dir, num_rounds, malicious, journey
+        )
 
     autoencoder = Autoencoder(len(feature_names), config.autoencoder.hidden_dims, config.autoencoder.bottleneck_dim)
     set_weights(autoencoder, final_weights)
-    thresholds = calibrate_thresholds(
-        autoencoder, prepared.client_data, config.autoencoder.anomaly_percentile, round_history
-    )
-    test_metrics = evaluate_bundle(final_boosting, autoencoder, thresholds, prepared, config)
+    with journey.stage(PHASE_A_STAGES[3]):
+        thresholds = calibrate_thresholds(
+            autoencoder, prepared.client_data, config.autoencoder.anomaly_percentile, round_history
+        )
+    with journey.stage(PHASE_A_STAGES[4]):
+        test_metrics = evaluate_bundle(final_boosting, autoencoder, thresholds, prepared, config)
 
     scalers = {}
     for cid, data in prepared.client_data.items():
@@ -391,6 +421,8 @@ def run_phase_a(
 
     last_round = round_history[-1] if round_history else {}
     updates = [entry["boosting_update"] for entry in round_history if entry.get("boosting_update")]
+    save_stage = journey.stage(PHASE_A_STAGES[5])
+    save_stage.__enter__()
     save_phase_a_artifacts(
         artifact_dir,
         final_boosting,
@@ -427,11 +459,14 @@ def run_phase_a(
             "seed": config.seed,
         },
     )
+    save_stage.__exit__(None, None, None)
+    (artifact_dir / "journey.json").write_text(json.dumps(journey.to_dict(), indent=2))
     cascade = test_metrics["cascade"]
     logger.info(
-        "Phase A done: cascade attack macro-recall %.3f, benign FPR %.4f on %d clients' held-out test slices; "
-        "bundle at %s",
-        cascade["attack_macro_recall"], cascade["benign_fpr"], len(prepared.client_data), artifact_dir,
+        "Phase A done in %.1fs: cascade attack macro-recall %.3f, benign FPR %.4f on %d clients' held-out "
+        "test slices; bundle at %s",
+        journey.elapsed(), cascade["attack_macro_recall"], cascade["benign_fpr"], len(prepared.client_data),
+        artifact_dir,
     )
     return artifact_dir
 

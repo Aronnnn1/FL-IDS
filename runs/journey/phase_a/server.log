@@ -1,0 +1,549 @@
+2026-10-30 02:39:35,590 [INFO] __main__: Starting Flower server on 127.0.0.1:9091 for 20 rounds
+[93mWARNING [0m:   DEPRECATED FEATURE: flwr.server.start_server() is deprecated.
+	Instead, use the `flower-superlink` CLI command to start a SuperLink as shown below:
+
+		$ flower-superlink --insecure
+
+	To view usage and all available options, run:
+
+		$ flower-superlink --help
+
+	Using `start_server()` is deprecated.
+
+            This is a deprecated feature. It will be removed
+            entirely in future versions of Flower.
+        
+2026-10-30 02:39:35,590 [WARNING] flwr: DEPRECATED FEATURE: flwr.server.start_server() is deprecated.
+	Instead, use the `flower-superlink` CLI command to start a SuperLink as shown below:
+
+		$ flower-superlink --insecure
+
+	To view usage and all available options, run:
+
+		$ flower-superlink --help
+
+	Using `start_server()` is deprecated.
+
+            This is a deprecated feature. It will be removed
+            entirely in future versions of Flower.
+        
+[92mINFO [0m:      Starting Flower server, config: num_rounds=20, no round_timeout
+2026-10-30 02:39:35,590 [INFO] flwr: Starting Flower server, config: num_rounds=20, no round_timeout
+[92mINFO [0m:      Flower ECE: gRPC server running (20 rounds), SSL is disabled
+2026-10-30 02:39:35,606 [INFO] flwr: Flower ECE: gRPC server running (20 rounds), SSL is disabled
+[92mINFO [0m:      [INIT]
+2026-10-30 02:39:35,606 [INFO] flwr: [INIT]
+[92mINFO [0m:      Using initial global parameters provided by strategy
+2026-10-30 02:39:35,606 [INFO] flwr: Using initial global parameters provided by strategy
+[92mINFO [0m:      Starting evaluation of initial global parameters
+2026-10-30 02:39:35,606 [INFO] flwr: Starting evaluation of initial global parameters
+[92mINFO [0m:      Evaluation returned no results (`None`)
+2026-10-30 02:39:35,606 [INFO] flwr: Evaluation returned no results (`None`)
+[92mINFO [0m:      
+2026-10-30 02:39:35,606 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 1]
+2026-10-30 02:39:35,606 [INFO] flwr: [ROUND 1]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:39:38,859 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:39:44,463 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:39:44,549 [INFO] fl_ids.fl.strategy: Round 1 trust filter: 6/10 clients survived, excluded {4: ['mad_outlier'], 0: ['mad_outlier'], 2: ['mad_outlier'], 1: ['mad_outlier']}. Trust scores: {9: 0.96, 8: 0.957, 6: 0.958, 3: 0.958, 4: 0.881, 7: 0.956, 5: 0.944, 0: 0.891, 2: 0.897, 1: 0.881}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:39:44,577 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:39:44,636 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[93mWARNING [0m:   No evaluate_metrics_aggregation_fn provided
+2026-10-30 02:39:44,637 [WARNING] flwr: No evaluate_metrics_aggregation_fn provided
+[92mINFO [0m:      
+2026-10-30 02:39:44,640 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 2]
+2026-10-30 02:39:44,640 [INFO] flwr: [ROUND 2]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:39:44,642 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:39:47,588 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:39:47,591 [INFO] fl_ids.fl.strategy: Round 2 trust filter: 7/10 clients survived, excluded {4: ['mad_outlier'], 0: ['mad_outlier'], 1: ['mad_outlier']}. Trust scores: {4: 0.841, 0: 0.848, 1: 0.831, 9: 0.953, 3: 0.942, 7: 0.932, 6: 0.94, 8: 0.94, 2: 0.863, 5: 0.934}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:39:47,592 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:39:47,608 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:39:47,608 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 3]
+2026-10-30 02:39:47,608 [INFO] flwr: [ROUND 3]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:39:47,609 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:39:49,744 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:39:49,747 [INFO] fl_ids.fl.strategy: Round 3 trust filter: 8/10 clients survived, excluded {1: ['mad_outlier'], 4: ['mad_outlier']}. Trust scores: {2: 0.823, 3: 0.918, 8: 0.91, 5: 0.903, 1: 0.781, 0: 0.803, 9: 0.931, 4: 0.791, 7: 0.899, 6: 0.911}
+2026-10-30 02:39:56,383 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 79713 rows (now 350 trees)
+2026-10-30 02:39:57,957 [INFO] fl_ids.models.boosting_update: Round 3: boosting v2 (continue) from 283 alerts ({'Backdoor': 1, 'DDoS_HTTP': 7, 'Normal': 268, 'Password': 2, 'Port_Scanning': 2, 'Ransomware': 1, 'Vulnerability_scanner': 2}); 4 from excluded clients ignored
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:39:58,037 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:39:58,052 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:39:58,053 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 4]
+2026-10-30 02:39:58,053 [INFO] flwr: [ROUND 4]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:39:58,053 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:00,947 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:00,951 [INFO] fl_ids.fl.strategy: Round 4 trust filter: 7/10 clients survived, excluded {4: ['mad_outlier'], 1: ['mad_outlier'], 0: ['mad_outlier']}. Trust scores: {5: 0.868, 8: 0.892, 3: 0.903, 2: 0.778, 4: 0.744, 1: 0.731, 0: 0.756, 6: 0.891, 7: 0.882, 9: 0.914}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:00,953 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:40:00,967 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:40:00,967 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 5]
+2026-10-30 02:40:00,967 [INFO] flwr: [ROUND 5]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:00,968 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:03,826 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:03,831 [INFO] fl_ids.fl.strategy: Round 5 trust filter: 10/10 clients survived, excluded {}. Trust scores: {5: 0.833, 2: 0.736, 3: 0.896, 8: 0.883, 6: 0.879, 7: 0.873, 9: 0.903, 1: 0.692, 4: 0.704, 0: 0.713}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:03,832 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:40:03,850 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:40:03,850 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 6]
+2026-10-30 02:40:03,850 [INFO] flwr: [ROUND 6]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:03,850 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:06,773 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:06,784 [INFO] fl_ids.fl.strategy: Round 6 trust filter: 10/10 clients survived, excluded {}. Trust scores: {9: 0.888, 3: 0.889, 8: 0.875, 1: 0.654, 4: 0.663, 7: 0.863, 2: 0.694, 0: 0.674, 6: 0.87, 5: 0.802}
+2026-10-30 02:40:14,403 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 79983 rows (now 400 trees)
+2026-10-30 02:40:16,050 [INFO] fl_ids.models.boosting_update: Round 6: boosting v3 (continue) from 270 alerts ({'Backdoor': 3, 'DDoS_HTTP': 8, 'Normal': 257, 'Password': 2}); 0 from excluded clients ignored
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:16,136 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:40:16,154 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:40:16,155 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 7]
+2026-10-30 02:40:16,156 [INFO] flwr: [ROUND 7]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:16,156 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:19,816 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:19,821 [INFO] fl_ids.fl.strategy: Round 7 trust filter: 10/10 clients survived, excluded {}. Trust scores: {0: 0.646, 6: 0.862, 7: 0.854, 9: 0.872, 3: 0.88, 4: 0.631, 2: 0.66, 8: 0.868, 1: 0.627, 5: 0.774}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:19,822 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:40:19,840 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:40:19,840 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 8]
+2026-10-30 02:40:19,840 [INFO] flwr: [ROUND 8]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:19,840 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:23,308 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:23,311 [INFO] fl_ids.fl.strategy: Round 8 trust filter: 10/10 clients survived, excluded {}. Trust scores: {5: 0.75, 2: 0.636, 0: 0.626, 6: 0.851, 8: 0.858, 1: 0.608, 4: 0.609, 3: 0.87, 7: 0.841, 9: 0.851}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:23,312 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:40:23,322 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:40:23,322 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 9]
+2026-10-30 02:40:23,322 [INFO] flwr: [ROUND 9]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:23,322 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:26,821 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:26,824 [INFO] fl_ids.fl.strategy: Round 9 trust filter: 10/10 clients survived, excluded {}. Trust scores: {3: 0.858, 5: 0.729, 1: 0.599, 9: 0.831, 6: 0.835, 7: 0.821, 2: 0.619, 8: 0.845, 0: 0.611, 4: 0.6}
+2026-10-30 02:40:35,757 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 80247 rows (now 450 trees)
+2026-10-30 02:40:37,672 [INFO] fl_ids.models.boosting_update: Round 9: boosting v4 (continue) from 264 alerts ({'Backdoor': 1, 'DDoS_HTTP': 4, 'Fingerprinting': 1, 'Normal': 255, 'Password': 3}); 0 from excluded clients ignored
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:37,777 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:40:37,808 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:40:37,809 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 10]
+2026-10-30 02:40:37,809 [INFO] flwr: [ROUND 10]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:37,809 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:42,060 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:42,063 [INFO] fl_ids.fl.strategy: Round 10 trust filter: 10/10 clients survived, excluded {}. Trust scores: {7: 0.797, 1: 0.592, 4: 0.599, 9: 0.811, 0: 0.602, 2: 0.61, 3: 0.842, 6: 0.813, 8: 0.828, 5: 0.713}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:42,065 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:40:42,077 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:40:42,077 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 11]
+2026-10-30 02:40:42,077 [INFO] flwr: [ROUND 11]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:42,077 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:46,307 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:46,313 [INFO] fl_ids.fl.strategy: Round 11 trust filter: 10/10 clients survived, excluded {}. Trust scores: {4: 0.603, 2: 0.611, 5: 0.698, 9: 0.788, 3: 0.822, 6: 0.789, 7: 0.774, 1: 0.59, 8: 0.808, 0: 0.603}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:46,315 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:40:46,333 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:40:46,334 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 12]
+2026-10-30 02:40:46,334 [INFO] flwr: [ROUND 12]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:40:46,334 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:50,469 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:40:50,473 [INFO] fl_ids.fl.strategy: Round 12 trust filter: 10/10 clients survived, excluded {}. Trust scores: {0: 0.605, 6: 0.766, 5: 0.685, 1: 0.588, 3: 0.8, 8: 0.788, 9: 0.762, 7: 0.753, 2: 0.617, 4: 0.607}
+2026-10-30 02:41:00,355 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 80514 rows (now 500 trees)
+2026-10-30 02:41:02,540 [INFO] fl_ids.models.boosting_update: Round 12: boosting v5 (continue) from 267 alerts ({'DDoS_HTTP': 5, 'Normal': 259, 'Password': 1, 'Ransomware': 2}); 0 from excluded clients ignored
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:41:02,648 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:41:02,684 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:41:02,685 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 13]
+2026-10-30 02:41:02,685 [INFO] flwr: [ROUND 13]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:41:02,685 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:41:07,772 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:41:07,789 [INFO] fl_ids.fl.strategy: Round 13 trust filter: 10/10 clients survived, excluded {}. Trust scores: {2: 0.622, 4: 0.611, 5: 0.674, 3: 0.785, 6: 0.747, 0: 0.606, 1: 0.588, 9: 0.739, 8: 0.771, 7: 0.735}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:41:07,791 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:41:07,806 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:41:07,807 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 14]
+2026-10-30 02:41:07,807 [INFO] flwr: [ROUND 14]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:41:07,808 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:41:12,953 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:41:12,975 [INFO] fl_ids.fl.strategy: Round 14 trust filter: 10/10 clients survived, excluded {}. Trust scores: {1: 0.586, 2: 0.629, 0: 0.609, 9: 0.719, 8: 0.755, 6: 0.729, 7: 0.721, 5: 0.664, 3: 0.771, 4: 0.613}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:41:12,978 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:41:13,035 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:41:13,036 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 15]
+2026-10-30 02:41:13,036 [INFO] flwr: [ROUND 15]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:41:13,037 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:41:18,068 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:41:18,075 [INFO] fl_ids.fl.strategy: Round 15 trust filter: 10/10 clients survived, excluded {}. Trust scores: {0: 0.613, 5: 0.66, 4: 0.615, 2: 0.638, 3: 0.756, 6: 0.713, 9: 0.701, 1: 0.583, 8: 0.739, 7: 0.708}
+2026-10-30 02:41:29,135 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 80779 rows (now 550 trees)
+2026-10-30 02:41:31,558 [INFO] fl_ids.models.boosting_update: Round 15: boosting v6 (continue) from 265 alerts ({'Backdoor': 1, 'Normal': 264}); 0 from excluded clients ignored
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:41:31,676 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:41:31,706 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:41:31,707 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 16]
+2026-10-30 02:41:31,707 [INFO] flwr: [ROUND 16]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:41:31,707 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:41:37,515 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:41:37,522 [INFO] fl_ids.fl.strategy: Round 16 trust filter: 10/10 clients survived, excluded {}. Trust scores: {2: 0.644, 0: 0.614, 1: 0.579, 8: 0.725, 6: 0.701, 7: 0.699, 5: 0.653, 4: 0.616, 3: 0.745, 9: 0.683}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:41:37,524 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:41:37,547 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:41:37,548 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 17]
+2026-10-30 02:41:37,548 [INFO] flwr: [ROUND 17]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:41:37,549 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:41:43,088 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:41:43,092 [INFO] fl_ids.fl.strategy: Round 17 trust filter: 9/10 clients survived, excluded {1: ['mad_outlier']}. Trust scores: {2: 0.647, 1: 0.575, 0: 0.616, 9: 0.669, 6: 0.69, 5: 0.651, 3: 0.737, 7: 0.691, 4: 0.617, 8: 0.713}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:41:43,093 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:41:43,104 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:41:43,105 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 18]
+2026-10-30 02:41:43,105 [INFO] flwr: [ROUND 18]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:41:43,105 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:41:48,962 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:41:48,975 [INFO] fl_ids.fl.strategy: Round 18 trust filter: 10/10 clients survived, excluded {}. Trust scores: {5: 0.645, 0: 0.625, 9: 0.655, 3: 0.731, 8: 0.703, 2: 0.652, 4: 0.62, 6: 0.684, 7: 0.681, 1: 0.591}
+2026-10-30 02:42:02,774 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 81043 rows (now 600 trees)
+2026-10-30 02:42:05,581 [INFO] fl_ids.models.boosting_update: Round 18: boosting v7 (continue) from 264 alerts ({'DDoS_HTTP': 3, 'Normal': 261}); 0 from excluded clients ignored
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:42:05,732 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:42:05,850 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:42:05,852 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 19]
+2026-10-30 02:42:05,852 [INFO] flwr: [ROUND 19]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:42:05,852 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:42:12,479 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:42:12,483 [INFO] fl_ids.fl.strategy: Round 19 trust filter: 10/10 clients survived, excluded {}. Trust scores: {7: 0.674, 5: 0.644, 3: 0.726, 0: 0.63, 6: 0.678, 8: 0.696, 1: 0.585, 9: 0.645, 2: 0.659, 4: 0.619}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:42:12,484 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:42:12,501 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:42:12,502 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 20]
+2026-10-30 02:42:12,502 [INFO] flwr: [ROUND 20]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-10-30 02:42:12,502 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:42:19,570 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-10-30 02:42:19,580 [INFO] fl_ids.fl.strategy: Round 20 trust filter: 9/10 clients survived, excluded {1: ['mad_outlier']}. Trust scores: {2: 0.661, 5: 0.644, 0: 0.63, 9: 0.635, 4: 0.618, 3: 0.722, 6: 0.67, 7: 0.668, 1: 0.579, 8: 0.686}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-10-30 02:42:19,586 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-10-30 02:42:19,639 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-10-30 02:42:19,645 [INFO] flwr: 
+[92mINFO [0m:      [SUMMARY]
+2026-10-30 02:42:19,645 [INFO] flwr: [SUMMARY]
+[92mINFO [0m:      Run finished 20 round(s) in 164.04s
+2026-10-30 02:42:19,646 [INFO] flwr: Run finished 20 round(s) in 164.04s
+[92mINFO [0m:      	History (loss, distributed):
+2026-10-30 02:42:19,654 [INFO] flwr: 	History (loss, distributed):
+[92mINFO [0m:      		round 1: 0.203455809246459
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 1: 0.203455809246459
+[92mINFO [0m:      		round 2: 0.05668729574741226
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 2: 0.05668729574741226
+[92mINFO [0m:      		round 3: 0.047994360867988785
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 3: 0.047994360867988785
+[92mINFO [0m:      		round 4: 0.04109769783994927
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 4: 0.04109769783994927
+[92mINFO [0m:      		round 5: 0.04357663533342143
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 5: 0.04357663533342143
+[92mINFO [0m:      		round 6: 0.04134146314026758
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 6: 0.04134146314026758
+[92mINFO [0m:      		round 7: 0.03865851371820214
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 7: 0.03865851371820214
+[92mINFO [0m:      		round 8: 0.03661008478827761
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 8: 0.03661008478827761
+[92mINFO [0m:      		round 9: 0.03528225765737013
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 9: 0.03528225765737013
+[92mINFO [0m:      		round 10: 0.03443606254353338
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 10: 0.03443606254353338
+[92mINFO [0m:      		round 11: 0.03406725590795979
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 11: 0.03406725590795979
+[92mINFO [0m:      		round 12: 0.03397167709135664
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 12: 0.03397167709135664
+[92mINFO [0m:      		round 13: 0.03385763955361481
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 13: 0.03385763955361481
+[92mINFO [0m:      		round 14: 0.03375590522967239
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 14: 0.03375590522967239
+[92mINFO [0m:      		round 15: 0.0336238023075553
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 15: 0.0336238023075553
+[92mINFO [0m:      		round 16: 0.033364480498767245
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 16: 0.033364480498767245
+[92mINFO [0m:      		round 17: 0.030365986838788602
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 17: 0.030365986838788602
+[92mINFO [0m:      		round 18: 0.03213946252562793
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 18: 0.03213946252562793
+[92mINFO [0m:      		round 19: 0.03190379762250735
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 19: 0.03190379762250735
+[92mINFO [0m:      		round 20: 0.02906578351081657
+2026-10-30 02:42:19,654 [INFO] flwr: 		round 20: 0.02906578351081657
+[92mINFO [0m:      	History (metrics, distributed, fit):
+2026-10-30 02:42:19,654 [INFO] flwr: 	History (metrics, distributed, fit):
+[92mINFO [0m:      	{'num_survivors': [(1, 6),
+2026-10-30 02:42:19,654 [INFO] flwr: 	{'num_survivors': [(1, 6),
+[92mINFO [0m:      	                   (2, 7),
+2026-10-30 02:42:19,654 [INFO] flwr: 	                   (2, 7),
+[92mINFO [0m:      	                   (3, 8),
+2026-10-30 02:42:19,654 [INFO] flwr: 	                   (3, 8),
+[92mINFO [0m:      	                   (4, 7),
+2026-10-30 02:42:19,654 [INFO] flwr: 	                   (4, 7),
+[92mINFO [0m:      	                   (5, 10),
+2026-10-30 02:42:19,654 [INFO] flwr: 	                   (5, 10),
+[92mINFO [0m:      	                   (6, 10),
+2026-10-30 02:42:19,654 [INFO] flwr: 	                   (6, 10),
+[92mINFO [0m:      	                   (7, 10),
+2026-10-30 02:42:19,654 [INFO] flwr: 	                   (7, 10),
+[92mINFO [0m:      	                   (8, 10),
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (8, 10),
+[92mINFO [0m:      	                   (9, 10),
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (9, 10),
+[92mINFO [0m:      	                   (10, 10),
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (10, 10),
+[92mINFO [0m:      	                   (11, 10),
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (11, 10),
+[92mINFO [0m:      	                   (12, 10),
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (12, 10),
+[92mINFO [0m:      	                   (13, 10),
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (13, 10),
+[92mINFO [0m:      	                   (14, 10),
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (14, 10),
+[92mINFO [0m:      	                   (15, 10),
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (15, 10),
+[92mINFO [0m:      	                   (16, 10),
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (16, 10),
+[92mINFO [0m:      	                   (17, 9),
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (17, 9),
+[92mINFO [0m:      	                   (18, 10),
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (18, 10),
+[92mINFO [0m:      	                   (19, 10),
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (19, 10),
+[92mINFO [0m:      	                   (20, 9)]}
+2026-10-30 02:42:19,655 [INFO] flwr: 	                   (20, 9)]}
+[92mINFO [0m:      
+2026-10-30 02:42:19,655 [INFO] flwr: 
+2026-10-30 02:42:19,693 [ERROR] grpc._server: Exception iterating responses: 
+Traceback (most recent call last):
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/grpc/_server.py", line 652, in _take_response_from_response_iterator
+    return next(response_iterator), True
+           ~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/flower_service_servicer.py", line 118, in Join
+    ins_wrapper: InsWrapper = next(ins_wrapper_iterator)
+                              ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 165, in ins_wrapper_iterator
+    self._raise_if_closed()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 81, in _raise_if_closed
+    raise GrpcBridgeClosed()
+flwr.server.superlink.fleet.grpc_bidi.grpc_bridge.GrpcBridgeClosed
+2026-10-30 02:42:19,697 [ERROR] grpc._server: Exception iterating responses: 
+Traceback (most recent call last):
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/grpc/_server.py", line 652, in _take_response_from_response_iterator
+    return next(response_iterator), True
+           ~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/flower_service_servicer.py", line 118, in Join
+    ins_wrapper: InsWrapper = next(ins_wrapper_iterator)
+                              ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 165, in ins_wrapper_iterator
+    self._raise_if_closed()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 81, in _raise_if_closed
+    raise GrpcBridgeClosed()
+flwr.server.superlink.fleet.grpc_bidi.grpc_bridge.GrpcBridgeClosed
+2026-10-30 02:42:19,698 [ERROR] grpc._server: Exception iterating responses: 
+Traceback (most recent call last):
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/grpc/_server.py", line 652, in _take_response_from_response_iterator
+    return next(response_iterator), True
+           ~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/flower_service_servicer.py", line 118, in Join
+    ins_wrapper: InsWrapper = next(ins_wrapper_iterator)
+                              ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 165, in ins_wrapper_iterator
+    self._raise_if_closed()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 81, in _raise_if_closed
+    raise GrpcBridgeClosed()
+flwr.server.superlink.fleet.grpc_bidi.grpc_bridge.GrpcBridgeClosed
+2026-10-30 02:42:19,698 [ERROR] grpc._server: Exception iterating responses: 
+Traceback (most recent call last):
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/grpc/_server.py", line 652, in _take_response_from_response_iterator
+    return next(response_iterator), True
+           ~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/flower_service_servicer.py", line 118, in Join
+    ins_wrapper: InsWrapper = next(ins_wrapper_iterator)
+                              ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 165, in ins_wrapper_iterator
+    self._raise_if_closed()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 81, in _raise_if_closed
+    raise GrpcBridgeClosed()
+flwr.server.superlink.fleet.grpc_bidi.grpc_bridge.GrpcBridgeClosed
+2026-10-30 02:42:19,698 [ERROR] grpc._server: Exception iterating responses: 
+Traceback (most recent call last):
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/grpc/_server.py", line 652, in _take_response_from_response_iterator
+    return next(response_iterator), True
+           ~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/flower_service_servicer.py", line 118, in Join
+    ins_wrapper: InsWrapper = next(ins_wrapper_iterator)
+                              ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 165, in ins_wrapper_iterator
+    self._raise_if_closed()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 81, in _raise_if_closed
+    raise GrpcBridgeClosed()
+flwr.server.superlink.fleet.grpc_bidi.grpc_bridge.GrpcBridgeClosed
+2026-10-30 02:42:19,698 [ERROR] grpc._server: Exception iterating responses: 
+Traceback (most recent call last):
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/grpc/_server.py", line 652, in _take_response_from_response_iterator
+    return next(response_iterator), True
+           ~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/flower_service_servicer.py", line 118, in Join
+    ins_wrapper: InsWrapper = next(ins_wrapper_iterator)
+                              ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 165, in ins_wrapper_iterator
+    self._raise_if_closed()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 81, in _raise_if_closed
+    raise GrpcBridgeClosed()
+flwr.server.superlink.fleet.grpc_bidi.grpc_bridge.GrpcBridgeClosed
+2026-10-30 02:42:19,701 [ERROR] grpc._server: Exception iterating responses: 
+Traceback (most recent call last):
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/grpc/_server.py", line 652, in _take_response_from_response_iterator
+    return next(response_iterator), True
+           ~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/flower_service_servicer.py", line 118, in Join
+    ins_wrapper: InsWrapper = next(ins_wrapper_iterator)
+                              ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 165, in ins_wrapper_iterator
+    self._raise_if_closed()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 81, in _raise_if_closed
+    raise GrpcBridgeClosed()
+flwr.server.superlink.fleet.grpc_bidi.grpc_bridge.GrpcBridgeClosed
+2026-10-30 02:42:19,702 [ERROR] grpc._server: Exception iterating responses: 
+Traceback (most recent call last):
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/grpc/_server.py", line 652, in _take_response_from_response_iterator
+    return next(response_iterator), True
+           ~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/flower_service_servicer.py", line 118, in Join
+    ins_wrapper: InsWrapper = next(ins_wrapper_iterator)
+                              ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 165, in ins_wrapper_iterator
+    self._raise_if_closed()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 81, in _raise_if_closed
+    raise GrpcBridgeClosed()
+flwr.server.superlink.fleet.grpc_bidi.grpc_bridge.GrpcBridgeClosed
+2026-10-30 02:42:19,703 [ERROR] grpc._server: Exception iterating responses: 
+Traceback (most recent call last):
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/grpc/_server.py", line 652, in _take_response_from_response_iterator
+    return next(response_iterator), True
+           ~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/flower_service_servicer.py", line 118, in Join
+    ins_wrapper: InsWrapper = next(ins_wrapper_iterator)
+                              ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 165, in ins_wrapper_iterator
+    self._raise_if_closed()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 81, in _raise_if_closed
+    raise GrpcBridgeClosed()
+flwr.server.superlink.fleet.grpc_bidi.grpc_bridge.GrpcBridgeClosed
+2026-10-30 02:42:19,704 [ERROR] grpc._server: Exception iterating responses: 
+Traceback (most recent call last):
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/grpc/_server.py", line 652, in _take_response_from_response_iterator
+    return next(response_iterator), True
+           ~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/flower_service_servicer.py", line 118, in Join
+    ins_wrapper: InsWrapper = next(ins_wrapper_iterator)
+                              ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 165, in ins_wrapper_iterator
+    self._raise_if_closed()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/aaron/FL-IDS/venv/lib/python3.14/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 81, in _raise_if_closed
+    raise GrpcBridgeClosed()
+flwr.server.superlink.fleet.grpc_bidi.grpc_bridge.GrpcBridgeClosed
+2026-10-30 02:42:19,835 [INFO] __main__: Saved final boosting model to runs/journey/phase_a/final_boosting_model.txt
+2026-10-30 02:42:19,930 [INFO] __main__: Saved final global weights to runs/journey/phase_a/final_weights.npz
