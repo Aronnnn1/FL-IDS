@@ -275,4 +275,10 @@ table.dense th, table.dense td { font-size: 12px; padding: 5px 8px; }
 .jlegend span { display:inline-block; width:12px; height:10px; border-radius:2px; margin:0 4px 0 0; vertical-align:middle; }
 .rounds { position:relative; height:34px; border-bottom:1px solid var(--border, #ccc); margin:8px 12px 4px; }
 .rounds span { position:absolute; bottom:4px; transform:translateX(-50%); font-size:10px; background:#2a6f97; color:#fff; border-radius:8px; padding:1px 4px; }
+.ptable.novelty td { white-space: normal; font-family: inherit; color: inherit; font-size: 12.5px; }
 .novelty td:first-child { font-weight:700; }
+.novelty td:nth-child(2) { min-width: 220px; }
+.novelty td:nth-child(3), .novelty td:nth-child(4) { min-width: 200px; }
+.refs { font-size: 12.5px; color: var(--text-secondary); padding-left: 22px; }
+.refs li { margin-bottom: 4px; }
+.refs li:target { color: var(--text-primary); background: rgba(214, 140, 0, .14); }

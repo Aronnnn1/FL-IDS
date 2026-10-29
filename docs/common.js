@@ -161,3 +161,46 @@
     el.innerHTML = '<div class="dg-wrap">' + s + "</div>";
   };
 })();
+
+// Scroll tracking for the top bar: highlight the link of the section being read,
+// and keep that link visible when the bar scrolls sideways on narrow screens.
+(function () {
+  "use strict";
+  var links = Array.prototype.filter.call(
+    document.querySelectorAll(".topbar nav a"),
+    function (a) { var h = a.getAttribute("href") || ""; return h.indexOf("#") !== -1; }
+  );
+  var pairs = links.map(function (a) {
+    return { link: a, section: document.getElementById(a.getAttribute("href").split("#")[1]) };
+  }).filter(function (p) { return p.section; });
+  if (!pairs.length) return;
+  var bar = document.querySelector(".topbar");
+  var current = null;
+
+  function update() {
+    var offset = (bar ? bar.offsetHeight : 0) + 24;
+    var active = pairs[0];
+    for (var i = 0; i < pairs.length; i++) {
+      if (pairs[i].section.getBoundingClientRect().top - offset <= 0) active = pairs[i];
+    }
+    // At the very bottom the last sections can't reach the top; mark the last one.
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+      active = pairs[pairs.length - 1];
+    }
+    if (active === current) return;
+    current = active;
+    links.forEach(function (a) { a.classList.toggle("on", a === active.link); });
+    if (bar && bar.scrollWidth > bar.clientWidth) {
+      var l = active.link.getBoundingClientRect(), b = bar.getBoundingClientRect();
+      if (l.left < b.left || l.right > b.right) {
+        bar.scrollLeft += l.left - b.left - (b.width - l.width) / 2;
+      }
+    }
+  }
+  // Scroll events already arrive at most once per frame, and the check is a
+  // dozen getBoundingClientRect calls, so it runs directly.
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+  window.addEventListener("load", update);
+  update();
+})();

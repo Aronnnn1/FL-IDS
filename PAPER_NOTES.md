@@ -424,6 +424,16 @@ Reviewers will ask about these. Each has a commit.
   metrics rest on very few test rows. Report supports next to them.
 
 ### 5.3 Data-quality findings in the released dataset (possible secondary contribution)
+> **Prior report (found 2026-10-30):** the placeholder leak (item 1) was
+> published first by M. M. Galal, "Provenance, Not Behaviour: A
+> Serialisation Artifact in Edge-IIoTset ...", arXiv:2608.15761, 16 Aug
+> 2026 (same "0" vs "0.0" mechanism, four leaking columns). Our fix
+> (`c1cc656`, 24 Sep 2026) was independent but later: **cite Galal and do
+> not claim the leak as new.** Galal keeps the MITM rows as released and
+> does not report the column shift (item 2), uses random stratified and
+> leave-one-device-out splits (no connection-grouped split), and adds no
+> flow features, so items 2+ and section 8.10 stay ours. The website's
+> Novelty section lists the closest prior work for every claim.
 1. **Placeholder label leak** (`c1cc656`). The "field doesn't apply"
    placeholder is spelled `0` or `0.0` depending on the source capture,
    and the spelling follows the label. In `mqtt.topic`,
