@@ -403,9 +403,9 @@ module paths are relative to fl_ids/.&rdquo;</div>
 which is just &ldquo;attack or not&rdquo; and would hand the guard the answer.</li>
 <li><b>Fix the placeholder:</b> &ldquo;doesn't apply&rdquo; was written <code>0</code> in some recordings and <code>0.0</code> in others, and the spelling matched
 the answer. One column alone (<code>mqtt.topic_0.0</code>) told friendly from bully perfectly (AUROC 1.0 = perfect separation). We made both spellings the same;
-now the best single clue only reaches about 0.71.</li>
+now the best single clue only reaches about 0.71. We spotted this ourselves, but Galal (arXiv, August 2026) published it first, so the site credits that paper.</li>
 <li>Drop empty rows and 309,497 exact copies.</li>
-<li><b>Repair MITM:</b> the MITM rows had values under the wrong column names. We replaced the 1,214 broken rows with 1,229 rows rebuilt from the original recording.</li>
+<li><b>Repair MITM:</b> the MITM rows had values under the wrong column names. We replaced the 1,214 broken rows with 1,229 rows rebuilt from the original recording. This one is our own find.</li>
 <li>Turn 7 word columns (like the web method &ldquo;GET&rdquo;) into yes/no number columns &rarr; 91 clues. Parameters list the counts and the 7 columns; if the
 repaired MITM file is missing, the program stops loudly instead of silently using broken data.</li>
 </ul>
