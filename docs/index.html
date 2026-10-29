@@ -362,7 +362,7 @@
     <h4>How it works</h4>
     <ul>
       <li>Read 47 of 63 columns: 15 ID/timestamp/payload columns are dropped per the dataset authors' own recipe, plus <code>Attack_label</code> (derivable from the target, so keeping it would leak the answer).</li>
-      <li><b>Canonicalise the placeholder.</b> &ldquo;Field doesn't apply&rdquo; is written <code>0</code> in some captures and <code>0.0</code> in others, and the spelling follows the label &mdash; so <code>mqtt.topic_0.0</code> alone separated benign from attack at AUROC 1.0. Both spellings become <code>0</code>; the strongest single feature is now ~0.71.</li>
+      <li><b>Canonicalise the placeholder.</b> &ldquo;Field doesn't apply&rdquo; is written <code>0</code> in some captures and <code>0.0</code> in others, and the spelling follows the label &mdash; so <code>mqtt.topic_0.0</code> alone separated benign from attack at AUROC 1.0. Both spellings become <code>0</code>; the strongest single feature is now ~0.71. Found independently, but first reported by Galal [<a href="#ref-galal">11</a>], so credited there.</li>
       <li>Drop NaN and duplicate rows (309,497 duplicates).</li>
       <li><b>Repair MITM.</b> The authors' MITM CSV has values under the wrong column names; its 1,214 rows are replaced by 1,229 rows re-extracted from their own pcap with tshark.</li>
       <li>One-hot encode 7 categorical columns &rarr; 91 features.</li>

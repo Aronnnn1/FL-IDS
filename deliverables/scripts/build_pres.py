@@ -503,7 +503,7 @@ for i, (h, b) in enumerate(steps):
     if i % 4 < 3:
         arrow(s, x + cw + 10000, y + 900000, x + cw + 190000, y + 900000)
 notes(s, "Eight steps from raw data to a blocked attacker. Steps 1 to 3 prepare the data, including fixing two "
-         "errors we found in the public dataset. Step 4 trains the classifier. Steps 5 and 6 are federated "
+         "errors in the public dataset: broken MITM rows we found, and a label leak first reported by Galal. Step 4 trains the classifier. Steps 5 and 6 are federated "
          "training across ten simulated sites. Step 7 evaluates everything, and step 8 is the live demo.")
 
 # =============================================================== 12 Implementation: accuracy
@@ -556,9 +556,10 @@ notes(s, "The dataset is Edge-IIoTset: about two million packets after cleaning,
          "traffic. The classifier is trained on 1.43 million of them and tested on 397 thousand it never saw. "
          "The federated part uses a smaller share, about 125 thousand rows, so that the 150 or so experiment runs finish in time. "
          "We test strictly, on whole connections never seen in training, and repeat with three seeds. "
-         "Before any of this we fixed two errors in the public data. One of them was a formatting difference "
-         "that alone separated normal from attack traffic perfectly, which would have made any model look "
-         "better than it really is.")
+         "Before any of this we fixed two errors in the public data. One was a formatting difference "
+         "that alone separated normal from attack traffic perfectly; Galal reported it first, in August 2026, "
+         "and we credit that paper. The other, MITM rows stored under the wrong column names, we found and "
+         "repaired ourselves.")
 
 # =============================================================== 14 Results: accuracy
 s = S[13]
@@ -682,13 +683,13 @@ bullets(s, [
     [("Catches new attacks: ", True), ("0.94 vs 0.80 detection of never-seen attack types (was 0.74 / 0.53)", False)],
     [("Resists sabotage: ", True), ("steady with up to 40% malicious sites", False)],
     [("Acts automatically: ", True), ("detected attacker blocked on the switch, verified", False)],
-    [("Honest data: ", True), ("found and fixed two errors in a widely used public dataset", False)],
-    [("What's novel: ", True), ("we found no published system combining all five parts, and the dataset fixes", False)],
+    [("Honest data: ", True), ("found and repaired broken MITM rows; fixed a label leak first reported by Galal (2026)", False)],
+    [("What's novel: ", True), ("we found no published system combining all five parts, and the MITM repair", False)],
     [("Project complete: ", True), ("every planned phase done and verified end to end; paper being written", False)],
 ], size=18, space=8)
 notes(s, "To conclude: the project is complete. We met the accuracy target with a strict test, the second check catches attacks never "
          "seen before, the training resists sabotage up to 40% bad sites, and detections turn into verified "
-         "blocking rules. We also found and fixed errors in a popular public dataset. Our searches found no "
+         "blocking rules. We also found and repaired broken MITM rows in a popular public dataset, and fixed a label leak first reported by Galal. Our searches found no "
          "published system that combines all five parts, though that is based on targeted searches, not a full "
          "systematic review.")
 

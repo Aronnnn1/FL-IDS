@@ -8,7 +8,7 @@ FL-IDS shows that the five parts of the system work together on real IoT/IIoT tr
   \item \textbf{The whole federated system improves with the new features.} A real run with ten client processes reaches 0.999 attack macro-recall (was 0.889), and the cascade detects never-seen attack classes at 0.943 macro-recall (was 0.736), against 0.801 for the classifier alone. The backstop's value is now clearest on unseen attacks: on known attacks the classifier alone has the higher detection F1 (0.998 vs.\ 0.961).
   \item \textbf{The trust filter keeps federated training usable under poisoning.} Attack detection stays at 0.997--1.000 and zero-day detection at 0.90--0.94 up to 40\% malicious clients, while plain FedAvg's autoencoder diverges at 30\%. The filter fails at 50\%, as expected for median-based defences.
   \item \textbf{Detection drives enforcement.} Phase B derives the same features live (99.8\% of live rows match training rows exactly); a replayed Backdoor capture was classified with 0.997 confidence and produced a drop rule, confirmed from the switch's flow table.
-  \item \textbf{Data quality.} The released Edge-IIoTset CSV contains a placeholder label leak (one feature with an AUROC of 1.0) and column-shifted MITM rows. Results trained directly on it are likely inflated.
+  \item \textbf{Data quality.} The released Edge-IIoTset CSV contains a placeholder label leak (one feature with an AUROC of 1.0), first reported by Galal~\cite{galal2026provenance}, and column-shifted MITM rows, which we found and repaired. Results trained directly on it are likely inflated.
 \end{itemize}
 
 \section*{Limitations}

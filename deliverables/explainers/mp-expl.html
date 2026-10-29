@@ -189,10 +189,11 @@ for this carefully.</p>
 conversation end up in both the study pile and the exam. That's like seeing half the exam answers while studying. We
 kept <b>whole conversations</b> out of studying, so the exam is truly new. We also ran it three times with different random
 shuffles: macro F1 was 0.983, 0.983 and 0.985 every time.</div>
-<div class="box coral"><b class="h">We found a cheat sheet hidden in the public dataset</b>In the dataset everyone uses,
+<div class="box coral"><b class="h">We fixed a cheat sheet hidden in the public dataset</b>In the dataset everyone uses,
 &ldquo;nothing here&rdquo; was written as <code>0</code> in normal traffic and as <code>0.0</code> in attack traffic. That
-tiny spelling difference gave away the answer perfectly! We made both spellings the same. We also found that the MITM
-attack rows were in the wrong columns, and rebuilt them from the original recordings.</div>
+tiny spelling difference gave away the answer perfectly! We made both spellings the same. (We spotted this ourselves, but
+a researcher called Galal published it first, in August 2026, so the credit is theirs.) We also found that the MITM
+attack rows were in the wrong columns, and rebuilt them from the original recordings. Nobody had reported that one.</div>
 <div class="box gold"><b class="h">No peeking at name tags</b>We never let the model see IP addresses or times. In this
 dataset each attack was recorded separately, so those would tell the model the answer without it learning anything.</div>
 <div class="box teal"><b class="h">A mistake we caught</b>Our first strict test went wrong: all the normal &ldquo;remote screen&rdquo;
@@ -252,9 +253,9 @@ published system combining all five: the photo-book guard, the &ldquo;looks norm
 the fair principal and the automatic door. We measured exactly how much each part adds.
 <p class="small">Honest note: this is based on targeted searches, not a full systematic review, so we say &ldquo;we found
 none&rdquo;, not &ldquo;none exist&rdquo;.</p></div>
-<div class="box teal"><b class="h">We found errors in a popular public dataset</b>The &ldquo;0 vs 0.0&rdquo; cheat sheet
-and the broken MITM rows mean other papers using this dataset may report scores that are too high. That is a useful
-finding for the whole research community.</div>
+<div class="box teal"><b class="h">We found an error in a popular public dataset</b>The broken MITM rows are our own
+find. Together with the &ldquo;0 vs 0.0&rdquo; cheat sheet (first reported by Galal, 2026), they mean other papers using
+this dataset may report scores that are too high. That is a useful finding for the whole research community.</div>
 <div class="box coral"><b class="h">Accuracy reached the honest way</b>We reached 99.7% / 0.983 by giving the model
 information that really describes attacks (which door, what was sent, how the conversation behaved), tested on
 conversations it never saw, without using names, times or the dataset's hidden cheat.</div>
