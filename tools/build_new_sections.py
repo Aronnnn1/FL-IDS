@@ -234,7 +234,7 @@ def journey() -> str:
         cls = "a" if phase == "Phase A" else "b"
         bars.append(f"<div class=\"jbar {cls}\" style=\"left:{left:.2f}%;width:{width:.2f}%\" "
                     f"title=\"{label}: {dur:.1f}s\"></div>")
-        trs.append(f"<tr class=\"{cls}\"><td>{phase}</td><td>{label}</td><td>{secs(start)}</td><td>{secs(dur)}</td>"
+        trs.append(f"<tr class=\"{cls}\"><td>{phase}</td><td>{label}</td><td>{start:.1f} s</td><td>{secs(dur)}</td>"
                    f"<td>{100 * dur / total:.1f}%</td></tr>")
         for sub in subs:
             trs.append(f"<tr class=\"sub\"><td></td><td>&#8627; {sub['label']}</td><td></td><td>{secs(sub['duration_s'])}</td>"
@@ -286,6 +286,8 @@ CSS = """
 .jbar.a, .jlegend .a, .jtable tr.a td:first-child { background:#2a6f97; }
 .jbar.b, .jlegend .b, .jtable tr.b td:first-child { background:#c8553d; }
 .jtable tr.a td:first-child, .jtable tr.b td:first-child { color:#fff; font-weight:600; }
+.jtable td { white-space: nowrap; }
+.jtable td:nth-child(2) { font-family: inherit; white-space: normal; }
 .jtable tr.sub td { font-size: 12px; color: var(--text-secondary, #666); padding-top:2px; padding-bottom:2px; }
 .jlegend { font-size:12px; color:var(--text-secondary, #666); margin-bottom:10px; }
 .jlegend span { display:inline-block; width:12px; height:10px; border-radius:2px; margin:0 4px 0 0; vertical-align:middle; }
