@@ -300,8 +300,14 @@ def run_live_pcap_demo(
         "journey": journey.to_dict(),
     }
     import json
+    import os
 
     Path(result_path).write_text(json.dumps(result, indent=2))
+    # Run via sudo, this file would stay root-owned, and /tmp's sticky bit
+    # then stops the next (non-root) Phase B run from removing it before
+    # its own run. Hand it back to the user who invoked sudo.
+    if os.geteuid() == 0 and "SUDO_UID" in os.environ:
+        os.chown(result_path, int(os.environ["SUDO_UID"]), int(os.environ.get("SUDO_GID", "-1")))
     print(f"=== LIVE DEMO RESULT ===\n{json.dumps(result, indent=2)}", flush=True)
     return result
 
