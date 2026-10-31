@@ -11,3 +11,11 @@ Documents produced from this repository's results (16 October 2026).
 
 Numbers in all of these come from `results/`, `results/extended/` and
 `experiments/accuracy/results/`; `PAPER_NOTES.md` gives the source of each.
+
+## Update 2026-11-01
+
+- `report/` now has a section on the real 20-client runs, repeat seeds and run timing (Chapter 5); the PDF was rebuilt in the VM with
+  `xelatex main.tex` (run three times; needs `texlive-xetex`, `texlive-latex-extra`, `texlive-fonts-extra`, `tex-gyre`).
+- `presentation/` has two added slides (19 "Scaling Up and Repeating", 21 "One Whole Run, Timed"), added in place by
+  `scripts/add_new_result_slides.py` because the deck's original builder input was lost.
+- The explainer PDFs were not regenerated.

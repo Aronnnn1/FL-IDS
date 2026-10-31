@@ -13,7 +13,8 @@
 >
 > This is notes, not prose. The paper gets written from this.
 
-Last updated: 2026-10-16 -- **project complete.** Every phase is done
+Last updated: 2026-11-01 -- real 20-client run, seeds 43/44 and the VMware re-host are in §8.13.
+Previous: 2026-10-16 -- **project complete.** Every phase is done
 (§0), the code and results are committed and pushed (`a06711e`,
 `4e19944`), and the full test suite passes (233 passed, 2 skipped). The
 service-port/content/flow features (§8.10) are integrated into the
@@ -1243,7 +1244,7 @@ bar; the test now uses the production (extended) feature set.
   0.9706 / 0.0332). 3 of 20 clients (0, 2, 13) get no benign validation
   rows -> threshold inf, AE never flags. ~4.3 s/round. A **real**
   20-process run exhausted the VM's 7.4 GB RAM (swap full, round 1 took
-  78 s) and was stopped: it needs more memory.
+  78 s) and was stopped: it needs more memory. (Done on a 24 GB VM: §8.13.)
 - **Journey timing** (`fl_ids/utils/journey.py`; Phase A, Phase B and the
   live demo log each stage and keep `journey.json` current). One real run
   (`scripts/reruns/run_journey.sh`, 10 client processes, feature cache
@@ -1254,6 +1255,64 @@ bar; the test now uses the production (extended) feature set.
 - **Class split** (`results/class_split/`): per class, raw / cleaned /
   classifier train-test / federated calibration / 20-client pool. The CSV
   has 2,219,201 rows; 2,219,216 after the MITM repair (1,214 -> 1,229).
+
+### 8.13 Real 20-client run, seeds 43/44, VMware re-host (2026-11-01)
+- **Environment.** The project was re-hosted on a VMware Workstation VM
+  (Windows host; Ubuntu 26.04, Python 3.14.4, 12 vCPUs, 24 GB RAM), built by
+  `D:\FL-IDS-VM\setup\setup_vm.py` (cloud image + `provision.sh`). Repo at
+  `0d660bf` plus the new run scripts. `pytest` there: 233 passed, 2 skipped
+  (`logs/vmware_check/pytest.log`). One fix on the way (`0d660bf`):
+  `topology.py` hands `/tmp/fl_ids_live_demo_result.json` back to the sudo
+  user, else a second Phase B run fails with `PermissionError`. All FL-IDS
+  work runs inside this VM only (project owner's rule: attack data stays off
+  the host).
+- **Real 20-client run** (`configs/config_20clients_real.yaml` = `config_20clients.yaml`
+  with outputs moved; `scripts/reruns/run_clients20_real.sh`; 1 Flower server
+  + 20 client OS processes, 20 rounds, seed 42; `runs/clients20_real/`,
+  `logs/clients20_real/`, bundle `saved_models/phase_a_20c_real`). It
+  completed; the earlier real attempt on the 7.4 GB UTM VM did not (§8.12).
+  Phase A 246.9 s (federated training 219.7 s); about 12 GB of the 24 GB in use
+  at round 5 (one `free -g` sample, not a measured peak). Cascade attack
+  macro-recall **0.978**, benign FPR **0.0362**, bootstrap boosting accuracy
+  0.9969 / macro F1 0.9847. Phase B on that bundle (`Backdoor_attack.pcap`):
+  Backdoor, confidence 0.997, boosting stage, 24,466 of 24,914 packets
+  flagged, action *block*, rule `priority=100,ip,nw_src=10.0.0.1 actions=drop`
+  read back from the switch; Phase B 9.0 s.
+- **Seeds 43 and 44, 10 and 20 real client processes**
+  (`scripts/reruns/run_multiseed.sh`, 20 rounds, no attackers; seed changes
+  the data split, the Dirichlet partition and the initialisation; configs
+  `configs/multiseed_*.yaml`, runs `runs/multiseed/`, logs `logs/multiseed/`).
+  Table made by `tools/summarize_real_runs.py` (`results/real_runs/summary.{json,md}`);
+  recall and FPR come from the "Phase A done" log line (recall to 3 decimals).
+  The seed-42 10-client row is the VM re-check (`logs/vmware_check/`), which
+  reproduces the §8.11 numbers (0.999 / 0.0350 there, 0.999 / 0.0340 here).
+
+| Run | Clients | Total s | Training s | Attack macro-recall | Benign FPR | Boosting acc / macro F1 | Filter exclusions |
+|---|---|---|---|---|---|---|---|
+| 10 clients, seed 42 (VM re-check) | 10 | 341 | 226 | 0.999 | 0.0340 | 0.9969 / 0.9847 | 15 |
+| 10 clients, seed 43 | 10 | 276 | 249 | 0.999 | 0.0311 | 0.9976 / 0.9847 | 2 |
+| 10 clients, seed 44 | 10 | 262 | 234 | 0.996 | 0.0284 | 0.9968 / 0.9828 | 6 |
+| 20 clients, seed 42 | 20 | 247 | 220 | 0.978 | 0.0362 | 0.9969 / 0.9847 | 38 |
+| 20 clients, seed 43 | 20 | 238 | 211 | 0.999 | 0.0284 | 0.9976 / 0.9847 | 42 |
+| 20 clients, seed 44 | 20 | 242 | 215 | 0.999 | 0.0396 | 0.9968 / 0.9828 | 27 |
+
+- **Means over the three seeds.** 10 clients: attack macro-recall
+  0.998, benign FPR 0.0312, Phase A 293 s. 20 clients: attack
+  macro-recall 0.992, benign FPR 0.0347, Phase A 242 s. Only three
+  seeds, so no confidence intervals are claimed.
+- **What to say.** 20 real client processes match 10 on attack recall in two
+  of three seeds (0.999 vs 0.999); seed 42 alone gives 0.978, which pulls the
+  20-client mean down. We did not break that run down per class, so the cause
+  is not established. Benign FPR stays 2.8-4.0% in every run.
+- **Trust filter with no attackers.** With 0% malicious clients the filter
+  still excluded clients in every run (client-rounds excluded over 20 rounds:
+  10 clients 15 / 2 / 6 for seeds 42 / 43 / 44; 20 clients 38 / 42 / 27).
+  These are honest clients whose non-IID updates look unlike the median, the
+  confound already listed in §10 (non-IID vs. malicious). Exclusion is more
+  frequent at 20 clients.
+- **Not done.** Per-class results for the real 20-client run, and repeating
+  the ablation, poisoning sweep and zero-day experiments with 20 clients or
+  more seeds (hours each; §12).
 
 ## 9. Do not cite (superseded numbers, with reason)
 

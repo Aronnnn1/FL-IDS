@@ -1,0 +1,80 @@
+[
+  {
+    "run": "10 clients, seed 42 (VM re-check)",
+    "run_dir": "runs/vmware_check/phase_a",
+    "clients": 10,
+    "total_s": 341.3,
+    "training_s": 225.7,
+    "attack_macro_recall": 0.999,
+    "benign_fpr": 0.034,
+    "boosting_accuracy": 0.9969,
+    "boosting_macro_f1": 0.9847,
+    "rounds": 20,
+    "clients_excluded_by_filter_total": 15
+  },
+  {
+    "run": "10 clients, seed 43",
+    "run_dir": "runs/multiseed/c10_s43",
+    "clients": 10,
+    "total_s": 276.0,
+    "training_s": 248.7,
+    "attack_macro_recall": 0.999,
+    "benign_fpr": 0.0311,
+    "boosting_accuracy": 0.9976,
+    "boosting_macro_f1": 0.9847,
+    "rounds": 20,
+    "clients_excluded_by_filter_total": 2
+  },
+  {
+    "run": "10 clients, seed 44",
+    "run_dir": "runs/multiseed/c10_s44",
+    "clients": 10,
+    "total_s": 261.8,
+    "training_s": 234.5,
+    "attack_macro_recall": 0.996,
+    "benign_fpr": 0.0284,
+    "boosting_accuracy": 0.9968,
+    "boosting_macro_f1": 0.9828,
+    "rounds": 20,
+    "clients_excluded_by_filter_total": 6
+  },
+  {
+    "run": "20 clients, seed 42",
+    "run_dir": "runs/clients20_real/phase_a",
+    "clients": 20,
+    "total_s": 246.9,
+    "training_s": 219.7,
+    "attack_macro_recall": 0.978,
+    "benign_fpr": 0.0362,
+    "boosting_accuracy": 0.9969,
+    "boosting_macro_f1": 0.9847,
+    "rounds": 20,
+    "clients_excluded_by_filter_total": 38
+  },
+  {
+    "run": "20 clients, seed 43",
+    "run_dir": "runs/multiseed/c20_s43",
+    "clients": 20,
+    "total_s": 238.4,
+    "training_s": 211.3,
+    "attack_macro_recall": 0.999,
+    "benign_fpr": 0.0284,
+    "boosting_accuracy": 0.9976,
+    "boosting_macro_f1": 0.9847,
+    "rounds": 20,
+    "clients_excluded_by_filter_total": 42
+  },
+  {
+    "run": "20 clients, seed 44",
+    "run_dir": "runs/multiseed/c20_s44",
+    "clients": 20,
+    "total_s": 242.2,
+    "training_s": 215.1,
+    "attack_macro_recall": 0.999,
+    "benign_fpr": 0.0396,
+    "boosting_accuracy": 0.9968,
+    "boosting_macro_f1": 0.9828,
+    "rounds": 20,
+    "clients_excluded_by_filter_total": 27
+  }
+]

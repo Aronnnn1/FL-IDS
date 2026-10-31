@@ -99,6 +99,19 @@ so one narrow sudoers rule covers it:
 <user> ALL=(root) NOPASSWD: /usr/bin/python3 /path/to/FL-IDS/fl_ids/sdn/topology.py
 ```
 
+**Where the work runs.** All FL-IDS work (data, training, results) runs inside an
+isolated Ubuntu 26.04 VM so that attack captures stay off the host. A VMware
+Workstation build (24 GB RAM, which holds a real 20-client run) is scripted in
+`D:\FL-IDS-VM\setup\` on the Windows host: `setup_vm.py` creates and provisions
+it, `verify_vm.sh` checks Phase A and Phase B. Real multi-process runs beyond
+the default 10 clients:
+
+```bash
+bash scripts/reruns/run_clients20_real.sh   # 1 server + 20 client processes, then Phase B (about 4.5 min)
+bash scripts/reruns/run_multiseed.sh        # seeds 43, 44 at 10 and 20 clients (about 20 min)
+python3 tools/summarize_real_runs.py        # -> results/real_runs/summary.{json,md}
+```
+
 ## Running
 
 ```bash

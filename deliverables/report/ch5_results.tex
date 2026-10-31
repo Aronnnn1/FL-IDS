@@ -146,5 +146,65 @@ Two classes got worse and are reported rather than hidden. MITM fell from 0.89 t
 
 \textbf{Phase B.} Live extraction now derives the same 130 features from the capture with the same code as training: for \texttt{Backdoor\_attack.pcap}, 99.8\% of the live rows are identical to that capture's training rows. Replayed through Mininet with the new bundle, the capture was classified as \textbf{Backdoor with 0.997 confidence} by the boosting stage, 24{,}669 of its 24{,}914 packets were flagged [23{,}895], the bridge chose \emph{block}, and the rule \texttt{priority=100,ip,nw\_src=10.0.0.1 actions=drop} was confirmed in the switch's flow table. Because classification happens once features have been extracted from the whole capture, 23{,}161 replayed packets had already been forwarded when the rule appeared. The mitigation is therefore capture-level, not inline per-packet blocking.
 
+\section{Scaling to 20 clients, repeat seeds and run timing}
+\textbf{Real 20-process runs.} The project was re-hosted on a virtual machine with 24~GB of memory, which can hold one Flower server and 20 client processes (an earlier attempt on a 7.4~GB machine could not). Phase A was run with 10 and with 20 real client processes at seeds 42, 43 and 44 (20 rounds, no attackers). The seed changes the data split, the Dirichlet partition and the initialisation. Table~\ref{tab:realruns} lists every run. Over the three seeds the cascade's attack macro-recall averages 0.998 with 10 clients and 0.992 with 20 clients, and the benign false-positive rate stays between 2.8\% and 4.0\%. At seed 42, the 20-client run dips to 0.978; this run was not analysed per class, so its cause is not established. With only three seeds, no confidence intervals are claimed.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Run} & \textbf{Phase A (s)} & \textbf{Attack macro-recall} & \textbf{False alarms} & \textbf{Classifier acc.} \\ \hline
+10 clients, seed 42 & 341 & 0.999 & 3.40\% & 0.9969 \\ \hline
+10 clients, seed 43 & 276 & 0.999 & 3.11\% & 0.9976 \\ \hline
+10 clients, seed 44 & 262 & 0.996 & 2.84\% & 0.9968 \\ \hline
+20 clients, seed 42 & 247 & 0.978 & 3.62\% & 0.9969 \\ \hline
+20 clients, seed 43 & 238 & 0.999 & 2.84\% & 0.9976 \\ \hline
+20 clients, seed 44 & 242 & 0.999 & 3.96\% & 0.9968 \\ \hline
+\end{tabular}
+\caption{Real multi-process Phase A runs (source: \texttt{results/real\_runs/summary.md})}
+\label{tab:realruns}
+\end{table}
+
+Phase B on the 20-client bundle classified \texttt{Backdoor\_attack.pcap} as Backdoor with 0.997 confidence, flagged 24{,}466 of 24{,}914 packets, and the drop rule \texttt{priority=100,ip,nw\_src=10.0.0.1 actions=drop} was read back from the switch.
+
+\textbf{The trust filter without attackers.} Even with no malicious clients, the filter excluded some clients' updates: over 20 rounds, 15, 2 and 6 client-rounds with 10 clients, and 38, 42 and 27 with 20 clients (seeds 42, 43, 44). These are honest clients whose non-IID updates look unlike the median, so the filter cannot tell unusual data from sabotage. This is the confound named in the limitations, and it is more frequent with 20 clients.
+
+\textbf{Simulation versus real run.} An in-process simulation of 20 clients (seed 42) gave a cascade attack-detection recall of 0.9960 against 0.9996 for 10 clients, an autoencoder recall of 0.685 against 0.728, and benign false alarms of 3.72\% against 3.32\%. Three of the 20 simulated clients received no benign validation rows, so their anomaly threshold is infinite and their autoencoder never flags. The simulation uses the same client, strategy and trust-filter code as the real run, and the table above is the real-process evidence.
+
+\textbf{Timing of one complete run.} One real run (10 client processes, warm feature cache) took 219~s in total: Phase A 210.6~s, of which federated training was 191.2~s, and Phase B 8.6~s. Tables~\ref{tab:timea} and~\ref{tab:timeb} give the stages.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Phase A stage} & \textbf{Seconds} \\ \hline
+Load, clean and encode the dataset & 1.9 \\ \hline
+Calibration split, bootstrap classifier, client partition & 14.4 \\ \hline
+Federated training & 191.2 \\ \hline
+Calibrate client anomaly thresholds & 0.1 \\ \hline
+Evaluate on the clients' test slices & 2.5 \\ \hline
+Save the model bundle & 0.2 \\ \hline
+\end{tabular}
+\caption{Phase A stage timing (source: \texttt{results/journey/phase\_a\_journey.json})}
+\label{tab:timea}
+\end{table}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Phase B stage} & \textbf{Seconds} \\ \hline
+Load the model bundle & 0.08 \\ \hline
+Start the SDN bridge and controller & 2.20 \\ \hline
+Network, replay, classify and block (root process) & 6.33 \\ \hline
+Check the switch's flow table & 0.00 \\ \hline
+\end{tabular}
+\caption{Phase B stage timing (source: \texttt{results/journey/phase\_b\_journey.json})}
+\label{tab:timeb}
+\end{table}
+
 \section{Boosting vs.\ a deep-learning classifier}
 On the same 500{,}000-row sample, LightGBM (base features) reached 0.887 macro F1 and a dense MLP of comparable effort (8{,}271 parameters, 15 epochs) reached 0.622. The gap was largest on the application-layer attacks (XSS 0.761 vs.\ 0.072 recall; SQL\_injection 0.767 vs.\ 0.183). This supports the boosting-first design. It is a comparison against a modest baseline, not a claim that deep learning cannot work here.
