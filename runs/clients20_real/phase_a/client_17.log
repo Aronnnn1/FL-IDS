@@ -1,0 +1,286 @@
+[93mWARNING [0m:   DEPRECATED FEATURE: flwr.client.start_client() is deprecated.
+	Instead, use the `flower-supernode` CLI command to start a SuperNode as shown below:
+
+		$ flower-supernode --insecure --superlink='<IP>:<PORT>'
+
+	To view all available options, run:
+
+		$ flower-supernode --help
+
+	Using `start_client()` is deprecated.
+
+            This is a deprecated feature. It will be removed
+            entirely in future versions of Flower.
+        
+2026-11-01 00:53:12,863 [WARNING] flwr: DEPRECATED FEATURE: flwr.client.start_client() is deprecated.
+	Instead, use the `flower-supernode` CLI command to start a SuperNode as shown below:
+
+		$ flower-supernode --insecure --superlink='<IP>:<PORT>'
+
+	To view all available options, run:
+
+		$ flower-supernode --help
+
+	Using `start_client()` is deprecated.
+
+            This is a deprecated feature. It will be removed
+            entirely in future versions of Flower.
+        
+2026-11-01 00:53:12,864 [DEBUG] flwr: Using InMemoryObjectStore
+2026-11-01 00:53:12,868 [DEBUG] flwr: Opened insecure gRPC connection (no certificates were passed)
+2026-11-01 00:53:12,869 [DEBUG] flwr: ChannelConnectivity.IDLE
+2026-11-01 00:53:12,873 [DEBUG] flwr: ChannelConnectivity.CONNECTING
+2026-11-01 00:53:12,873 [DEBUG] flwr: ChannelConnectivity.READY
+[92mINFO [0m:      
+2026-11-01 00:53:15,397 [INFO] flwr: 
+[92mINFO [0m:      Received: train message d10292e9-39e6-4764-bd60-b6d9b885219b
+2026-11-01 00:53:15,397 [INFO] flwr: Received: train message d10292e9-39e6-4764-bd60-b6d9b885219b
+[92mINFO [0m:      Sent reply
+2026-11-01 00:53:16,586 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:53:17,745 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 44b0c4fa-53eb-4266-83d9-78e01195ed0c
+2026-11-01 00:53:17,745 [INFO] flwr: Received: evaluate message 44b0c4fa-53eb-4266-83d9-78e01195ed0c
+[92mINFO [0m:      Sent reply
+2026-11-01 00:53:17,748 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:53:19,851 [INFO] flwr: 
+[92mINFO [0m:      Received: train message e47becd5-0c09-4674-b84e-d297a12e1e9d
+2026-11-01 00:53:19,852 [INFO] flwr: Received: train message e47becd5-0c09-4674-b84e-d297a12e1e9d
+[92mINFO [0m:      Sent reply
+2026-11-01 00:53:20,128 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:53:21,434 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 67f6af62-45d7-4ecc-9730-14d0a31737b0
+2026-11-01 00:53:21,434 [INFO] flwr: Received: evaluate message 67f6af62-45d7-4ecc-9730-14d0a31737b0
+[92mINFO [0m:      Sent reply
+2026-11-01 00:53:21,440 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:53:22,311 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 6c4e088d-de69-4380-a733-2dfac396870a
+2026-11-01 00:53:22,311 [INFO] flwr: Received: train message 6c4e088d-de69-4380-a733-2dfac396870a
+2026-11-01 00:53:22,559 [INFO] __main__: Client 17 round 3: 37 of 491 boosting-passed rows flagged; surfacing 37
+[92mINFO [0m:      Sent reply
+2026-11-01 00:53:22,591 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:53:41,153 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 6eb99e28-026b-4f6c-a558-2d66cf90364f
+2026-11-01 00:53:41,154 [INFO] flwr: Received: evaluate message 6eb99e28-026b-4f6c-a558-2d66cf90364f
+[92mINFO [0m:      Sent reply
+2026-11-01 00:53:41,155 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:53:41,764 [INFO] flwr: 
+[92mINFO [0m:      Received: train message a11a630e-e084-4e71-967a-d6c3c34c1c7a
+2026-11-01 00:53:41,764 [INFO] flwr: Received: train message a11a630e-e084-4e71-967a-d6c3c34c1c7a
+[92mINFO [0m:      Sent reply
+2026-11-01 00:53:42,168 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:53:43,508 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 514b1bc4-0179-4599-9be8-6e83fed6cd19
+2026-11-01 00:53:43,508 [INFO] flwr: Received: evaluate message 514b1bc4-0179-4599-9be8-6e83fed6cd19
+[92mINFO [0m:      Sent reply
+2026-11-01 00:53:43,510 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:53:43,990 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 95314384-a83f-4b04-b537-6cb47b3a62bf
+2026-11-01 00:53:43,992 [INFO] flwr: Received: train message 95314384-a83f-4b04-b537-6cb47b3a62bf
+[92mINFO [0m:      Sent reply
+2026-11-01 00:53:44,450 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:53:45,828 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 6691b3f2-df17-4051-b883-91c58f920418
+2026-11-01 00:53:45,828 [INFO] flwr: Received: evaluate message 6691b3f2-df17-4051-b883-91c58f920418
+[92mINFO [0m:      Sent reply
+2026-11-01 00:53:45,830 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:53:45,980 [INFO] flwr: 
+[92mINFO [0m:      Received: train message ccee8835-341e-4af5-be42-bae3f8ec9fc4
+2026-11-01 00:53:45,980 [INFO] flwr: Received: train message ccee8835-341e-4af5-be42-bae3f8ec9fc4
+2026-11-01 00:53:46,292 [INFO] __main__: Client 17 round 6: 36 of 489 boosting-passed rows flagged; surfacing 36
+[92mINFO [0m:      Sent reply
+2026-11-01 00:53:46,405 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:54:09,399 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 7d6e1412-9275-4fd4-9aa3-1522f0313ddd
+2026-11-01 00:54:09,399 [INFO] flwr: Received: evaluate message 7d6e1412-9275-4fd4-9aa3-1522f0313ddd
+[92mINFO [0m:      Sent reply
+2026-11-01 00:54:09,401 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:54:09,526 [INFO] flwr: 
+[92mINFO [0m:      Received: train message afd60018-a686-4541-bf6b-3a3780cdcb7f
+2026-11-01 00:54:09,526 [INFO] flwr: Received: train message afd60018-a686-4541-bf6b-3a3780cdcb7f
+[92mINFO [0m:      Sent reply
+2026-11-01 00:54:09,891 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:54:12,081 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message d5527d99-f54d-4fc2-84c2-d722f29f38ae
+2026-11-01 00:54:12,081 [INFO] flwr: Received: evaluate message d5527d99-f54d-4fc2-84c2-d722f29f38ae
+[92mINFO [0m:      Sent reply
+2026-11-01 00:54:12,083 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:54:12,254 [INFO] flwr: 
+[92mINFO [0m:      Received: train message cb9438d7-354a-4832-8467-7c22beb453f7
+2026-11-01 00:54:12,254 [INFO] flwr: Received: train message cb9438d7-354a-4832-8467-7c22beb453f7
+[92mINFO [0m:      Sent reply
+2026-11-01 00:54:12,931 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:54:14,754 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 95dc42e0-feda-4389-9630-d44251aa8953
+2026-11-01 00:54:14,754 [INFO] flwr: Received: evaluate message 95dc42e0-feda-4389-9630-d44251aa8953
+[92mINFO [0m:      Sent reply
+2026-11-01 00:54:14,756 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:54:14,992 [INFO] flwr: 
+[92mINFO [0m:      Received: train message fd9176c1-0551-4672-b578-a1f34a0fd7d1
+2026-11-01 00:54:14,993 [INFO] flwr: Received: train message fd9176c1-0551-4672-b578-a1f34a0fd7d1
+2026-11-01 00:54:15,532 [INFO] __main__: Client 17 round 9: 25 of 490 boosting-passed rows flagged; surfacing 25
+[92mINFO [0m:      Sent reply
+2026-11-01 00:54:15,587 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:54:41,154 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message a06be54f-5951-4a24-8689-f93c0b4e83a6
+2026-11-01 00:54:41,154 [INFO] flwr: Received: evaluate message a06be54f-5951-4a24-8689-f93c0b4e83a6
+[92mINFO [0m:      Sent reply
+2026-11-01 00:54:41,156 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:54:41,367 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 07fdab70-45fb-47a9-832b-2bc406939746
+2026-11-01 00:54:41,367 [INFO] flwr: Received: train message 07fdab70-45fb-47a9-832b-2bc406939746
+[92mINFO [0m:      Sent reply
+2026-11-01 00:54:41,984 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:54:44,309 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 3c677d28-52d7-49e4-8425-6306173fd8b4
+2026-11-01 00:54:44,310 [INFO] flwr: Received: evaluate message 3c677d28-52d7-49e4-8425-6306173fd8b4
+[92mINFO [0m:      Sent reply
+2026-11-01 00:54:44,312 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:54:44,508 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 995f68f1-a461-4789-a4ef-be2b30af2333
+2026-11-01 00:54:44,508 [INFO] flwr: Received: train message 995f68f1-a461-4789-a4ef-be2b30af2333
+[92mINFO [0m:      Sent reply
+2026-11-01 00:54:45,038 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:54:47,298 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message e583ec07-c4b9-41f1-bb55-88954bbcb1b8
+2026-11-01 00:54:47,298 [INFO] flwr: Received: evaluate message e583ec07-c4b9-41f1-bb55-88954bbcb1b8
+[92mINFO [0m:      Sent reply
+2026-11-01 00:54:47,301 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:54:47,637 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 11d68f7c-e272-4c8e-9127-d48984d735b3
+2026-11-01 00:54:47,638 [INFO] flwr: Received: train message 11d68f7c-e272-4c8e-9127-d48984d735b3
+2026-11-01 00:54:48,113 [INFO] __main__: Client 17 round 12: 23 of 492 boosting-passed rows flagged; surfacing 23
+[92mINFO [0m:      Sent reply
+2026-11-01 00:54:48,170 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:55:16,434 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message c7ef4c5e-0fb9-4e9b-a5ea-fc8b64d6530d
+2026-11-01 00:55:16,434 [INFO] flwr: Received: evaluate message c7ef4c5e-0fb9-4e9b-a5ea-fc8b64d6530d
+[92mINFO [0m:      Sent reply
+2026-11-01 00:55:16,436 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:55:16,948 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 9a5fe8b0-f577-4bde-9740-c1ff9768db5d
+2026-11-01 00:55:16,948 [INFO] flwr: Received: train message 9a5fe8b0-f577-4bde-9740-c1ff9768db5d
+[92mINFO [0m:      Sent reply
+2026-11-01 00:55:17,733 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:55:19,884 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message ca4a89f3-8397-4d14-a861-1a36043644c5
+2026-11-01 00:55:19,884 [INFO] flwr: Received: evaluate message ca4a89f3-8397-4d14-a861-1a36043644c5
+[92mINFO [0m:      Sent reply
+2026-11-01 00:55:19,886 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:55:20,149 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 15cf290a-a91f-4016-81a4-0ac023e96fe6
+2026-11-01 00:55:20,149 [INFO] flwr: Received: train message 15cf290a-a91f-4016-81a4-0ac023e96fe6
+[92mINFO [0m:      Sent reply
+2026-11-01 00:55:20,692 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:55:22,722 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 6d7bd174-acd7-4fcc-b52a-0e39508bc539
+2026-11-01 00:55:22,722 [INFO] flwr: Received: evaluate message 6d7bd174-acd7-4fcc-b52a-0e39508bc539
+[92mINFO [0m:      Sent reply
+2026-11-01 00:55:22,724 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:55:23,036 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 61dab054-87de-4c40-a5a8-1e2de38441b4
+2026-11-01 00:55:23,036 [INFO] flwr: Received: train message 61dab054-87de-4c40-a5a8-1e2de38441b4
+2026-11-01 00:55:23,726 [INFO] __main__: Client 17 round 15: 23 of 490 boosting-passed rows flagged; surfacing 23
+[92mINFO [0m:      Sent reply
+2026-11-01 00:55:23,794 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:55:54,609 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message cf2cd096-8897-4c44-8cad-0d3716ba1977
+2026-11-01 00:55:54,609 [INFO] flwr: Received: evaluate message cf2cd096-8897-4c44-8cad-0d3716ba1977
+[92mINFO [0m:      Sent reply
+2026-11-01 00:55:54,611 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:55:54,828 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 10541266-5c74-458f-8a6f-60073b5b7c6a
+2026-11-01 00:55:54,828 [INFO] flwr: Received: train message 10541266-5c74-458f-8a6f-60073b5b7c6a
+[92mINFO [0m:      Sent reply
+2026-11-01 00:55:55,561 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:55:58,162 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 59126f20-1e74-4596-a356-213e341c165f
+2026-11-01 00:55:58,162 [INFO] flwr: Received: evaluate message 59126f20-1e74-4596-a356-213e341c165f
+[92mINFO [0m:      Sent reply
+2026-11-01 00:55:58,163 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:55:58,590 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 4080162c-d1f8-4d2a-bacb-8a2a62e90cd5
+2026-11-01 00:55:58,590 [INFO] flwr: Received: train message 4080162c-d1f8-4d2a-bacb-8a2a62e90cd5
+[92mINFO [0m:      Sent reply
+2026-11-01 00:55:59,238 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:56:01,842 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 893757b4-dd04-49ea-a756-8585d9b256c5
+2026-11-01 00:56:01,842 [INFO] flwr: Received: evaluate message 893757b4-dd04-49ea-a756-8585d9b256c5
+[92mINFO [0m:      Sent reply
+2026-11-01 00:56:01,844 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:56:02,034 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 03c077dd-c008-48d6-bcd6-5422cdf88056
+2026-11-01 00:56:02,034 [INFO] flwr: Received: train message 03c077dd-c008-48d6-bcd6-5422cdf88056
+2026-11-01 00:56:02,950 [INFO] __main__: Client 17 round 18: 15 of 490 boosting-passed rows flagged; surfacing 15
+[92mINFO [0m:      Sent reply
+2026-11-01 00:56:02,996 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:56:36,267 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 184c4e05-3a56-4d3b-a5f3-1505bd353184
+2026-11-01 00:56:36,267 [INFO] flwr: Received: evaluate message 184c4e05-3a56-4d3b-a5f3-1505bd353184
+[92mINFO [0m:      Sent reply
+2026-11-01 00:56:36,269 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:56:36,968 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 5273d554-0d4d-4c30-89b0-34c428637082
+2026-11-01 00:56:36,969 [INFO] flwr: Received: train message 5273d554-0d4d-4c30-89b0-34c428637082
+[92mINFO [0m:      Sent reply
+2026-11-01 00:56:37,844 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:56:39,891 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 3f33495b-ab60-4c36-9bde-f5720b5ca5cd
+2026-11-01 00:56:39,891 [INFO] flwr: Received: evaluate message 3f33495b-ab60-4c36-9bde-f5720b5ca5cd
+[92mINFO [0m:      Sent reply
+2026-11-01 00:56:39,892 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:56:40,314 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 34231838-2cda-43ae-85e5-0ca1d6121813
+2026-11-01 00:56:40,314 [INFO] flwr: Received: train message 34231838-2cda-43ae-85e5-0ca1d6121813
+[92mINFO [0m:      Sent reply
+2026-11-01 00:56:41,084 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:56:43,722 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 7318cc5b-9480-4b98-ac79-7dcb71a96f93
+2026-11-01 00:56:43,723 [INFO] flwr: Received: evaluate message 7318cc5b-9480-4b98-ac79-7dcb71a96f93
+[92mINFO [0m:      Sent reply
+2026-11-01 00:56:43,724 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 00:56:43,747 [INFO] flwr: 
+[92mINFO [0m:      Received: reconnect message 0217d34e-89d9-4cdf-97f7-217e49b2ecab
+2026-11-01 00:56:43,747 [INFO] flwr: Received: reconnect message 0217d34e-89d9-4cdf-97f7-217e49b2ecab
+2026-11-01 00:56:43,770 [DEBUG] flwr: gRPC channel closed
+[92mINFO [0m:      Disconnect and shut down
+2026-11-01 00:56:43,770 [INFO] flwr: Disconnect and shut down

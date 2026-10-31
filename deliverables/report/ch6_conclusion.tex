@@ -18,7 +18,7 @@ The service-port feature benefits from the testbed's lack of benign HTTP traffic
 \begin{enumerate}
   \item Make mitigation streaming: classify flows incrementally (for example after the first $n$ packets) so a rule can be installed while an attack is still running.
   \item Test adaptive attackers that stay just above the filter's thresholds, and attackers above 50\%, possibly using a small trusted root dataset as in FLTrust~\cite{cao2021fltrust}.
-  \item Repeat all federated experiments over several seeds and report confidence intervals.
+  \item Repeat the ablation, poisoning sweep and zero-day experiments over several seeds and report confidence intervals (Phase A itself has been repeated over three seeds with 10 and 20 real client processes).
   \item Run the federated system on the full client pool instead of a 60{,}000-row sample, on a machine with more memory.
   \item Validate on a second dataset that contains benign web traffic, to measure how much the service-port feature depends on the testbed.
   \item Apply weight pruning to the autoencoder and its updates (Objective 3). It has not been implemented yet; the model is already small (9{,}834 parameters), and pruning would cut communication further.

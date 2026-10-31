@@ -232,6 +232,32 @@ def class_split() -> str:
 
 
 # ---------------------------------------------------------------- 20 clients
+def real_runs() -> str:
+    """Table of real multi-process runs (10 and 20 client processes, three seeds) from results/real_runs/summary.json."""
+    path = RES / "real_runs" / "summary.json"
+    if not path.exists():
+        return ""
+    rows = json.load(open(path))
+    trs = "".join(
+        f"<tr><td>{r['run']}</td><td>{r['total_s']:.0f}</td><td>{r['attack_macro_recall']:.3f}</td>"
+        f"<td>{100 * r['benign_fpr']:.2f}%</td><td>{r['boosting_accuracy']:.4f}</td></tr>"
+        for r in rows
+    )
+    return f"""<h3>Real runs: separate client processes, three seeds</h3>
+  <p>Not a simulation: one Flower server plus 10 or 20 separate client processes, 20 rounds, no attackers, on a VM with
+  24 GB of RAM (the 7.4 GB machine could not hold 21 processes). Seeds 43 and 44 change the data split, the partition
+  and the initialisation.</p>
+  <div class="table-wrap"><table class="ptable">
+    <thead><tr><th>Run</th><th>Phase A, s</th><th>Attack macro-recall</th><th>False alarms</th><th>Classifier accuracy</th></tr></thead>
+    <tbody>{trs}</tbody>
+  </table></div>
+  <p><b>Reading it:</b> 20 real clients detect attacks as well as 10 in two of three seeds; seed 42 dips to 0.978 and we have
+  not traced why. False alarms stay between 2.8% and 4.0%. Even with no attackers the trust filter sometimes excludes honest
+  clients whose non-IID updates look unusual (more often at 20 clients). Phase B on the 20-client bundle also blocks the
+  Backdoor capture (confidence 0.997, drop rule read back from the switch). Source: <code>results/real_runs/</code>,
+  <code>runs/clients20_real/</code>, <code>runs/multiseed/</code>.</p>"""
+
+
 def clients20() -> str:
     s10 = stage_report(RES / "extended" / "per_class_stage_report.csv")
     s20 = stage_report(RES / "clients20" / "per_class_stage_report.csv")
@@ -262,6 +288,7 @@ def clients20() -> str:
          lambda s: f"{100 * s[key(s, 'casc')]['fpr']:.2f}%"),
     ]
     trs = "".join(f"<tr><td>{label}</td><td>{f(s10)}</td><td>{f(s20)}</td></tr>" for label, f in rows)
+    real = real_runs()
     return f"""
 <section id="clients20">
   <h2>Scaling to 20 clients</h2>
@@ -279,11 +306,10 @@ def clients20() -> str:
   99.6% of attacks &mdash; while each client gets half as much data. The cost shows in the autoencoder: lower recall on
   its own (0.685 vs. 0.728) and slightly more false alarms (3.7% vs. 3.3%), and {no_val} clients get no normal rows at
   all to calibrate on. Communication per round doubles, since every client sends its update.</p>
-  <p class="meta"><b>Scope:</b> this 20-client run uses the in-process simulation (the same client, strategy and
-  trust-filter code as the real run, in one Python process). A real run with 20 separate client processes exhausted the
-  VM's 7.4 GB of RAM (21 Python processes each loading PyTorch and LightGBM) and was stopped after round 1; it needs a
-  machine with more memory. The classifier rows rest on few rows for rare classes (Fingerprinting 4, MITM 1). Single seed.
-  Source: <code>results/clients20/per_class_stage_report.csv</code>, <code>logs/clients20/</code>.</p>
+  <p class="meta"><b>Scope:</b> the table above is the in-process simulation (the same client, strategy and trust-filter
+  code as the real run, in one Python process), single seed. The classifier rows rest on few rows for rare classes
+  (Fingerprinting 4, MITM 1). Source: <code>results/clients20/per_class_stage_report.csv</code>, <code>logs/clients20/</code>.</p>
+  {real}
 </section>
 """
 

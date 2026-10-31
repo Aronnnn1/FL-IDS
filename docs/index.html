@@ -581,11 +581,22 @@
   99.6% of attacks &mdash; while each client gets half as much data. The cost shows in the autoencoder: lower recall on
   its own (0.685 vs. 0.728) and slightly more false alarms (3.7% vs. 3.3%), and 3 clients get no normal rows at
   all to calibrate on. Communication per round doubles, since every client sends its update.</p>
-  <p class="meta"><b>Scope:</b> this 20-client run uses the in-process simulation (the same client, strategy and
-  trust-filter code as the real run, in one Python process). A real run with 20 separate client processes exhausted the
-  VM's 7.4 GB of RAM (21 Python processes each loading PyTorch and LightGBM) and was stopped after round 1; it needs a
-  machine with more memory. The classifier rows rest on few rows for rare classes (Fingerprinting 4, MITM 1). Single seed.
-  Source: <code>results/clients20/per_class_stage_report.csv</code>, <code>logs/clients20/</code>.</p>
+  <p class="meta"><b>Scope:</b> the table above is the in-process simulation (the same client, strategy and trust-filter
+  code as the real run, in one Python process), single seed. The classifier rows rest on few rows for rare classes
+  (Fingerprinting 4, MITM 1). Source: <code>results/clients20/per_class_stage_report.csv</code>, <code>logs/clients20/</code>.</p>
+  <h3>Real runs: separate client processes, three seeds</h3>
+  <p>Not a simulation: one Flower server plus 10 or 20 separate client processes, 20 rounds, no attackers, on a VM with
+  24 GB of RAM (the 7.4 GB machine could not hold 21 processes). Seeds 43 and 44 change the data split, the partition
+  and the initialisation.</p>
+  <div class="table-wrap"><table class="ptable">
+    <thead><tr><th>Run</th><th>Phase A, s</th><th>Attack macro-recall</th><th>False alarms</th><th>Classifier accuracy</th></tr></thead>
+    <tbody><tr><td>10 clients, seed 42 (VM re-check)</td><td>341</td><td>0.999</td><td>3.40%</td><td>0.9969</td></tr><tr><td>10 clients, seed 43</td><td>276</td><td>0.999</td><td>3.11%</td><td>0.9976</td></tr><tr><td>10 clients, seed 44</td><td>262</td><td>0.996</td><td>2.84%</td><td>0.9968</td></tr><tr><td>20 clients, seed 42</td><td>247</td><td>0.978</td><td>3.62%</td><td>0.9969</td></tr><tr><td>20 clients, seed 43</td><td>238</td><td>0.999</td><td>2.84%</td><td>0.9976</td></tr><tr><td>20 clients, seed 44</td><td>242</td><td>0.999</td><td>3.96%</td><td>0.9968</td></tr></tbody>
+  </table></div>
+  <p><b>Reading it:</b> 20 real clients detect attacks as well as 10 in two of three seeds; seed 42 dips to 0.978 and we have
+  not traced why. False alarms stay between 2.8% and 4.0%. Even with no attackers the trust filter sometimes excludes honest
+  clients whose non-IID updates look unusual (more often at 20 clients). Phase B on the 20-client bundle also blocks the
+  Backdoor capture (confidence 0.997, drop rule read back from the switch). Source: <code>results/real_runs/</code>,
+  <code>runs/clients20_real/</code>, <code>runs/multiseed/</code>.</p>
 </section>
 <!-- /GEN:clients20 -->
 
