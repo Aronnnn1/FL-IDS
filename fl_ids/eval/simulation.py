@@ -28,7 +28,12 @@ from fl_ids.models.autoencoder import Autoencoder, get_weights, set_weights
 from fl_ids.models.boosting import BoostingClassifier
 from fl_ids.models.boosting_update import SURFACE_ALERTS_KEY, BoostingUpdater, BoostingUpdateRecord, decode_alerts
 from fl_ids.robustness.aggregation import apply_delta, trimmed_mean_delta
-from fl_ids.robustness.attackers import SignFlipAttackerClient, attacker_claimed_examples
+from fl_ids.robustness.attackers import (
+    ATTACK_KINDS,
+    SignFlipAttackerClient,
+    StealthAttackerClient,
+    attacker_claimed_examples,
+)
 from fl_ids.robustness.trust_filter import TrustTracker, compute_delta, filter_client_deltas, flatten_weights
 from fl_ids.utils.config import Config
 
@@ -99,6 +104,15 @@ class SimulationResult:
         return float(outside[-1] + 2) if len(outside) else 1.0
 
 
+def prune_weight_matrices(weights: list[np.ndarray], sparsity: float) -> list[np.ndarray]:
+    """Zero the smallest `sparsity` fraction (global, by magnitude) of the entries of the weight matrices; biases untouched."""
+    if sparsity <= 0:
+        return weights
+    matrices = [w for w in weights if w.ndim > 1]
+    cutoff = np.quantile(np.concatenate([np.abs(w).ravel() for w in matrices]), sparsity)
+    return [np.where(np.abs(w) <= cutoff, 0.0, w).astype(w.dtype) if w.ndim > 1 else w for w in weights]
+
+
 def _make_clients(
     client_data: dict[int, dict[str, np.ndarray]],
     config: Config,
@@ -106,13 +120,18 @@ def _make_clients(
     malicious_client_ids: set[int],
     use_boosting_filter: bool,
     amplification: float,
+    attack: str = "sign_flip",
 ) -> dict[int, AutoencoderClient]:
+    if attack not in ATTACK_KINDS:
+        raise ValueError(f"attack must be one of {ATTACK_KINDS}, got {attack!r}")
     clients = {}
     claimed = attacker_claimed_examples(config.robustness, [len(d["X"]) for d in client_data.values()])
     for cid, data in client_data.items():
         args = (cid, data["X"], data["X_raw"], data["X_val_benign"], config, input_dim)
         kwargs = {"use_boosting_filter": use_boosting_filter, "y_train": data["y"]}
-        if cid in malicious_client_ids:
+        if cid in malicious_client_ids and attack == "stealth":
+            clients[cid] = StealthAttackerClient(*args, claimed_num_examples=claimed, **kwargs)
+        elif cid in malicious_client_ids:
             clients[cid] = SignFlipAttackerClient(
                 *args, amplification=amplification, claimed_num_examples=claimed, **kwargs
             )
@@ -134,6 +153,8 @@ def run_simulated_fl_training(
     amplification: float = 5.0,
     seed: int = 0,
     boosting_updater: BoostingUpdater | None = None,
+    attack: str = "sign_flip",
+    prune_sparsity: float = 0.0,
 ) -> SimulationResult:
     """Run `num_rounds` of in-process FL training and return per-round diagnostics.
 
@@ -156,6 +177,10 @@ def run_simulated_fl_training(
             autoencoders on unfiltered local traffic (the "autoencoder-only,
             no boosting pre-filter" ablation case).
         amplification: Sign-flip attacker delta amplification.
+        prune_sparsity: Final fraction of autoencoder weight-matrix entries kept at zero. The server re-prunes the global
+            model after every aggregation, ramping linearly from 0 to this value over the first half of the rounds
+            (clients still train and send dense updates). 0 disables pruning.
+        attack: Attacker kind for `malicious_client_ids`: `"sign_flip"` or the adaptive `"stealth"`.
         seed: Random seed for initial global weights.
         boosting_updater: If given, the incremental boosting update
             (component 2), exactly as `TrustFilteredStrategy` runs it: on
@@ -172,7 +197,9 @@ def run_simulated_fl_training(
     input_dim = next(iter(client_data.values()))["X"].shape[1]
     input_dim_raw = next(iter(client_data.values()))["X_raw"].shape[1]
 
-    clients = _make_clients(client_data, config, input_dim, malicious_client_ids, use_boosting_filter, amplification)
+    clients = _make_clients(
+        client_data, config, input_dim, malicious_client_ids, use_boosting_filter, amplification, attack
+    )
 
     # Explicit seed: torch's default generator differs per process, so an
     # unseeded init made each run (and each ablation variant) start from
@@ -228,6 +255,11 @@ def run_simulated_fl_training(
             global_weights = apply_delta(global_weights, aggregated_delta)
         else:
             raise ValueError(f"Unknown aggregation mode: {aggregation}")
+
+        if prune_sparsity > 0:
+            global_weights = prune_weight_matrices(
+                global_weights, prune_sparsity * min(1.0, round_num / max(1, num_rounds // 2))
+            )
 
         update_record = None
         if update_round:

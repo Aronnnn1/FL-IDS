@@ -112,6 +112,21 @@ bash scripts/reruns/run_multiseed.sh        # seeds 43, 44 at 10 and 20 clients 
 python3 tools/summarize_real_runs.py        # -> results/real_runs/summary.{json,md}
 ```
 
+Follow-up experiments (2026-11-01; results in `PAPER_NOTES.md` section 8.14 and `results/followups/`):
+
+```bash
+python3 tools/run_sharded_seeds.py --workers 14       # ablation, sweep, zero-day at seeds 43/44, one process per job (about 30 min on 20 vCPUs)
+python3 tools/summarize_seeds.py                     # -> results/seeds/summary.{md,json}
+python -m fl_ids.eval.adaptive_attack --num-rounds 20   # stealth vs sign-flip attackers
+python -m fl_ids.eval.pruning_fl --num-rounds 20        # weight pruning during federated training
+python -m fl_ids.eval.pruning --config-path configs/config_vmware_check.yaml \
+  --artifact-dir saved_models/vmware_check_phase_a --run-dir runs/vmware_check/phase_a   # post-training pruning
+python -m fl_ids.eval.clip_comparison --num-rounds 20   # with / without the per-client z-score clip
+python -m fl_ids.eval.bundle_report --config-path <cfg> --artifact-dir <bundle> --run-dir <run>  # per-class / per-client breakdown
+python experiments/accuracy/train_eval.py full --temporal --balance --seed 42   # time-ordered split
+python3 tools/build_followups.py                     # tables for the notes, report and results page
+```
+
 ## Running
 
 ```bash

@@ -83,6 +83,8 @@ def train_variant(
     num_rounds: int,
     malicious_client_ids: set[int],
     seed: int,
+    attack: str = "sign_flip",
+    prune_sparsity: float = 0.0,
 ) -> TrainedVariant:
     """Run the variant's FL training (if any) and calibrate each client's threshold.
 
@@ -91,8 +93,9 @@ def train_variant(
         setup: Shared evaluation setup.
         config: Full project config.
         num_rounds: FL rounds.
-        malicious_client_ids: Clients running the sign-flip attacker.
+        malicious_client_ids: Clients running the attacker.
         seed: Random seed.
+        attack: Attacker kind (`"sign_flip"` or `"stealth"`).
 
     Returns:
         The trained variant.
@@ -115,6 +118,8 @@ def train_variant(
         use_boosting_filter=variant.use_boosting_filter,
         seed=seed,
         boosting_updater=updater,
+        attack=attack,
+        prune_sparsity=prune_sparsity,
     )
     autoencoder, thresholds = calibrate_client_thresholds(result.final_weights, setup, config)
     return TrainedVariant(variant, result.final_boosting_model, autoencoder, thresholds, result)

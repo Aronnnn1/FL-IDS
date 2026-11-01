@@ -539,8 +539,8 @@ system's normal ones (0.02%). Who won is still fair.</li>
 <li><b>Ideas 3&ndash;6 weren't run:</b> no claims about them.</li>
 <li><b>Unusual but honest classrooms can look sneaky:</b> a classroom with very unusual notes sometimes gets excluded for a round.</li>
 <li><b>The filter breaks at 50%;</b> trimmed mean alone also breaks once sneaky classrooms outnumber what it trims.</li>
-<li><b>Only one kind of sneaky classroom tested</b> (sign-flip, exaggerating its size); cleverer ones are untested.</li>
-<li><b>Mostly one seed for whole-school tests:</b> one odd pattern (20% vs 30%) disappeared with other seeds, so it was noise. The final guard used three seeds.</li>
+<li><b>Two kinds of sneaky classroom tested</b> (sign-flip, and a clever one that knows the filter and mostly slips past it); other clever ones are untested.</li>
+<li><b>Whole-school tests now use three seeds</b> for the main experiments (ablation, sweep, new-bully test); the pruning and clever-attacker tests use one. One odd pattern (20% vs 30%) disappeared with other seeds, so it was noise.</li>
 <li><b>The whole-school system uses a sample:</b> the stand-alone guard 1 studied 1.43 million notes, but the whole-school system learns from about 125,000, so the 150 or so test runs finish in time. Guard 1 studying only the principal's 5% still scored 99.7% / 0.979; guard 2 was never tried on all the notes.</li>
 <li><b>Tiny classes:</b> MITM (358&ndash;406 notes) and Fingerprinting (853) give few exam notes, so their scores wobble.</li>
 <li><b>Novelty isn't proven:</b> our searches found no system with all five parts, but that's not a complete review.</li>
@@ -635,6 +635,19 @@ For example SQL_injection 0.804 &rarr; 1.000, Uploading 0.758 &rarr; 1.000, Fing
 <div class="why">This index is the most honest table on the site: for each result, it says what you're allowed to claim and what you're not.</div>
 
 <!-- ====================================================== 12 -->
+<!-- ====================================================== 11b -->
+<h2>11b. What was added after this guide was first written</h2>
+<div class="site">&ldquo;Real runs, repeated over seeds&rdquo; &middot; &ldquo;Follow-up experiments&rdquo; (on the Cumulative results page, sections 7b and 7c) &middot; &ldquo;Scaling to 20 clients&rdquo; and &ldquo;The whole journey, timed&rdquo; (on the main page).</div>
+<ul>
+<li><b>Scaling to 20 clients.</b> The principal now also runs with 20 schools. Before, this was pretend; it has been run for real (one server plus 20 separate programs), on a computer with enough memory.
+Attack detection stays about the same; the table lists every run.</li>
+<li><b>The whole journey, timed.</b> From raw notes to a locked door took about 219 seconds in one run: most of it is learning together, and the live part (replay, spot, lock) takes seconds.</li>
+<li><b>Real runs, three seeds (7b).</b> Each size was run three times with different shuffles. The one low score (0.978) is one missed note out of a group of 4.</li>
+<li><b>Follow-up experiments (7c).</b> The big tests were repeated with two more seeds (same story); a clever saboteur mostly slips past the filter; deleting 70% of the numbers in guard 2's brain works if done while learning, not after; and a stricter &ldquo;earlier teaches, later tests&rdquo; exam gives 99.4% accuracy.</li>
+<li><b>What a table cell means.</b> &ldquo;0.745 / 0.727 / 0.688&rdquo; style cells list the three seeds in order (42 / 43 / 44) so you can see how much they differ.</li>
+</ul>
+<p class="eli5">When something still wobbles after three tries, we show you all three numbers instead of hiding it behind one.</p>
+
 <h2>12. Dictionary: the 15 kinds of traffic</h2>
 <table>
 <tr><th>Type</th><th>Like you're five</th></tr>

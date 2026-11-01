@@ -1,0 +1,15 @@
+2026-11-01 13:31:19,116 [INFO] __main__: sparsity=0.00 nnz=9600 ae_recall=0.742 auroc=0.987 cascade_macro=0.999 fpr=0.0340
+2026-11-01 13:31:21,764 [INFO] __main__: sparsity=0.50 nnz=4800 ae_recall=0.273 auroc=0.742 cascade_macro=0.998 fpr=0.0287
+2026-11-01 13:31:24,400 [INFO] __main__: sparsity=0.70 nnz=2880 ae_recall=0.168 auroc=0.596 cascade_macro=0.998 fpr=0.0292
+2026-11-01 13:31:27,005 [INFO] __main__: sparsity=0.80 nnz=1920 ae_recall=0.145 auroc=0.559 cascade_macro=0.996 fpr=0.0334
+2026-11-01 13:31:29,563 [INFO] __main__: sparsity=0.90 nnz=960 ae_recall=0.144 auroc=0.594 cascade_macro=0.996 fpr=0.0323
+2026-11-01 13:31:32,196 [INFO] __main__: sparsity=0.95 nnz=480 ae_recall=0.147 auroc=0.593 cascade_macro=0.996 fpr=0.0366
+2026-11-01 13:31:34,849 [INFO] __main__: sparsity=0.98 nnz=192 ae_recall=0.147 auroc=0.593 cascade_macro=0.996 fpr=0.0366
+ sparsity  parameters  nonzero_weights  dense_bytes  sparse_bytes  sparse_vs_dense_bytes  ae_attack_macro_recall  ae_auroc  cascade_attack_macro_recall  cascade_attack_micro_recall  benign_fpr
+     0.00        9834             9600        39336         77736               1.976205                0.741841  0.986561                     0.998950                     0.999197    0.033974
+     0.50        9834             4800        39336         39336               1.000000                0.272703  0.742063                     0.997729                     0.997591    0.028747
+     0.70        9834             2880        39336         23976               0.609518                0.167769  0.595842                     0.997729                     0.997591    0.029208
+     0.80        9834             1920        39336         16296               0.414277                0.144663  0.558752                     0.995746                     0.996788    0.033359
+     0.90        9834              960        39336          8616               0.219036                0.144403  0.594204                     0.995746                     0.996788    0.032283
+     0.95        9834              480        39336          4776               0.121415                0.147016  0.593152                     0.995746                     0.996788    0.036587
+     0.98        9834              192        39336          2472               0.062843                0.146681  0.592936                     0.995746                     0.996788    0.036587

@@ -17,11 +17,11 @@ The service-port feature benefits from the testbed's lack of benign HTTP traffic
 \section*{Future Work}
 \begin{enumerate}
   \item Make mitigation streaming: classify flows incrementally (for example after the first $n$ packets) so a rule can be installed while an attack is still running.
-  \item Test adaptive attackers that stay just above the filter's thresholds, and attackers above 50\%, possibly using a small trusted root dataset as in FLTrust~\cite{cao2021fltrust}.
-  \item Repeat the ablation, poisoning sweep and zero-day experiments over several seeds and report confidence intervals (Phase A itself has been repeated over three seeds with 10 and 20 real client processes).
+  \item Defend against the white-box stealth attacker (Section~\ref{sec:followups}), which the filter mostly misses, for example with a small trusted root dataset as in FLTrust~\cite{cao2021fltrust}; measure zero-day detection under it; and test other adaptive strategies and attackers above 50\%.
+  \item Add more seeds (now three) and confidence intervals to the ablation, poisoning sweep and zero-day experiments, and repeat the zero-day columns inside the first two at the extra seeds.
   \item Run the federated system on the full client pool instead of a 60{,}000-row sample, on a machine with more memory.
   \item Validate on a second dataset that contains benign web traffic, to measure how much the service-port feature depends on the testbed.
-  \item Apply weight pruning to the autoencoder and its updates (Objective 3). It has not been implemented yet; the model is already small (9{,}834 parameters), and pruning would cut communication further.
+  \item Reduce the per-round communication as well: weight pruning (Objective 3, Section~\ref{sec:followups}) shrinks the model, with autoencoder recall 0.744 dense and 0.688 at 70\% sparsity, but clients still send dense updates. Sparse updates, and zero-day detection of pruned models, remain to be done.
   \item Federate the classifier itself (for example with histogram-based federated boosting) so the calibration set no longer needs to be held centrally.
   \item Deploy on physical edge hardware and a hardware OpenFlow switch.
 \end{enumerate}

@@ -19,3 +19,10 @@ Numbers in all of these come from `results/`, `results/extended/` and
 - `presentation/` has two added slides (19 "Scaling Up and Repeating", 21 "One Whole Run, Timed"), added in place by
   `scripts/add_new_result_slides.py` because the deck's original builder input was lost.
 - The explainer PDFs were not regenerated.
+
+## Update 2026-11-01 (later)
+
+- `report/` Chapter 5 gained a section on the follow-up experiments (more seeds, an adaptive attacker, pruning, a time-ordered split); the PDF is 65 pages.
+- `presentation/` has a third added slide (22, "Pruning and Smarter Attackers", added by `scripts/add_followup_slide.py`); the future-work slide no longer lists weight pruning as undone. The deck has 27 slides.
+- `explainers/` were regenerated with WeasyPrint (`mp-expl.pdf` 9 pages, `website-explained.pdf` 23 pages) after adding the November results. They were built with Chrome before, so spacing differs slightly.
+- `scripts/new_figures.py` produces the figures added to `report/figures/` (trust trajectories, partition heatmap, reconstruction error, clip comparison, placeholder AUROC, Phase B timeline).

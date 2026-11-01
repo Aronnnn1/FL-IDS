@@ -1,0 +1,243 @@
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Variant} & \textbf{Attack macro-recall} & \textbf{Autoencoder-alone recall} & \textbf{Benign FPR} \\ \hline
+full\_pipeline & 1.000 / 0.999 / 0.997 & 0.712 / 0.679 / 0.565 & 0.0309 / 0.0284 / 0.0320 \\ \hline
+plain\_fedavg & 0.998 / 0.997 / 0.994 & 0.002 / 0.000 / 0.000 & 0.0347 / 0.0317 / 0.0297 \\ \hline
+trimmed\_mean\_only & 0.997 / 0.997 / 0.996 & 0.000 / 0.000 / 0.026 & 0.0334 / 0.0291 / 0.0337 \\ \hline
+autoencoder\_only & 0.372 / 0.295 / 0.306 & 0.372 / 0.295 / 0.306 & 0.0301 / 0.0281 / 0.0325 \\ \hline
+boosting\_only & 0.996 / 0.997 / 0.996 & n/a / n/a / n/a & 0.0002 / 0.0000 / 0.0005 \\ \hline
+\end{tabular}
+\caption{Ablation at 30\% sign-flip attackers, seeds 42 / 43 / 44 (source: results/seeds/summary.json)}
+\label{tab:fu_seed_ablation}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Attackers} & \textbf{Attack macro-recall} & \textbf{Autoencoder-alone recall} & \textbf{Attacker survival} \\ \hline
+0\% & 1.000 / 0.999 / 0.997 & 0.737 / 0.765 / 0.612 & n/a / n/a / n/a \\ \hline
+20\% & 0.999 / 0.999 / 0.996 & 0.736 / 0.739 / 0.618 & 0.10 / 0.03 / 0.23 \\ \hline
+30\% & 1.000 / 0.999 / 0.997 & 0.712 / 0.679 / 0.565 & 0.12 / 0.12 / 0.27 \\ \hline
+40\% & 1.000 / 0.998 / 0.997 & 0.691 / 0.620 / 0.537 & 0.36 / 0.31 / 0.44 \\ \hline
+50\% & 0.997 / 0.997 / 0.995 & 0.000 / 0.000 / 0.000 & 1.00 / 0.99 / 0.97 \\ \hline
+\end{tabular}
+\caption{Poisoning sweep, seeds 42 / 43 / 44}
+\label{tab:fu_seed_sweep}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Stage} & \textbf{Mean detection rate} \\ \hline
+Classifier alone & 0.801 / 0.748 / 0.791 \\ \hline
+Autoencoder alone & 0.757 / 0.775 / 0.747 \\ \hline
+Cascade & 0.943 / 0.952 / 0.952 \\ \hline
+Cascade, DDoS\_HTTP & 0.878 / 0.846 / 0.948 \\ \hline
+Cascade, MITM & 0.695 / 0.963 / 0.837 \\ \hline
+Cascade, Uploading & 0.716 / 0.677 / 0.665 \\ \hline
+\end{tabular}
+\caption{Zero-day detection of the unseen class, mean over 14 classes, seeds 42 / 43 / 44}
+\label{tab:fu_seed_zeroday}
+\end{table}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Attack} & \textbf{Attackers} & \textbf{Attack macro-recall} & \textbf{Autoencoder-alone recall} & \textbf{Attacker survival} & \textbf{Final validation loss} \\ \hline
+sign\_flip & 20\% & 0.9993 & 0.730 & 0.10 & 0.026 \\ \hline
+sign\_flip & 30\% & 1.0000 & 0.718 & 0.12 & 0.029 \\ \hline
+sign\_flip & 40\% & 0.9997 & 0.663 & 0.36 & 0.021 \\ \hline
+stealth & 20\% & 0.9997 & 0.747 & 0.90 & 0.041 \\ \hline
+stealth & 30\% & 1.0000 & 0.741 & 0.72 & 0.040 \\ \hline
+stealth & 40\% & 0.9997 & 0.499 & 0.82 & 0.037 \\ \hline
+\end{tabular}
+\caption{Adaptive (stealth) attacker vs. sign-flip, seed 42, 20 rounds (source: results/adaptive/adaptive\_attack.csv)}
+\label{tab:fu_adaptive}
+\end{table}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Sparsity} & \textbf{Non-zero weights} & \textbf{Sparse / dense bytes} & \textbf{Autoencoder recall} & \textbf{Autoencoder AUROC} & \textbf{Cascade macro-recall} & \textbf{Benign FPR} \\ \hline
+0\% & 9600 & 1.98 & 0.742 & 0.987 & 0.999 & 0.0340 \\ \hline
+50\% & 4800 & 1.00 & 0.273 & 0.742 & 0.998 & 0.0287 \\ \hline
+70\% & 2880 & 0.61 & 0.168 & 0.596 & 0.998 & 0.0292 \\ \hline
+80\% & 1920 & 0.41 & 0.145 & 0.559 & 0.996 & 0.0334 \\ \hline
+90\% & 960 & 0.22 & 0.144 & 0.594 & 0.996 & 0.0323 \\ \hline
+95\% & 480 & 0.12 & 0.147 & 0.593 & 0.996 & 0.0366 \\ \hline
+98\% & 192 & 0.06 & 0.147 & 0.593 & 0.996 & 0.0366 \\ \hline
+\end{tabular}
+\caption{Post-training magnitude pruning of the 10-client autoencoder, thresholds recalibrated (source: results/pruning/c10\_s42/pruning.csv)}
+\label{tab:fu_prune_post}
+\end{table}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Sparsity} & \textbf{Non-zero weights} & \textbf{Sparse / dense bytes} & \textbf{Autoencoder-alone recall} & \textbf{Cascade macro-recall} & \textbf{Benign FPR} & \textbf{Final validation loss} \\ \hline
+0\% & 9600 & 1.98 & 0.744 & 1.000 & 0.0320 & 0.034 \\ \hline
+50\% & 4800 & 1.00 & 0.727 & 1.000 & 0.0323 & 0.040 \\ \hline
+70\% & 2880 & 0.61 & 0.688 & 1.000 & 0.0298 & 0.049 \\ \hline
+80\% & 1920 & 0.41 & 0.467 & 0.999 & 0.0312 & 0.080 \\ \hline
+90\% & 960 & 0.22 & 0.176 & 0.998 & 0.0289 & 0.207 \\ \hline
+\end{tabular}
+\caption{Pruning during federated training (server re-prunes each round, linear ramp over the first 10 rounds), seed 42, no attackers (source: results/pruning/pruning\_during\_fl.csv)}
+\label{tab:fu_prune_fl}
+\end{table}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Normalisation} & \textbf{Round 1} & \textbf{Round 5} & \textbf{Round 10} & \textbf{Round 20} \\ \hline
+clip 10 & 0.2047 & 0.04336 & 0.03999 & 0.03369 \\ \hline
+no clip & 50.63 & 50.15 & 50 & 49.86 \\ \hline
+\end{tabular}
+\caption{Benign validation loss with and without the per-client z-score clip (source: results/clip/clip\_comparison.csv)}
+\label{tab:fu_clip}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Split} & \textbf{Accuracy} & \textbf{Macro F1} \\ \hline
+Time-ordered, seeds 42 / 43 / 44 & 0.9942 / 0.9943 / 0.9941 & 0.9133 / 0.9122 / 0.9129 \\ \hline
+Connection-grouped, seed 42 & 0.9972 & 0.9828 \\ \hline
+\end{tabular}
+\caption{Per-class time-ordered split vs. connection-grouped split (source: experiments/accuracy/results/full\_temporal\_bal\_s*.json)}
+\label{tab:fu_temporal_summary}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Class} & \textbf{Test rows (time-ordered)} & \textbf{Time-ordered recall} & \textbf{Grouped recall} \\ \hline
+Backdoor & 4835 & 0.947 / 0.948 / 0.962 & 0.989 \\ \hline
+DDoS\_HTTP & 9954 & 0.918 / 0.925 / 0.912 & 0.980 \\ \hline
+DDoS\_ICMP & 13752 & 1.000 / 1.000 / 1.000 & 1.000 \\ \hline
+DDoS\_TCP & 10013 & 1.000 / 1.000 / 1.000 & 1.000 \\ \hline
+DDoS\_UDP & 24314 & 1.000 / 1.000 / 1.000 & 1.000 \\ \hline
+Fingerprinting & 258 & 0.977 / 0.977 / 0.977 & 0.937 \\ \hline
+MITM & 406 & 0.000 / 0.000 / 0.000 & 0.000 \\ \hline
+Normal & 287325 & 0.999 / 0.999 / 0.998 & 0.999 \\ \hline
+Password & 10007 & 0.977 / 0.973 / 0.978 & 0.958 \\ \hline
+Port\_Scanning & 4044 & 0.998 / 0.998 / 0.998 & 0.999 \\ \hline
+Ransomware & 2074 & 0.954 / 0.951 / 0.949 & 0.950 \\ \hline
+SQL\_injection & 10203 & 1.000 / 1.000 / 1.000 & 0.999 \\ \hline
+Uploading & 7461 & 0.999 / 0.999 / 0.999 & 0.999 \\ \hline
+Vulnerability\_scanner & 10011 & 0.998 / 0.998 / 0.998 & 0.997 \\ \hline
+XSS & 3042 & 0.983 / 0.984 / 0.984 & 0.986 \\ \hline
+\end{tabular}
+\caption{Recall per class, time-ordered split (seeds 42 / 43 / 44) vs. grouped split (seed 42)}
+\label{tab:fu_temporal_classes}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Feature} & \textbf{AUROC} & \textbf{State} \\ \hline
+mqtt.topic == 0.0 & 1.0000 & raw, before the fix \\ \hline
+mqtt.conack.flags == 0.0 & 1.0000 & raw, before the fix \\ \hline
+mqtt.protoname == 0.0 & 1.0000 & raw, before the fix \\ \hline
+dns.qry.name.len == 0.0 & 0.9998 & raw, before the fix \\ \hline
+f\_rst & 0.8789 & 130-feature matrix, after \\ \hline
+f\_npkts & 0.8657 & 130-feature matrix, after \\ \hline
+svc\_port & 0.8350 & 130-feature matrix, after \\ \hline
+f\_fin & 0.8039 & 130-feature matrix, after \\ \hline
+f\_pl\_nonzero & 0.7328 & 130-feature matrix, after \\ \hline
+f\_syn & 0.7108 & 130-feature matrix, after \\ \hline
+\end{tabular}
+\caption{Single-feature AUROC, attack vs. normal (source: results/leak/single\_feature\_auroc.json; after: 300,000-row sample)}
+\label{tab:fu_leak}
+\end{table}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Run} & \textbf{Macro-recall} & \textbf{Micro recall} & \textbf{Fingerprinting test rows, recall} & \textbf{MITM test rows, recall} & \textbf{Clients with infinite threshold} \\ \hline
+10 clients, seed 42 & 0.999 & 0.9992 & 3 rows, 1.00 & 3 rows, 1.00 & 0 \\ \hline
+10 clients, seed 43 & 0.999 & 0.9992 & 4 rows, 1.00 & 4 rows, 1.00 & 1 \\ \hline
+10 clients, seed 44 & 0.996 & 0.9960 & 4 rows, 1.00 & 5 rows, 1.00 & 1 \\ \hline
+20 clients, seed 42 & 0.978 & 0.9964 & 4 rows, 0.75 & 1 rows, 1.00 & 3 \\ \hline
+20 clients, seed 43 & 0.999 & 0.9992 & 2 rows, 1.00 & 3 rows, 1.00 & 2 \\ \hline
+20 clients, seed 44 & 0.999 & 0.9988 & 2 rows, 1.00 & 3 rows, 1.00 & 2 \\ \hline
+\end{tabular}
+\caption{Where the real-run macro-recall comes from (source: results/real\_runs/<run>/, made by fl\_ids.eval.bundle\_report)}
+\label{tab:fu_realrun_breakdown}
+\end{table}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Attackers} & \textbf{Attacker clients} & \textbf{Attacker client-rounds excluded} & \textbf{Honest client-rounds excluded} & \textbf{Attack macro-recall} & \textbf{Benign FPR} \\ \hline
+20\% & 0,7 & 36 of 40 & 0 of 160 & 0.998 & 0.0335 \\ \hline
+30\% & 0,6,9 & 52 of 60 & 0 of 140 & 0.999 & 0.0317 \\ \hline
+\end{tabular}
+\caption{Real multi-process Phase A with sign-flip attackers (10 clients, 20 rounds, seed 42; source: runs/attack\_runs/)}
+\label{tab:fu_attack_runs}
+\end{table}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Bundle} & \textbf{Class} & \textbf{Confidence} & \textbf{Packets flagged} & \textbf{Phase B time} \\ \hline
+10 clients, seed 43 & Backdoor & 0.997 & 24244 / 24914 & 10.8 s \\ \hline
+10 clients, seed 44 & Backdoor & 0.998 & 24914 / 24914 & 8.3 s \\ \hline
+20 clients, seed 43 & Backdoor & 0.997 & 24848 / 24914 & 11.1 s \\ \hline
+20 clients, seed 44 & Backdoor & 0.997 & 24914 / 24914 & 9.1 s \\ \hline
+\end{tabular}
+\caption{Phase B on the multi-seed bundles, Backdoor\_attack.pcap, every run ends with a drop rule read back from the switch (source: logs/multiseed/status\_phase\_b.log)}
+\label{tab:fu_phase_b_seeds}
+\end{table}
