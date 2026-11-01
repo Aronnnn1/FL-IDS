@@ -1,0 +1,100 @@
+/home/flids/FL-IDS-clean/fl_ids/sdn/bridge.py:243: EventletDeprecationWarning: 
+Eventlet is deprecated. It is currently being maintained in bugfix mode, and
+we strongly recommend against using it for new projects.
+
+If you are already using Eventlet, we recommend migrating to a different
+framework.  For more detail see
+https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
+
+  import eventlet
+/home/flids/FL-IDS-clean/venv/lib/python3.14/site-packages/eventlet/patcher.py:576: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
+  if isinstance(obj, klass):
+/home/flids/FL-IDS-clean/venv/lib/python3.14/site-packages/eventlet/patcher.py:587: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
+  if isinstance(container, dict):
+/home/flids/FL-IDS-clean/venv/lib/python3.14/site-packages/eventlet/patcher.py:592: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
+  if isinstance(container, list):
+/home/flids/FL-IDS-clean/venv/lib/python3.14/site-packages/eventlet/patcher.py:598: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
+  container_vars = vars(container)
+/home/flids/FL-IDS-clean/venv/lib/python3.14/site-packages/eventlet/patcher.py:502: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
+  if isinstance(o, rlock_type):
+/home/flids/FL-IDS-clean/venv/lib/python3.14/site-packages/eventlet/patcher.py:525: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
+  if not isinstance(o, rlock_type):
+2 RLock(s) were not greened, to fix this error make sure you run eventlet.monkey_patch() before importing any other modules.
+2026-11-01 13:26:16,153 [INFO] os_ken.base.app_manager: loading app os_ken.controller.ofp_handler
+2026-11-01 13:26:16,154 [INFO] os_ken.base.app_manager: loading app fl_ids.sdn.controller
+2026-11-01 13:26:16,154 [INFO] os_ken.base.app_manager: loading app os_ken.controller.ofp_handler
+2026-11-01 13:26:16,154 [INFO] os_ken.base.app_manager: instantiating app os_ken.controller.ofp_handler of OFPHandler
+2026-11-01 13:26:16,154 [INFO] os_ken.base.app_manager: instantiating app fl_ids.sdn.controller of MitigationController
+2026-11-01 13:26:16,155 [INFO] fl_ids.sdn.controller: OpenFlow 1.3 controller listening on port 6653
+2026-11-01 13:26:16,191 [INFO] __main__: SDN mitigation bridge listening on 127.0.0.1:8080
+(48327) wsgi starting up on http://127.0.0.1:8080
+(48327) accepted ('127.0.0.1', 46664)
+127.0.0.1 - - [01/Nov/2026 13:26:16] "GET /health HTTP/1.1" 200 173 0.000515
+2026-11-01 13:26:19,290 [INFO] fl_ids.sdn.controller: Switch connected: datapath_id=1
+2026-11-01 13:26:19,290 [INFO] fl_ids.sdn.controller: Installed default NORMAL flow on datapath_id=1
+(48327) accepted ('127.0.0.1', 46670)
+127.0.0.1 - - [01/Nov/2026 13:26:20] "GET /health HTTP/1.1" 200 174 0.000362
+(48327) accepted ('127.0.0.1', 46686)
+2026-11-01 13:26:20,687 [INFO] __main__: Registered device: device_id=h1 datapath_id=1 ip=10.0.0.1
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 152 0.000417
+(48327) accepted ('127.0.0.1', 46688)
+2026-11-01 13:26:20,688 [INFO] __main__: Registered device: device_id=h2 datapath_id=1 ip=10.0.0.2
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 152 0.000317
+(48327) accepted ('127.0.0.1', 46690)
+2026-11-01 13:26:20,689 [INFO] __main__: Registered device: device_id=h3 datapath_id=1 ip=10.0.0.3
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 152 0.000289
+(48327) accepted ('127.0.0.1', 46706)
+2026-11-01 13:26:20,690 [INFO] __main__: Registered device: device_id=h4 datapath_id=1 ip=10.0.0.4
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 152 0.000267
+(48327) accepted ('127.0.0.1', 46716)
+2026-11-01 13:26:20,691 [INFO] __main__: Registered device: device_id=h5 datapath_id=1 ip=10.0.0.5
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 152 0.000279
+(48327) accepted ('127.0.0.1', 46726)
+2026-11-01 13:26:20,692 [INFO] __main__: Registered device: device_id=h6 datapath_id=1 ip=10.0.0.6
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 152 0.000259
+(48327) accepted ('127.0.0.1', 46742)
+2026-11-01 13:26:20,693 [INFO] __main__: Registered device: device_id=h7 datapath_id=1 ip=10.0.0.7
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 152 0.000265
+(48327) accepted ('127.0.0.1', 46748)
+2026-11-01 13:26:20,694 [INFO] __main__: Registered device: device_id=h8 datapath_id=1 ip=10.0.0.8
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 152 0.000280
+(48327) accepted ('127.0.0.1', 46754)
+2026-11-01 13:26:20,695 [INFO] __main__: Registered device: device_id=h9 datapath_id=1 ip=10.0.0.9
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 152 0.000254
+(48327) accepted ('127.0.0.1', 46760)
+2026-11-01 13:26:20,697 [INFO] __main__: Registered device: device_id=h10 datapath_id=1 ip=10.0.0.10
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 153 0.000391
+(48327) accepted ('127.0.0.1', 46762)
+2026-11-01 13:26:20,698 [INFO] __main__: Registered device: device_id=h11 datapath_id=1 ip=10.0.0.11
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 153 0.000265
+(48327) accepted ('127.0.0.1', 46770)
+2026-11-01 13:26:20,699 [INFO] __main__: Registered device: device_id=h12 datapath_id=1 ip=10.0.0.12
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 153 0.000255
+(48327) accepted ('127.0.0.1', 46774)
+2026-11-01 13:26:20,700 [INFO] __main__: Registered device: device_id=h13 datapath_id=1 ip=10.0.0.13
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 153 0.000261
+(48327) accepted ('127.0.0.1', 46788)
+2026-11-01 13:26:20,701 [INFO] __main__: Registered device: device_id=h14 datapath_id=1 ip=10.0.0.14
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 153 0.000258
+(48327) accepted ('127.0.0.1', 46796)
+2026-11-01 13:26:20,702 [INFO] __main__: Registered device: device_id=h15 datapath_id=1 ip=10.0.0.15
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 153 0.000248
+(48327) accepted ('127.0.0.1', 46802)
+2026-11-01 13:26:20,703 [INFO] __main__: Registered device: device_id=h16 datapath_id=1 ip=10.0.0.16
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 153 0.000262
+(48327) accepted ('127.0.0.1', 46806)
+2026-11-01 13:26:20,704 [INFO] __main__: Registered device: device_id=h17 datapath_id=1 ip=10.0.0.17
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 153 0.000254
+(48327) accepted ('127.0.0.1', 46818)
+2026-11-01 13:26:20,705 [INFO] __main__: Registered device: device_id=h18 datapath_id=1 ip=10.0.0.18
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 153 0.000254
+(48327) accepted ('127.0.0.1', 46830)
+2026-11-01 13:26:20,706 [INFO] __main__: Registered device: device_id=h19 datapath_id=1 ip=10.0.0.19
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 153 0.000253
+(48327) accepted ('127.0.0.1', 46838)
+2026-11-01 13:26:20,707 [INFO] __main__: Registered device: device_id=h20 datapath_id=1 ip=10.0.0.20
+127.0.0.1 - - [01/Nov/2026 13:26:20] "POST /devices/register HTTP/1.1" 200 153 0.000264
+(48327) accepted ('127.0.0.1', 46852)
+2026-11-01 13:26:24,381 [INFO] fl_ids.sdn.controller: Installed BLOCK rule: datapath_id=1 device_ip=10.0.0.1
+2026-11-01 13:26:24,381 [INFO] __main__: Mitigation: device_id=h1 ip=10.0.0.1 classification=Backdoor confidence=0.997 -> action=block applied=True
+127.0.0.1 - - [01/Nov/2026 13:26:24] "POST /mitigate HTTP/1.1" 200 318 0.000773

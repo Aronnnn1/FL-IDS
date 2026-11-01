@@ -81,6 +81,9 @@ def main() -> None:
     p.add_argument("--lr", type=float, default=0.1)
     p.add_argument("--train-fraction", type=float, default=0.0,
                    help="keep only this fraction of all rows for training (stratified), e.g. 0.05 = the server calibration set")
+    p.add_argument("--temporal", action="store_true",
+                   help="per-class time-ordered split: each class's earliest ~80%% of flows (CSV row order is capture order "
+                        "within a class) train, the latest ~20%% test; whole flows stay on one side")
     p.add_argument("--balance", action="store_true", help="sqrt inverse-frequency class weights")
     p.add_argument("--sample", type=int, default=0, help="capped stratified sample size (0 = all rows)")
     args = p.parse_args()
@@ -107,7 +110,23 @@ def main() -> None:
     if args.sample:
         from fl_ids.data.sampling import capped_stratified_sample_indices
         idx = np.sort(capped_stratified_sample_indices(y, args.sample, args.seed))
-    if args.grouped:
+    if args.temporal:
+        # Rows are in capture order within a class (checked: time is non-decreasing in row order for every class).
+        # Order each class's flows by their first row and send the last ~20% of its rows (whole flows) to test.
+        pos = np.arange(len(y))
+        flow = df["flow_id"].to_numpy()
+        test_mask = np.zeros(len(y), dtype=bool)
+        for c in range(len(classes)):
+            rows = idx[y[idx] == c]
+            first = pd.Series(pos[rows]).groupby(flow[rows]).min()
+            sizes = pd.Series(1, index=rows).groupby(flow[rows]).sum().reindex(first.index)
+            order = first.sort_values().index
+            cum = sizes.loc[order].cumsum().to_numpy()
+            late = set(order[cum > 0.8 * cum[-1]])
+            test_mask[rows[np.isin(flow[rows], list(late))]] = True
+        te = idx[test_mask[idx]]
+        tr = idx[~test_mask[idx]]
+    elif args.grouped:
         # 5 folds -> ~20% test; every class present on both sides, no flow on both
         sgk = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=args.seed)
         f_tr, f_te = next(sgk.split(idx, y[idx], groups=df["flow_id"].to_numpy()[idx]))
@@ -159,7 +178,7 @@ def main() -> None:
     imp = pd.Series(booster.feature_importance("gain"), index=feat_cols).sort_values(ascending=False)
     res = {
         "feature_set": args.feature_set,
-        "split": "flow_grouped" if args.grouped else "stratified_random",
+        "split": "temporal_per_class" if args.temporal else ("flow_grouped" if args.grouped else "stratified_random"),
         "seed": args.seed,
         "n_features": len(feat_cols),
         "rows_before_dedup": n_before,
@@ -185,7 +204,7 @@ def main() -> None:
         "total_seconds": time.time() - t0,
     }
     RESULTS.mkdir(parents=True, exist_ok=True)
-    name = f"{args.feature_set}{'_grouped' if args.grouped else ''}{f'_n{args.sample}' if args.sample else ''}{'_bal' if args.balance else ''}{f'_tf{args.train_fraction}' if args.train_fraction else ''}_s{args.seed}"
+    name = f"{args.feature_set}{'_grouped' if args.grouped else ''}{'_temporal' if args.temporal else ''}{f'_n{args.sample}' if args.sample else ''}{'_bal' if args.balance else ''}{f'_tf{args.train_fraction}' if args.train_fraction else ''}_s{args.seed}"
     (RESULTS / f"{name}.json").write_text(json.dumps(res, indent=1))
     booster.save_model(str(RESULTS / f"{name}.model.txt"))
     np.savez_compressed(RESULTS / f"{name}.pred.npz", test_idx=te, y_true=yt, y_pred=pred,

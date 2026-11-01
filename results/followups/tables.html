@@ -1,0 +1,165 @@
+<!-- seed_ablation -->
+<p class="src"><b>Ablation at 30% sign-flip attackers, seeds 42 / 43 / 44 (source: results/seeds/summary.json)</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Variant</th><th>Attack macro-recall</th><th>Autoencoder-alone recall</th><th>Benign FPR</th></tr></thead>
+<tbody>
+<tr><td>full_pipeline</td><td>1.000 / 0.999 / 0.997</td><td>0.712 / 0.679 / 0.565</td><td>0.0309 / 0.0284 / 0.0320</td></tr>
+<tr><td>plain_fedavg</td><td>0.998 / 0.997 / 0.994</td><td>0.002 / 0.000 / 0.000</td><td>0.0347 / 0.0317 / 0.0297</td></tr>
+<tr><td>trimmed_mean_only</td><td>0.997 / 0.997 / 0.996</td><td>0.000 / 0.000 / 0.026</td><td>0.0334 / 0.0291 / 0.0337</td></tr>
+<tr><td>autoencoder_only</td><td>0.372 / 0.295 / 0.306</td><td>0.372 / 0.295 / 0.306</td><td>0.0301 / 0.0281 / 0.0325</td></tr>
+<tr><td>boosting_only</td><td>0.996 / 0.997 / 0.996</td><td>n/a / n/a / n/a</td><td>0.0002 / 0.0000 / 0.0005</td></tr>
+</tbody></table></div>
+
+<!-- seed_sweep -->
+<p class="src"><b>Poisoning sweep, seeds 42 / 43 / 44</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Attackers</th><th>Attack macro-recall</th><th>Autoencoder-alone recall</th><th>Attacker survival</th></tr></thead>
+<tbody>
+<tr><td>0%</td><td>1.000 / 0.999 / 0.997</td><td>0.737 / 0.765 / 0.612</td><td>n/a / n/a / n/a</td></tr>
+<tr><td>20%</td><td>0.999 / 0.999 / 0.996</td><td>0.736 / 0.739 / 0.618</td><td>0.10 / 0.03 / 0.23</td></tr>
+<tr><td>30%</td><td>1.000 / 0.999 / 0.997</td><td>0.712 / 0.679 / 0.565</td><td>0.12 / 0.12 / 0.27</td></tr>
+<tr><td>40%</td><td>1.000 / 0.998 / 0.997</td><td>0.691 / 0.620 / 0.537</td><td>0.36 / 0.31 / 0.44</td></tr>
+<tr><td>50%</td><td>0.997 / 0.997 / 0.995</td><td>0.000 / 0.000 / 0.000</td><td>1.00 / 0.99 / 0.97</td></tr>
+</tbody></table></div>
+
+<!-- seed_zeroday -->
+<p class="src"><b>Zero-day detection of the unseen class, mean over 14 classes, seeds 42 / 43 / 44</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Stage</th><th>Mean detection rate</th></tr></thead>
+<tbody>
+<tr><td>Classifier alone</td><td>0.801 / 0.748 / 0.791</td></tr>
+<tr><td>Autoencoder alone</td><td>0.757 / 0.775 / 0.747</td></tr>
+<tr><td>Cascade</td><td>0.943 / 0.952 / 0.952</td></tr>
+<tr><td>Cascade, DDoS_HTTP</td><td>0.878 / 0.846 / 0.948</td></tr>
+<tr><td>Cascade, MITM</td><td>0.695 / 0.963 / 0.837</td></tr>
+<tr><td>Cascade, Uploading</td><td>0.716 / 0.677 / 0.665</td></tr>
+</tbody></table></div>
+
+<!-- adaptive -->
+<p class="src"><b>Adaptive (stealth) attacker vs. sign-flip, seed 42, 20 rounds (source: results/adaptive/adaptive_attack.csv)</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Attack</th><th>Attackers</th><th>Attack macro-recall</th><th>Autoencoder-alone recall</th><th>Attacker survival</th><th>Final validation loss</th></tr></thead>
+<tbody>
+<tr><td>sign_flip</td><td>20%</td><td>0.9993</td><td>0.730</td><td>0.10</td><td>0.026</td></tr>
+<tr><td>sign_flip</td><td>30%</td><td>1.0000</td><td>0.718</td><td>0.12</td><td>0.029</td></tr>
+<tr><td>sign_flip</td><td>40%</td><td>0.9997</td><td>0.663</td><td>0.36</td><td>0.021</td></tr>
+<tr><td>stealth</td><td>20%</td><td>0.9997</td><td>0.747</td><td>0.90</td><td>0.041</td></tr>
+<tr><td>stealth</td><td>30%</td><td>1.0000</td><td>0.741</td><td>0.72</td><td>0.040</td></tr>
+<tr><td>stealth</td><td>40%</td><td>0.9997</td><td>0.499</td><td>0.82</td><td>0.037</td></tr>
+</tbody></table></div>
+
+<!-- prune_post -->
+<p class="src"><b>Post-training magnitude pruning of the 10-client autoencoder, thresholds recalibrated (source: results/pruning/c10_s42/pruning.csv)</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Sparsity</th><th>Non-zero weights</th><th>Sparse / dense bytes</th><th>Autoencoder recall</th><th>Autoencoder AUROC</th><th>Cascade macro-recall</th><th>Benign FPR</th></tr></thead>
+<tbody>
+<tr><td>0%</td><td>9600</td><td>1.98</td><td>0.742</td><td>0.987</td><td>0.999</td><td>0.0340</td></tr>
+<tr><td>50%</td><td>4800</td><td>1.00</td><td>0.273</td><td>0.742</td><td>0.998</td><td>0.0287</td></tr>
+<tr><td>70%</td><td>2880</td><td>0.61</td><td>0.168</td><td>0.596</td><td>0.998</td><td>0.0292</td></tr>
+<tr><td>80%</td><td>1920</td><td>0.41</td><td>0.145</td><td>0.559</td><td>0.996</td><td>0.0334</td></tr>
+<tr><td>90%</td><td>960</td><td>0.22</td><td>0.144</td><td>0.594</td><td>0.996</td><td>0.0323</td></tr>
+<tr><td>95%</td><td>480</td><td>0.12</td><td>0.147</td><td>0.593</td><td>0.996</td><td>0.0366</td></tr>
+<tr><td>98%</td><td>192</td><td>0.06</td><td>0.147</td><td>0.593</td><td>0.996</td><td>0.0366</td></tr>
+</tbody></table></div>
+
+<!-- prune_fl -->
+<p class="src"><b>Pruning during federated training (server re-prunes each round, linear ramp over the first 10 rounds), seed 42, no attackers (source: results/pruning/pruning_during_fl.csv)</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Sparsity</th><th>Non-zero weights</th><th>Sparse / dense bytes</th><th>Autoencoder-alone recall</th><th>Cascade macro-recall</th><th>Benign FPR</th><th>Final validation loss</th></tr></thead>
+<tbody>
+<tr><td>0%</td><td>9600</td><td>1.98</td><td>0.744</td><td>1.000</td><td>0.0320</td><td>0.034</td></tr>
+<tr><td>50%</td><td>4800</td><td>1.00</td><td>0.727</td><td>1.000</td><td>0.0323</td><td>0.040</td></tr>
+<tr><td>70%</td><td>2880</td><td>0.61</td><td>0.688</td><td>1.000</td><td>0.0298</td><td>0.049</td></tr>
+<tr><td>80%</td><td>1920</td><td>0.41</td><td>0.467</td><td>0.999</td><td>0.0312</td><td>0.080</td></tr>
+<tr><td>90%</td><td>960</td><td>0.22</td><td>0.176</td><td>0.998</td><td>0.0289</td><td>0.207</td></tr>
+</tbody></table></div>
+
+<!-- clip -->
+<p class="src"><b>Benign validation loss with and without the per-client z-score clip (source: results/clip/clip_comparison.csv)</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Normalisation</th><th>Round 1</th><th>Round 5</th><th>Round 10</th><th>Round 20</th></tr></thead>
+<tbody>
+<tr><td>clip 10</td><td>0.2047</td><td>0.04336</td><td>0.03999</td><td>0.03369</td></tr>
+<tr><td>no clip</td><td>50.63</td><td>50.15</td><td>50</td><td>49.86</td></tr>
+</tbody></table></div>
+
+<!-- temporal_summary -->
+<p class="src"><b>Per-class time-ordered split vs. connection-grouped split (source: experiments/accuracy/results/full_temporal_bal_s*.json)</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Split</th><th>Accuracy</th><th>Macro F1</th></tr></thead>
+<tbody>
+<tr><td>Time-ordered, seeds 42 / 43 / 44</td><td>0.9942 / 0.9943 / 0.9941</td><td>0.9133 / 0.9122 / 0.9129</td></tr>
+<tr><td>Connection-grouped, seed 42</td><td>0.9972</td><td>0.9828</td></tr>
+</tbody></table></div>
+
+<!-- temporal_classes -->
+<p class="src"><b>Recall per class, time-ordered split (seeds 42 / 43 / 44) vs. grouped split (seed 42)</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Class</th><th>Test rows (time-ordered)</th><th>Time-ordered recall</th><th>Grouped recall</th></tr></thead>
+<tbody>
+<tr><td>Backdoor</td><td>4835</td><td>0.947 / 0.948 / 0.962</td><td>0.989</td></tr>
+<tr><td>DDoS_HTTP</td><td>9954</td><td>0.918 / 0.925 / 0.912</td><td>0.980</td></tr>
+<tr><td>DDoS_ICMP</td><td>13752</td><td>1.000 / 1.000 / 1.000</td><td>1.000</td></tr>
+<tr><td>DDoS_TCP</td><td>10013</td><td>1.000 / 1.000 / 1.000</td><td>1.000</td></tr>
+<tr><td>DDoS_UDP</td><td>24314</td><td>1.000 / 1.000 / 1.000</td><td>1.000</td></tr>
+<tr><td>Fingerprinting</td><td>258</td><td>0.977 / 0.977 / 0.977</td><td>0.937</td></tr>
+<tr><td>MITM</td><td>406</td><td>0.000 / 0.000 / 0.000</td><td>0.000</td></tr>
+<tr><td>Normal</td><td>287325</td><td>0.999 / 0.999 / 0.998</td><td>0.999</td></tr>
+<tr><td>Password</td><td>10007</td><td>0.977 / 0.973 / 0.978</td><td>0.958</td></tr>
+<tr><td>Port_Scanning</td><td>4044</td><td>0.998 / 0.998 / 0.998</td><td>0.999</td></tr>
+<tr><td>Ransomware</td><td>2074</td><td>0.954 / 0.951 / 0.949</td><td>0.950</td></tr>
+<tr><td>SQL_injection</td><td>10203</td><td>1.000 / 1.000 / 1.000</td><td>0.999</td></tr>
+<tr><td>Uploading</td><td>7461</td><td>0.999 / 0.999 / 0.999</td><td>0.999</td></tr>
+<tr><td>Vulnerability_scanner</td><td>10011</td><td>0.998 / 0.998 / 0.998</td><td>0.997</td></tr>
+<tr><td>XSS</td><td>3042</td><td>0.983 / 0.984 / 0.984</td><td>0.986</td></tr>
+</tbody></table></div>
+
+<!-- leak -->
+<p class="src"><b>Single-feature AUROC, attack vs. normal (source: results/leak/single_feature_auroc.json; after: 300,000-row sample)</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Feature</th><th>AUROC</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>mqtt.topic == 0.0</td><td>1.0000</td><td>raw, before the fix</td></tr>
+<tr><td>mqtt.conack.flags == 0.0</td><td>1.0000</td><td>raw, before the fix</td></tr>
+<tr><td>mqtt.protoname == 0.0</td><td>1.0000</td><td>raw, before the fix</td></tr>
+<tr><td>dns.qry.name.len == 0.0</td><td>0.9998</td><td>raw, before the fix</td></tr>
+<tr><td>f_rst</td><td>0.8789</td><td>130-feature matrix, after</td></tr>
+<tr><td>f_npkts</td><td>0.8657</td><td>130-feature matrix, after</td></tr>
+<tr><td>svc_port</td><td>0.8350</td><td>130-feature matrix, after</td></tr>
+<tr><td>f_fin</td><td>0.8039</td><td>130-feature matrix, after</td></tr>
+<tr><td>f_pl_nonzero</td><td>0.7328</td><td>130-feature matrix, after</td></tr>
+<tr><td>f_syn</td><td>0.7108</td><td>130-feature matrix, after</td></tr>
+</tbody></table></div>
+
+<!-- realrun_breakdown -->
+<p class="src"><b>Where the real-run macro-recall comes from (source: results/real_runs/&lt;run&gt;/, made by fl_ids.eval.bundle_report)</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Run</th><th>Macro-recall</th><th>Micro recall</th><th>Fingerprinting test rows, recall</th><th>MITM test rows, recall</th><th>Clients with infinite threshold</th></tr></thead>
+<tbody>
+<tr><td>10 clients, seed 42</td><td>0.999</td><td>0.9992</td><td>3 rows, 1.00</td><td>3 rows, 1.00</td><td>0</td></tr>
+<tr><td>10 clients, seed 43</td><td>0.999</td><td>0.9992</td><td>4 rows, 1.00</td><td>4 rows, 1.00</td><td>1</td></tr>
+<tr><td>10 clients, seed 44</td><td>0.996</td><td>0.9960</td><td>4 rows, 1.00</td><td>5 rows, 1.00</td><td>1</td></tr>
+<tr><td>20 clients, seed 42</td><td>0.978</td><td>0.9964</td><td>4 rows, 0.75</td><td>1 rows, 1.00</td><td>3</td></tr>
+<tr><td>20 clients, seed 43</td><td>0.999</td><td>0.9992</td><td>2 rows, 1.00</td><td>3 rows, 1.00</td><td>2</td></tr>
+<tr><td>20 clients, seed 44</td><td>0.999</td><td>0.9988</td><td>2 rows, 1.00</td><td>3 rows, 1.00</td><td>2</td></tr>
+</tbody></table></div>
+
+<!-- attack_runs -->
+<p class="src"><b>Real multi-process Phase A with sign-flip attackers (10 clients, 20 rounds, seed 42; source: runs/attack_runs/)</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Attackers</th><th>Attacker clients</th><th>Attacker client-rounds excluded</th><th>Honest client-rounds excluded</th><th>Attack macro-recall</th><th>Benign FPR</th></tr></thead>
+<tbody>
+<tr><td>20%</td><td>0,7</td><td>36 of 40</td><td>0 of 160</td><td>0.998</td><td>0.0335</td></tr>
+<tr><td>30%</td><td>0,6,9</td><td>52 of 60</td><td>0 of 140</td><td>0.999</td><td>0.0317</td></tr>
+</tbody></table></div>
+
+<!-- phase_b_seeds -->
+<p class="src"><b>Phase B on the multi-seed bundles, Backdoor_attack.pcap, every run ends with a drop rule read back from the switch (source: logs/multiseed/status_phase_b.log)</b></p>
+<div class="table-wrap"><table class="ptable">
+<thead><tr><th>Bundle</th><th>Class</th><th>Confidence</th><th>Packets flagged</th><th>Phase B time</th></tr></thead>
+<tbody>
+<tr><td>10 clients, seed 43</td><td>Backdoor</td><td>0.997</td><td>24244 / 24914</td><td>10.8 s</td></tr>
+<tr><td>10 clients, seed 44</td><td>Backdoor</td><td>0.998</td><td>24914 / 24914</td><td>8.3 s</td></tr>
+<tr><td>20 clients, seed 43</td><td>Backdoor</td><td>0.997</td><td>24848 / 24914</td><td>11.1 s</td></tr>
+<tr><td>20 clients, seed 44</td><td>Backdoor</td><td>0.997</td><td>24914 / 24914</td><td>9.1 s</td></tr>
+</tbody></table></div>

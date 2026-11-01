@@ -268,10 +268,33 @@ conversations it never saw, without using names, times or the dataset's hidden c
   would help less.</li>
   <li><b>Guard 2 makes a few false alarms on purpose</b> (about 3 in 100 friendly notes). For bullies guard 1 already
   knows, that costs a little; guard 2 earns its place on brand-new bullies.</li>
-  <li>Only one kind of saboteur was tested, and the defence fails at 50% bad sites.</li>
+  <li>Two kinds of saboteur were tested. The second, a clever one that knows how our guard works, <b>slips past it most of the time</b>, and the defence fails at 50% bad sites.</li>
 </ul>
 
-<h2>9. Mini glossary</h2>
+<h2>9. What we did next</h2>
+<div class="box teal"><b class="h">A real 20-school test, and more tries</b>Before, our 20-school test was pretend (everything in one program). Now we ran it
+for real: 20 separate schools plus the principal, on a bigger computer. We also repeated the big tests with three different shuffles of the
+data. Almost everything came out the same each time, but a few numbers wobble (like how many new bullies the second guard catches alone), so we
+give ranges, not one number.
+<p class="eli5">Doing a test three times with different shuffles is like asking three different friends to try your game. If they all
+win about the same, you can trust the game a bit more.</p></div>
+<div class="box coral"><b class="h">One odd score, explained</b>One 20-school run scored a little lower. The reason: of the tiny group of
+&ldquo;Fingerprinting&rdquo; notes it was tested on, there were only 4, and it missed 1. It was not a hidden problem.</div>
+<div class="box navy"><b class="h">A cleverer saboteur</b>The sneaky school that knows exactly how the principal's filter works now gets through
+most of the time (72&ndash;90% of its notes are accepted, against 10&ndash;36% for the simple saboteur). Known bullies are still caught by guard 1,
+so the harm stays small, but with 4 sneaky schools out of 10, guard 2 on its own catches only 50 in 100 new-bully notes instead of 66. We did not test new bullies
+against this sneaky school, so we say so.
+<p class="real">A white-box attacker that keeps cosine similarity 0.1 to the last aggregate update and hides its harm in the orthogonal direction.
+Attacker survival 0.72&ndash;0.90; autoencoder-alone recall 0.499 at 40% attackers.</p></div>
+<div class="box gold"><b class="h">Making the model smaller (pruning)</b>We tried deleting the smallest 70% of the numbers inside guard 2's brain. If we delete them
+<i>while it learns</i>, it adapts and barely gets worse (catches 69 of 100 new-bully notes instead of 74). If we delete them <i>after</i> it has learned,
+it forgets (27 of 100 at half deleted). So &ldquo;prune while training&rdquo; is the way. The schools still send full-size messages, so this makes the
+brain smaller but does not shrink the mail.</div>
+<div class="box grey"><b class="h">A stricter exam: earlier notes teach, later notes test</b>We also trained on the earlier part of each kind of traffic and tested
+on the later part. Overall accuracy stays 99.4%. The score for &ldquo;average over kinds&rdquo; looks lower (0.913) only because MITM is one single conversation,
+so all of it lands in the test and the model never saw any; without that, it is about 0.978. Backdoor and website-flood notes did get a little harder.</div>
+
+<h2>10. Mini glossary</h2>
 <dl>
   <dt>Packet</dt><dd>One small message on a network, like one note.</dd>
   <dt>Flow / connection</dt><dd>All the packets of one conversation between two devices.</dd>

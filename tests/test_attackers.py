@@ -67,3 +67,27 @@ def test_inflated_counts_make_attackers_far_more_damaging_under_fedavg(federatio
 
     honest, inflated = final_loss("honest"), final_loss("max_client")
     assert inflated > 2 * honest, (honest, inflated)
+
+
+def test_stealth_attacker_is_honest_first_then_keeps_a_small_positive_cosine_to_the_last_global_update(federation):
+    from fl_ids.robustness.attackers import StealthAttackerClient
+
+    config, client_data, boosting, class_names = federation
+    data = client_data[0]
+    attacker = StealthAttackerClient(
+        0, data["X"], data["X_raw"], data["X_val_benign"], config, data["X"].shape[1], cosine_target=0.1, norm_multiplier=1.5
+    )
+    fit_config = {"boosting_model_bytes": boosting.to_bytes(), "num_classes": len(class_names), "benign_class": 0}
+    flat = lambda arrays: np.concatenate([np.asarray(a).ravel() for a in arrays]).astype(np.float64)  # noqa: E731
+    autoencoder = Autoencoder(data["X"].shape[1], config.autoencoder.hidden_dims, config.autoencoder.bottleneck_dim)
+    round1 = get_weights(autoencoder)
+    out1, _, _ = attacker.fit(round1, fit_config)  # no consensus estimate yet: an honest update
+    assert np.linalg.norm(flat(out1) - flat(round1)) > 0
+
+    rng = np.random.default_rng(0)
+    round2 = [w + 0.05 * rng.standard_normal(w.shape).astype(w.dtype) for w in round1]
+    out2, _, _ = attacker.fit(round2, fit_config)
+    crafted, consensus = flat(out2) - flat(round2), flat(round2) - flat(round1)
+    cosine = crafted @ consensus / (np.linalg.norm(crafted) * np.linalg.norm(consensus))
+    assert cosine == pytest.approx(0.1, abs=1e-3)
+    assert [w.shape for w in out2] == [w.shape for w in round2]

@@ -39,3 +39,15 @@
 2026-11-01 01:06:24,763 [INFO] fl_ids.orchestration.artifacts: Saved Phase A bundle to saved_models/multiseed/c10_s44 (10 clients)
 2026-11-01 01:06:24,763 [INFO] fl_ids.utils.journey: [phase_a] stage 6/6 done: Save the model bundle in 0.2s
 2026-11-01 01:06:24,763 [INFO] __main__: Phase A done in 261.8s: cascade attack macro-recall 0.996, benign FPR 0.0284 on 10 clients' held-out test slices; bundle at saved_models/multiseed/c10_s44
+2026-11-01 13:26:04,104 [INFO] fl_ids.utils.journey: [phase_b] stage 1/4 started: Load the model bundle (t+0.0s)
+2026-11-01 13:26:04,186 [INFO] fl_ids.utils.journey: [phase_b] stage 1/4 done: Load the model bundle in 0.1s
+2026-11-01 13:26:04,186 [INFO] __main__: Phase A bundle /home/flids/FL-IDS-clean/saved_models/multiseed/c10_s44: 10 clients -> 10 Mininet hosts
+2026-11-01 13:26:04,188 [INFO] fl_ids.utils.journey: [phase_b] stage 2/4 started: Start the SDN bridge and controller (t+0.1s)
+2026-11-01 13:26:06,197 [INFO] __main__: Controller + bridge up at http://127.0.0.1:8080 (OpenFlow port 6653)
+2026-11-01 13:26:06,197 [INFO] fl_ids.utils.journey: [phase_b] stage 2/4 done: Start the SDN bridge and controller in 2.0s
+2026-11-01 13:26:06,198 [INFO] __main__: Running the topology as root: sudo -n /usr/bin/python3 /home/flids/FL-IDS-clean/fl_ids/sdn/topology.py
+2026-11-01 13:26:06,198 [INFO] fl_ids.utils.journey: [phase_b] stage 3/4 started: Network, replay, classify and block (root process) (t+2.1s)
+2026-11-01 13:26:12,413 [INFO] fl_ids.utils.journey: [phase_b] stage 3/4 done: Network, replay, classify and block (root process) in 6.2s
+2026-11-01 13:26:12,430 [INFO] fl_ids.utils.journey: [phase_b] stage 4/4 started: Check the switch's flow table (t+8.3s)
+2026-11-01 13:26:12,430 [INFO] fl_ids.utils.journey: [phase_b] stage 4/4 done: Check the switch's flow table in 0.0s
+2026-11-01 13:26:12,431 [INFO] __main__: Phase B done in 8.3s: h1 (client 0) -> Backdoor (confidence 0.998, boosting stage, 24914/24914 packets non-benign) -> block; flow rule: cookie=0x0, duration=0.004s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 actions=drop

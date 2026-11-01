@@ -1,0 +1,102 @@
+2026-11-01 15:18:00,008 [INFO] fl_ids.data.pipeline: Loaded extended features from cache data/processed/encoded_extended.npz: (1985768, 130)
+2026-11-01 15:18:01,328 [INFO] __main__: Zero-day run: holding out MITM
+2026-11-01 15:18:13,138 [INFO] fl_ids.eval.common: Excluded classes ['MITM'] from training: removed 20 calibration rows, 12 federated-pool rows
+2026-11-01 15:18:13,139 [INFO] fl_ids.models.boosting: Training boosting classifier: 99268 samples, 15 classes, 300 rounds
+2026-11-01 15:18:34,043 [INFO] fl_ids.eval.common: Evaluation setup: 99268 calibration, 59988 federated pool (subsampled), 8994 test rows across 10 clients
+2026-11-01 15:18:48,807 [INFO] fl_ids.eval.simulation: Round 1: mean_val_loss=0.2024, comm_bytes=786720
+2026-11-01 15:19:02,074 [INFO] fl_ids.eval.simulation: Round 2: mean_val_loss=0.0850, comm_bytes=786720
+2026-11-01 15:19:02,466 [INFO] fl_ids.fl.client: Client 0 round 3: 6 of 226 boosting-passed rows flagged; surfacing 6
+2026-11-01 15:19:03,057 [INFO] fl_ids.fl.client: Client 1 round 3: 40 of 1193 boosting-passed rows flagged; surfacing 40
+2026-11-01 15:19:03,854 [INFO] fl_ids.fl.client: Client 2 round 3: 86 of 2219 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:19:04,672 [INFO] fl_ids.fl.client: Client 3 round 3: 0 of 35 boosting-passed rows flagged; surfacing 0
+2026-11-01 15:19:05,096 [INFO] fl_ids.fl.client: Client 4 round 3: 13 of 88 boosting-passed rows flagged; surfacing 13
+2026-11-01 15:19:09,364 [INFO] fl_ids.fl.client: Client 5 round 3: 431 of 14703 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:19:11,667 [INFO] fl_ids.fl.client: Client 6 round 3: 131 of 4370 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:19:12,951 [INFO] fl_ids.fl.client: Client 7 round 3: 92 of 3002 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:19:15,122 [INFO] fl_ids.fl.client: Client 8 round 3: 177 of 4955 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:19:16,060 [INFO] fl_ids.fl.client: Client 9 round 3: 23 of 665 boosting-passed rows flagged; surfacing 23
+2026-11-01 15:19:47,334 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 99581 rows (now 350 trees)
+2026-11-01 15:19:47,334 [INFO] fl_ids.models.boosting_update: Round 3: boosting v2 (continue) from 313 alerts ({'DDoS_HTTP': 6, 'Normal': 295, 'Password': 8, 'Port_Scanning': 2, 'Ransomware': 1, 'Vulnerability_scanner': 1}); 19 from excluded clients ignored
+2026-11-01 15:19:47,462 [INFO] fl_ids.eval.simulation: Round 3: mean_val_loss=0.0408, comm_bytes=786720
+2026-11-01 15:20:03,845 [INFO] fl_ids.eval.simulation: Round 4: mean_val_loss=0.0314, comm_bytes=786720
+2026-11-01 15:20:19,726 [INFO] fl_ids.eval.simulation: Round 5: mean_val_loss=0.0261, comm_bytes=786720
+2026-11-01 15:20:20,173 [INFO] fl_ids.fl.client: Client 0 round 6: 15 of 227 boosting-passed rows flagged; surfacing 15
+2026-11-01 15:20:20,765 [INFO] fl_ids.fl.client: Client 1 round 6: 38 of 1192 boosting-passed rows flagged; surfacing 38
+2026-11-01 15:20:21,736 [INFO] fl_ids.fl.client: Client 2 round 6: 97 of 2215 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:20:22,679 [INFO] fl_ids.fl.client: Client 3 round 6: 0 of 36 boosting-passed rows flagged; surfacing 0
+2026-11-01 15:20:23,248 [INFO] fl_ids.fl.client: Client 4 round 6: 15 of 88 boosting-passed rows flagged; surfacing 15
+2026-11-01 15:20:28,075 [INFO] fl_ids.fl.client: Client 5 round 6: 455 of 14703 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:20:30,588 [INFO] fl_ids.fl.client: Client 6 round 6: 132 of 4370 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:20:32,209 [INFO] fl_ids.fl.client: Client 7 round 6: 101 of 3000 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:20:35,323 [INFO] fl_ids.fl.client: Client 8 round 6: 138 of 4954 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:20:36,172 [INFO] fl_ids.fl.client: Client 9 round 6: 16 of 663 boosting-passed rows flagged; surfacing 16
+2026-11-01 15:21:12,234 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 99885 rows (now 400 trees)
+2026-11-01 15:21:12,234 [INFO] fl_ids.models.boosting_update: Round 6: boosting v3 (continue) from 304 alerts ({'Backdoor': 1, 'DDoS_HTTP': 3, 'Normal': 293, 'Password': 4, 'Ransomware': 1, 'SQL_injection': 1, 'XSS': 1}); 30 from excluded clients ignored
+2026-11-01 15:21:12,440 [INFO] fl_ids.eval.simulation: Round 6: mean_val_loss=0.0226, comm_bytes=786720
+2026-11-01 15:21:31,114 [INFO] fl_ids.eval.simulation: Round 7: mean_val_loss=0.0257, comm_bytes=786720
+2026-11-01 15:21:51,096 [INFO] fl_ids.eval.simulation: Round 8: mean_val_loss=0.0242, comm_bytes=786720
+2026-11-01 15:21:51,671 [INFO] fl_ids.fl.client: Client 0 round 9: 15 of 226 boosting-passed rows flagged; surfacing 15
+2026-11-01 15:21:52,451 [INFO] fl_ids.fl.client: Client 1 round 9: 38 of 1191 boosting-passed rows flagged; surfacing 38
+2026-11-01 15:21:53,458 [INFO] fl_ids.fl.client: Client 2 round 9: 78 of 2213 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:21:54,426 [INFO] fl_ids.fl.client: Client 3 round 9: 0 of 33 boosting-passed rows flagged; surfacing 0
+2026-11-01 15:21:55,089 [INFO] fl_ids.fl.client: Client 4 round 9: 15 of 89 boosting-passed rows flagged; surfacing 15
+2026-11-01 15:22:00,124 [INFO] fl_ids.fl.client: Client 5 round 9: 429 of 14703 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:22:02,849 [INFO] fl_ids.fl.client: Client 6 round 9: 126 of 4370 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:22:04,333 [INFO] fl_ids.fl.client: Client 7 round 9: 103 of 3000 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:22:07,586 [INFO] fl_ids.fl.client: Client 8 round 9: 141 of 4955 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:22:09,241 [INFO] fl_ids.fl.client: Client 9 round 9: 13 of 662 boosting-passed rows flagged; surfacing 13
+2026-11-01 15:22:50,335 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 100216 rows (now 450 trees)
+2026-11-01 15:22:50,336 [INFO] fl_ids.models.boosting_update: Round 9: boosting v4 (continue) from 331 alerts ({'DDoS_HTTP': 4, 'Normal': 319, 'Password': 4, 'Port_Scanning': 1, 'Ransomware': 1, 'SQL_injection': 1, 'Uploading': 1}); 0 from excluded clients ignored
+2026-11-01 15:22:50,495 [INFO] fl_ids.eval.simulation: Round 9: mean_val_loss=0.0256, comm_bytes=786720
+2026-11-01 15:23:10,370 [INFO] fl_ids.eval.simulation: Round 10: mean_val_loss=0.0255, comm_bytes=786720
+2026-11-01 15:23:32,097 [INFO] fl_ids.eval.simulation: Round 11: mean_val_loss=0.0253, comm_bytes=786720
+2026-11-01 15:23:32,996 [INFO] fl_ids.fl.client: Client 0 round 12: 10 of 224 boosting-passed rows flagged; surfacing 10
+2026-11-01 15:23:34,041 [INFO] fl_ids.fl.client: Client 1 round 12: 39 of 1192 boosting-passed rows flagged; surfacing 39
+2026-11-01 15:23:35,097 [INFO] fl_ids.fl.client: Client 2 round 12: 72 of 2212 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:23:36,285 [INFO] fl_ids.fl.client: Client 3 round 12: 0 of 33 boosting-passed rows flagged; surfacing 0
+2026-11-01 15:23:37,266 [INFO] fl_ids.fl.client: Client 4 round 12: 15 of 88 boosting-passed rows flagged; surfacing 15
+2026-11-01 15:23:45,583 [INFO] fl_ids.fl.client: Client 5 round 12: 414 of 14702 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:23:49,034 [INFO] fl_ids.fl.client: Client 6 round 12: 127 of 4370 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:23:50,993 [INFO] fl_ids.fl.client: Client 7 round 12: 105 of 3001 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:23:54,136 [INFO] fl_ids.fl.client: Client 8 round 12: 144 of 4952 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:23:55,407 [INFO] fl_ids.fl.client: Client 9 round 12: 17 of 662 boosting-passed rows flagged; surfacing 17
+2026-11-01 15:24:43,565 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 100547 rows (now 500 trees)
+2026-11-01 15:24:43,565 [INFO] fl_ids.models.boosting_update: Round 12: boosting v5 (continue) from 331 alerts ({'DDoS_HTTP': 3, 'Normal': 318, 'Password': 4, 'Port_Scanning': 1, 'Ransomware': 2, 'SQL_injection': 1, 'Vulnerability_scanner': 2}); 0 from excluded clients ignored
+2026-11-01 15:24:43,749 [INFO] fl_ids.eval.simulation: Round 12: mean_val_loss=0.0252, comm_bytes=786720
+2026-11-01 15:25:09,378 [INFO] fl_ids.eval.simulation: Round 13: mean_val_loss=0.0253, comm_bytes=786720
+2026-11-01 15:25:36,419 [INFO] fl_ids.eval.simulation: Round 14: mean_val_loss=0.0252, comm_bytes=786720
+2026-11-01 15:25:37,045 [INFO] fl_ids.fl.client: Client 0 round 15: 9 of 222 boosting-passed rows flagged; surfacing 9
+2026-11-01 15:25:38,261 [INFO] fl_ids.fl.client: Client 1 round 15: 44 of 1190 boosting-passed rows flagged; surfacing 44
+2026-11-01 15:25:39,711 [INFO] fl_ids.fl.client: Client 2 round 15: 72 of 2211 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:25:41,420 [INFO] fl_ids.fl.client: Client 3 round 15: 0 of 32 boosting-passed rows flagged; surfacing 0
+2026-11-01 15:25:42,372 [INFO] fl_ids.fl.client: Client 4 round 15: 15 of 87 boosting-passed rows flagged; surfacing 15
+2026-11-01 15:25:50,141 [INFO] fl_ids.fl.client: Client 5 round 15: 412 of 14702 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:25:55,104 [INFO] fl_ids.fl.client: Client 6 round 15: 123 of 4368 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:25:57,505 [INFO] fl_ids.fl.client: Client 7 round 15: 111 of 2999 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:26:02,085 [INFO] fl_ids.fl.client: Client 8 round 15: 133 of 4951 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:26:04,166 [INFO] fl_ids.fl.client: Client 9 round 15: 21 of 662 boosting-passed rows flagged; surfacing 21
+2026-11-01 15:26:54,791 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 100886 rows (now 550 trees)
+2026-11-01 15:26:54,792 [INFO] fl_ids.models.boosting_update: Round 15: boosting v6 (continue) from 339 alerts ({'DDoS_HTTP': 2, 'Normal': 335, 'Password': 2}); 0 from excluded clients ignored
+2026-11-01 15:26:55,019 [INFO] fl_ids.eval.simulation: Round 15: mean_val_loss=0.0250, comm_bytes=786720
+2026-11-01 15:27:23,887 [INFO] fl_ids.eval.simulation: Round 16: mean_val_loss=0.0248, comm_bytes=786720
+2026-11-01 15:27:52,018 [INFO] fl_ids.eval.simulation: Round 17: mean_val_loss=0.0246, comm_bytes=786720
+2026-11-01 15:27:52,751 [INFO] fl_ids.fl.client: Client 0 round 18: 10 of 223 boosting-passed rows flagged; surfacing 10
+2026-11-01 15:27:54,022 [INFO] fl_ids.fl.client: Client 1 round 18: 49 of 1190 boosting-passed rows flagged; surfacing 49
+2026-11-01 15:27:55,894 [INFO] fl_ids.fl.client: Client 2 round 18: 72 of 2211 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:27:57,684 [INFO] fl_ids.fl.client: Client 3 round 18: 0 of 31 boosting-passed rows flagged; surfacing 0
+2026-11-01 15:27:58,865 [INFO] fl_ids.fl.client: Client 4 round 18: 15 of 87 boosting-passed rows flagged; surfacing 15
+2026-11-01 15:28:08,208 [INFO] fl_ids.fl.client: Client 5 round 18: 419 of 14703 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:28:12,392 [INFO] fl_ids.fl.client: Client 6 round 18: 117 of 4368 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:28:14,556 [INFO] fl_ids.fl.client: Client 7 round 18: 113 of 2999 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:28:18,040 [INFO] fl_ids.fl.client: Client 8 round 18: 147 of 4950 boosting-passed rows flagged; surfacing 50
+2026-11-01 15:28:19,567 [INFO] fl_ids.fl.client: Client 9 round 18: 16 of 662 boosting-passed rows flagged; surfacing 16
+2026-11-01 15:29:14,258 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 101226 rows (now 600 trees)
+2026-11-01 15:29:14,259 [INFO] fl_ids.models.boosting_update: Round 18: boosting v7 (continue) from 340 alerts ({'Backdoor': 1, 'DDoS_HTTP': 1, 'Normal': 337, 'Password': 1}); 0 from excluded clients ignored
+2026-11-01 15:29:14,523 [INFO] fl_ids.eval.simulation: Round 18: mean_val_loss=0.0244, comm_bytes=786720
+2026-11-01 15:29:46,819 [INFO] fl_ids.eval.simulation: Round 19: mean_val_loss=0.0244, comm_bytes=786720
+2026-11-01 15:30:16,776 [INFO] fl_ids.eval.simulation: Round 20: mean_val_loss=0.0245, comm_bytes=786720
+2026-11-01 15:30:25,239 [INFO] __main__: holdout=MITM: boosting_only=0.057 autoencoder_alone=0.948 cascade=0.963 (benign FPR 0.0002 -> 0.0275)
+2026-11-01 15:30:25,261 [INFO] __main__: Saved /home/flids/FL-IDS-clean/results/seeds/s43/shards/zeroday_s43_MITM/zero_day_holdout.csv
+2026-11-01 15:30:25,642 [INFO] __main__: Saved /home/flids/FL-IDS-clean/results/seeds/s43/shards/zeroday_s43_MITM/zero_day_holdout.png
+holdout_class  holdout_rows  boosting_only_detection_rate  autoencoder_alone_detection_rate  cascade_detection_rate  autoencoder_added_detection_rate boosting_top_misattributed_label  boosting_top_misattributed_share  autoencoder_auroc_vs_benign  boosting_only_benign_fpr  cascade_benign_fpr  boosting_only_known_attack_macro_recall  cascade_known_attack_macro_recall  final_val_loss
+         MITM           406                       0.05665                          0.948276                0.963054                          0.906404                         DDoS_UDP                           0.05665                     0.999962                  0.000154            0.027486                                 0.995503                           0.998488        0.024503

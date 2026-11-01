@@ -1,0 +1,197 @@
+*** Configuring hosts
+2026-11-01 13:26:06,636 [INFO] mininet: *** Configuring hosts
+
+h1 2026-11-01 13:26:06,636 [INFO] mininet: h1 
+h2 2026-11-01 13:26:06,648 [INFO] mininet: h2 
+h3 2026-11-01 13:26:06,657 [INFO] mininet: h3 
+h4 2026-11-01 13:26:06,666 [INFO] mininet: h4 
+h5 2026-11-01 13:26:06,675 [INFO] mininet: h5 
+h6 2026-11-01 13:26:06,684 [INFO] mininet: h6 
+h7 2026-11-01 13:26:06,693 [INFO] mininet: h7 
+h8 2026-11-01 13:26:06,702 [INFO] mininet: h8 
+h9 2026-11-01 13:26:06,710 [INFO] mininet: h9 
+h10 2026-11-01 13:26:06,720 [INFO] mininet: h10 
+
+2026-11-01 13:26:06,729 [INFO] mininet: 
+
+*** Starting controller
+2026-11-01 13:26:06,729 [INFO] mininet: *** Starting controller
+
+c0 2026-11-01 13:26:06,729 [INFO] mininet: c0 
+
+2026-11-01 13:26:06,729 [INFO] mininet: 
+
+*** Starting 1 switches
+2026-11-01 13:26:06,729 [INFO] mininet: *** Starting 1 switches
+
+s1 2026-11-01 13:26:06,729 [INFO] mininet: s1 
+...2026-11-01 13:26:06,746 [INFO] mininet: ...
+
+2026-11-01 13:26:06,750 [INFO] mininet: 
+
+=== LIVE DEMO RESULT ===
+{
+  "pcap": "/home/flids/FL-IDS-clean/data/raw/pcaps/Backdoor_attack.pcap",
+  "artifact_dir": "/home/flids/FL-IDS-clean/saved_models/multiseed/c10_s44",
+  "device_ip": "10.0.0.1",
+  "classification": {
+    "device_id": "h1",
+    "classification": "Backdoor",
+    "confidence": 0.9976602615543747,
+    "stage": "boosting",
+    "client_id": 0,
+    "num_packets": 24914,
+    "num_non_benign": 24914
+  },
+  "mitigation": {
+    "action": "block",
+    "applied": true,
+    "classification": "Backdoor",
+    "confidence": 0.9976602615543747,
+    "device_id": "h1",
+    "ip_address": "10.0.0.1",
+    "stage": "boosting",
+    "timestamp": 1793519771.6181982
+  },
+  "switch_packets_before": 24,
+  "switch_packets_after": 11815,
+  "flow_table": " cookie=0x0, duration=0.004s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 actions=drop\r\n cookie=0x0, duration=4.874s, table=0, n_packets=24107, n_bytes=6103392, priority=0 actions=NORMAL\r\n",
+  "journey": {
+    "name": "live_demo",
+    "started_at": "2026-11-01T07:56:06.248536+00:00",
+    "elapsed_s": 5.381,
+    "planned_stages": [
+      "Start the Mininet network",
+      "Load the model bundle",
+      "Register hosts with the bridge",
+      "Replay the capture through the switch",
+      "Extract features with tshark",
+      "Classify with the cascade",
+      "Send the verdict, install the drop rule",
+      "Read back the switch's flow table"
+    ],
+    "current_stage": null,
+    "stages": [
+      {
+        "index": 1,
+        "label": "Start the Mininet network",
+        "start_s": 0.0,
+        "end_s": 0.502,
+        "duration_s": 0.502,
+        "status": "done",
+        "detail": null
+      },
+      {
+        "index": 2,
+        "label": "Load the model bundle",
+        "start_s": 1.826,
+        "end_s": 1.873,
+        "duration_s": 0.047,
+        "status": "done",
+        "detail": null
+      },
+      {
+        "index": 3,
+        "label": "Register hosts with the bridge",
+        "start_s": 1.873,
+        "end_s": 1.887,
+        "duration_s": 0.014,
+        "status": "done",
+        "detail": null
+      },
+      {
+        "index": 4,
+        "label": "Replay the capture through the switch",
+        "start_s": 1.887,
+        "end_s": 2.128,
+        "duration_s": 0.241,
+        "status": "done",
+        "detail": null
+      },
+      {
+        "index": 5,
+        "label": "Extract features with tshark",
+        "start_s": 2.128,
+        "end_s": 4.272,
+        "duration_s": 2.144,
+        "status": "done",
+        "detail": null
+      },
+      {
+        "index": 6,
+        "label": "Classify with the cascade",
+        "start_s": 4.272,
+        "end_s": 5.367,
+        "duration_s": 1.095,
+        "status": "done",
+        "detail": null
+      },
+      {
+        "index": 7,
+        "label": "Send the verdict, install the drop rule",
+        "start_s": 5.367,
+        "end_s": 5.37,
+        "duration_s": 0.003,
+        "status": "done",
+        "detail": null
+      },
+      {
+        "index": 8,
+        "label": "Read back the switch's flow table",
+        "start_s": 5.37,
+        "end_s": 5.381,
+        "duration_s": 0.011,
+        "status": "done",
+        "detail": null
+      }
+    ]
+  }
+}
+*** Stopping 1 controllers
+2026-11-01 13:26:11,635 [INFO] mininet: *** Stopping 1 controllers
+
+c0 2026-11-01 13:26:11,635 [INFO] mininet: c0 
+
+2026-11-01 13:26:11,635 [INFO] mininet: 
+
+*** Stopping 10 links
+2026-11-01 13:26:11,635 [INFO] mininet: *** Stopping 10 links
+
+.2026-11-01 13:26:11,635 [INFO] mininet: .
+.2026-11-01 13:26:11,653 [INFO] mininet: .
+.2026-11-01 13:26:11,671 [INFO] mininet: .
+.2026-11-01 13:26:11,691 [INFO] mininet: .
+.2026-11-01 13:26:11,712 [INFO] mininet: .
+.2026-11-01 13:26:11,732 [INFO] mininet: .
+.2026-11-01 13:26:11,753 [INFO] mininet: .
+.2026-11-01 13:26:11,772 [INFO] mininet: .
+.2026-11-01 13:26:11,788 [INFO] mininet: .
+.2026-11-01 13:26:11,805 [INFO] mininet: .
+
+2026-11-01 13:26:11,824 [INFO] mininet: 
+
+*** Stopping 1 switches
+2026-11-01 13:26:11,824 [INFO] mininet: *** Stopping 1 switches
+
+s1 2026-11-01 13:26:11,887 [INFO] mininet: s1 
+
+2026-11-01 13:26:11,887 [INFO] mininet: 
+
+*** Stopping 10 hosts
+2026-11-01 13:26:11,887 [INFO] mininet: *** Stopping 10 hosts
+
+h1 2026-11-01 13:26:11,887 [INFO] mininet: h1 
+h2 2026-11-01 13:26:11,887 [INFO] mininet: h2 
+h3 2026-11-01 13:26:11,888 [INFO] mininet: h3 
+h4 2026-11-01 13:26:11,889 [INFO] mininet: h4 
+h5 2026-11-01 13:26:11,889 [INFO] mininet: h5 
+h6 2026-11-01 13:26:11,889 [INFO] mininet: h6 
+h7 2026-11-01 13:26:11,890 [INFO] mininet: h7 
+h8 2026-11-01 13:26:11,890 [INFO] mininet: h8 
+h9 2026-11-01 13:26:11,891 [INFO] mininet: h9 
+h10 2026-11-01 13:26:11,891 [INFO] mininet: h10 
+
+*** Done
+2026-11-01 13:26:11,892 [INFO] mininet: 
+*** Done
+
