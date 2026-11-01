@@ -34,6 +34,7 @@
     <a href="#r-multiseed">5 &middot; Multi-seed check</a>
     <a href="#r-zeroday">6 &middot; Zero-day</a>
     <a href="#r-live">7 &middot; Real Phase A / B</a>
+    <a href="#r-realruns">7b &middot; Real runs, seeds</a>
     <a href="#r-accuracy">8 &middot; Classifier accuracy (final)</a>
     <a href="#r-base">9 &middot; Original 91-feature federated results</a>
     <a href="#r-index">Index &amp; scope</a>
@@ -46,9 +47,9 @@
     <tr><td>Dataset</td><td style="white-space:normal">Edge-IIoTset <code>DNN-EdgeIIoT-dataset.csv</code>: 2,219,201 rows (2,219,216 after the MITM repair) &rarr; 1,909,719 after cleaning and MITM repair, 91 features, 15 classes (1,909,671 rows in the boosting-vs-DL comparison, which skipped the MITM repair)</td></tr>
     <tr><td>Feature set</td><td style="white-space:normal">Sections 2&ndash;7 use the current pipeline: 130 features (<code>data.extended_features</code>), 1,985,768 rows, LightGBM with square-root class weights, results in <code>results/extended/</code>. Section 9 keeps the same experiments with the original 91 features (<code>results/</code>) for comparison. Section 1 (boosting vs. DL) used the 91 features.</td></tr>
     <tr><td>Classifier-accuracy runs</td><td style="white-space:normal">Section 8 only: 130 features (91 original + service port + 18 content + 20 flow), 2,219,216 rows &rarr; 1,985,768 after de-duplication on that feature set; all rows, natural class distribution, 80/20 random and flow-grouped splits</td></tr>
-    <tr><td>Seed</td><td style="white-space:normal">42 for everything, except the multi-seed check (43, 44)</td></tr>
+    <tr><td>Seed</td><td style="white-space:normal">42 for everything, except the multi-seed check (43, 44) and the real-run repeats in section 7b (42, 43, 44)</td></tr>
     <tr><td>Federation</td><td style="white-space:normal">10 clients, Dirichlet &alpha; = 0.3, 20 rounds, 60,000-row federated pool, 5% server calibration set. Rows trained on: server bootstrap 79,430; client autoencoders 45,474 in total (736&ndash;11,549 per client). The section 8 classifier: 1,429,825 train, 397,073 test</td></tr>
-    <tr><td>Hardware</td><td style="white-space:normal">MacBook Pro (M5, 16 GB) running an Ubuntu 26.04 aarch64 VM under UTM: 4 vCPUs, 7.2 GB RAM (12 GB for the real Phase A run), CPU only</td></tr>
+    <tr><td>Hardware</td><td style="white-space:normal">MacBook Pro (M5, 16 GB) running an Ubuntu 26.04 aarch64 VM under UTM: 4 vCPUs, 7.2 GB RAM (12 GB for the real Phase A run), CPU only. Sections 7 (20-client row) and 7b: Ubuntu 26.04 x86-64 VM under VMware Workstation on a Windows host, 12 vCPUs, 24 GB RAM, CPU only</td></tr>
     <tr><td>Software</td><td style="white-space:normal">Python 3.14.4, LightGBM 4.7.0, PyTorch 2.14.0 (CPU), Flower 1.38.0, scikit-learn 1.9.1; 233 tests pass, 2 skip</td></tr>
   </tbody></table></div>
 </section>
@@ -103,10 +104,28 @@
     <tbody>
       <tr><td>Real Phase A (1 Flower server + 10 client processes, 20 rounds)</td><td style="white-space:normal">Attack macro-recall <b>0.999</b> [0.889], benign FPR <b>0.035</b> [0.035]; bootstrap boosting accuracy 0.997 [0.963]; about 4 min [5 min 15 s]</td><td style="white-space:normal">130 features; seed 42; [brackets] = the original 91-feature run</td></tr>
       <tr><td>Phase B: Backdoor_attack.pcap through Mininet/OpenFlow</td><td style="white-space:normal">Classified <b>Backdoor</b>, confidence 0.997, boosting stage; <code>priority=100,ip,nw_src=10.0.0.1 actions=drop</code> verified in <code>ovs-ofctl dump-flows</code></td><td style="white-space:normal">One capture; 24,914 packets, 24,669 non-benign [23,895]; live features match the capture's training rows exactly for 99.8% of packets; capture-level (not streaming) mitigation: 23,161 packets passed before the rule applied</td></tr>
-      <tr><td>Dashboard (training view) during a real run</td><td style="white-space:normal">Round 20, 10/10 clients surviving, boosting model v7, all per-client panels populated</td><td style="white-space:normal">Observed during the 91-feature run; Live Simulation (Phase B) tab not separately observed live</td></tr>
+      <tr><td>Real Phase A with 20 client processes (1 server + 20, 20 rounds, seed 42), VMware VM, 24 GB RAM</td><td style="white-space:normal">Attack macro-recall <b>0.978</b>, benign FPR <b>0.0362</b>; Phase A 247 s. Phase B on its bundle: Backdoor, confidence 0.997, 24,466 of 24,914 packets non-benign, drop rule read back from the switch</td><td style="white-space:normal">130 features; seed 42; the 7.4 GB UTM VM could not run this (see the repeat-seed table below)</td></tr>
+      <tr><td>Dashboard (training view) during a real run</td><td style="white-space:normal">Round 20, 10/10 clients surviving, boosting model v7, all per-client panels populated</td><td style="white-space:normal">Observed during the 91-feature run. The Live Simulation (Phase B) tab was rendered headlessly against the real bridge on 2026-11-01 (all tables populated, no errors); not watched in a browser</td></tr>
       <tr><td>Test suite</td><td style="white-space:normal">233 passed, 2 skipped (7 min 32 s) [224 passed]</td><td style="white-space:normal">The 2 skips need raw pcap fixtures not downloaded</td></tr>
     </tbody>
   </table></div>
+</section>
+
+<section id="r-realruns">
+  <h2>7b &middot; Real runs repeated over seeds (10 and 20 client processes)</h2>
+  <p>Phase A only, 20 rounds, no attackers. Source: <code>results/real_runs/summary.md</code>, built by <code>tools/summarize_real_runs.py</code> from each run's own logs and records. Recall and false-alarm rate come from the &ldquo;Phase A done&rdquo; log line.</p>
+  <div class="table-wrap"><table class="ptable">
+    <thead><tr><th>Run</th><th>Phase A, s</th><th>Attack macro-recall</th><th>Benign FPR</th><th>Bootstrap classifier accuracy</th><th>Client-rounds excluded by the trust filter</th></tr></thead>
+    <tbody>
+      <tr><td>10 clients, seed 42 (VM re-check)</td><td>341</td><td>0.999</td><td>3.40%</td><td>0.9969</td><td>15</td></tr>
+      <tr><td>10 clients, seed 43</td><td>276</td><td>0.999</td><td>3.11%</td><td>0.9976</td><td>2</td></tr>
+      <tr><td>10 clients, seed 44</td><td>262</td><td>0.996</td><td>2.84%</td><td>0.9968</td><td>6</td></tr>
+      <tr><td>20 clients, seed 42</td><td>247</td><td>0.978</td><td>3.62%</td><td>0.9969</td><td>38</td></tr>
+      <tr><td>20 clients, seed 43</td><td>238</td><td>0.999</td><td>2.84%</td><td>0.9976</td><td>42</td></tr>
+      <tr><td>20 clients, seed 44</td><td>242</td><td>0.999</td><td>3.96%</td><td>0.9968</td><td>27</td></tr>
+    </tbody>
+  </table></div>
+  <p>Three seeds, so no confidence intervals. With no attackers the filter still excludes honest, unusual clients (non-IID data), more often at 20 clients. The seed-42 20-client dip (0.978) was not analysed per class.</p>
 </section>
 
 <section id="r-accuracy">

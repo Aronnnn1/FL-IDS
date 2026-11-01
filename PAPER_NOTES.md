@@ -61,9 +61,10 @@ standard launch prefix for any future real multi-process run.
 | 7 SDN | `5cbb35c`; re-run this session (2026-09-27) | **done with a real Phase A bundle** (§8.7) -- corrected the pre-fix demo's misclassification |
 | 8 Dashboard | `0fa7c81`; app tests `f48f5fe`; bug found+fixed this session | **done, now actually verified live** (Training view watched in a real browser during a real Phase A run this session -- round 20, 10/10 clients surviving, boosting model v7, all per-client panels populated with real data) |
 | 11 Orchestration | `0a0726f`; real run this session (2026-09-27) | **real-data Phase A completed end-to-end for the first time** (§8.1a) |
-| 9 End-to-end run | 2026-09-27; repeated with 130 features 2026-10-16 (`a06711e`) | **done**: Phase A -> Phase B back-to-back with the real bundle, no manual patching between them (§8.1a, §8.7, §8.11). The dashboard's Training view was watched live during a real run (§8.8); its Live Simulation view was not separately watched live |
+| 9 End-to-end run | 2026-09-27; repeated with 130 features 2026-10-16 (`a06711e`) | **done**: Phase A -> Phase B back-to-back with the real bundle, no manual patching between them (§8.1a, §8.7, §8.11). The dashboard's Training view was watched live during a real run (§8.8); its Live Simulation view was not watched in a browser; on 2026-11-01 it was rendered headlessly (Streamlit AppTest) against the real bridge while Phase B held, and showed the live classification, the drop rule and the port table with no errors (`logs/audit/live_view_check.log`, §12.2) |
 | 10 Polish | README `2dcad51`, `4e19944`; full pytest 233 passed, 2 skipped (2026-10-16, 7 min 32 s) | **done** |
 | 12 Accuracy + integration | `11c1cfa` (classifier, §8.10), `a06711e` (federated + Phase B, §8.11), `4e19944` (site/notes) | **done**: 99.7% / 0.983 on held-out connections; all federated experiments re-run |
+| 13 VMware re-host + real 20 clients | `e5453c7` (2026-11-01) | **done**: VM built by script, `pytest` 233 passed / 2 skipped there, real 1+20 process Phase A and Phase B, seeds 42-44 at 10 and 20 clients (§8.13) |
 
 ---
 
@@ -1407,14 +1408,14 @@ bar; the test now uses the production (extended) feature set.
 
 ## 11. Figures and tables to generate
 
-- [ ] Poisoning-resistance curve: x = malicious fraction; y = AE-alone
+- [x] (`deliverables/report/figures/poisoning_sweep.png`) Poisoning-resistance curve: x = malicious fraction; y = AE-alone
       macro-recall, zero-day macro-recall, attack macro-recall; second
       panel: malicious-client survival. (The harness writes
       `poisoning_resistance_sweep.png`; check its style.)
-- [ ] Ablation table (§8.2 plus the CSV's zero-day, F1, convergence and
+- [x] (`ablation.png`) Ablation table (§8.2 plus the CSV's zero-day, F1, convergence and
       bytes columns).
 - [ ] Per-attack-type recall heatmap: variant × class (§8.2 table).
-- [ ] Zero-day per-class bar chart: boosting-only vs AE-alone vs
+- [x] (`zero_day.png`, `zero_day_compare.png`) Zero-day per-class bar chart: boosting-only vs AE-alone vs
       cascade, 14 held-out classes (`zero_day_holdout.png` exists as a
       harness output; check it).
 - [ ] Trust-score trajectories per client over rounds, honest vs
@@ -1430,7 +1431,7 @@ bar; the test now uses the production (extended) feature set.
 - [ ] Data-quality figure: single-feature AUROC before/after the
       placeholder fix (§5.3.1).
 - [ ] Per-client × per-class partition heatmap (seed 42, α = 0.3).
-- [ ] Architecture diagram: two phases, cascade, filter, SDN.
+- [x] (`high_level_design.png`, `methodology_flowchart.png`) Architecture diagram: two phases, cascade, filter, SDN.
 - [ ] Phase B timeline: replay start → classification → flow rule
       (latency, once measured).
 
@@ -1452,6 +1453,22 @@ bar; the test now uses the production (extended) feature set.
 - ~~Commit this session's work to git~~ -- **done**; everything through
   2026-10-16 is committed and pushed (`4e19944`). Historical note: as of the 2026-09-27 update nothing from
   2026-09-25 through 2026-09-27 is committed yet.
+
+### 12.2 Gap audit against CLAUDE.md and this file (2026-11-01)
+Checked: CLAUDE.md "What done looks like", §0 status, §10 limitations, §11 figures, §12 pending.
+- **Closed and evidenced.** (1) Phase 6 numbers exist (§8.2, §8.3, §8.5). (2) Phase 9 end-to-end run happened and is logged: `scripts/reruns/run_journey.sh` /
+  `logs/journey/` (10 clients) and `scripts/reruns/run_clients20_real.sh` / `logs/clients20_real/` (20 clients); dashboard Training view watched live in a browser (§8.8).
+  (3) Phase 10: `pytest` re-run after the 2026-11-01 changes, 233 passed, 2 skipped, 610.8 s (`logs/audit/pytest.log`). (4) Real 20-client run and repeat seeds (§8.13).
+  (5) The cumulative results page (`docs/results.html`) now has the real runs (7, 7b) and the VMware host.
+- **Live Simulation dashboard view.** Checked on 2026-11-01 with Phase B holding (`--hold-seconds 75`) and `tools/live_view_check.py` (Streamlit AppTest, auto-refresh off):
+  bridge status ok, 1 switch, 1 classification, 1 device under mitigation, five tables populated, no errors (`logs/audit/live_view_check.log`).
+  This is a headless render of the real bridge's responses, not a person watching it in a browser.
+- **Still open (honest list).** (a) Full multi-seed repeats of the ablation, poisoning sweep and zero-day experiments (only Phase A is repeated, §8.13); (b) the 20-client run
+  has no per-class breakdown, so the seed-42 dip (0.978) is unexplained; (c) adaptive attackers (§10.5) and splits by capture file or time period are untested;
+  (d) no streaming/inline mitigation (§10.16); (e) §11 figures not yet generated: trust-score trajectories, similarity-per-round, reconstruction-error distributions,
+  clipped vs unclipped validation loss, single-feature AUROC before/after, partition heatmap, Phase B timeline; (f) the explainer PDFs were not regenerated after 2026-10-30;
+  (g) weight pruning (Objective 3) is not implemented; (h) the team's guide checklist was never received (handover note, open item 7).
+- **Not part of CLAUDE.md but noted.** The multi-seed Phase A runs have no Phase B step; only the seed-42 20-client bundle was replayed.
 
 ### 12.1 [RESOLVED] Historical diagnosis: real multi-process Phase A OOM on the old VM (2026-09-25)
 Kept in full below for the record -- this is real kernel-level diagnostic
