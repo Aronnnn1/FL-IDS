@@ -354,7 +354,7 @@ The colours on the diagram say which kind of job each box is.</div>
 <tr><th>Box</th><th>Says</th><th>Like you're five</th></tr>
 <tr><td>1 Raw dataset</td><td>2,219,216 rows &times; 63 columns, 15 classes</td><td>The big pile: 2.2 million notes, 63 facts about each, 15 kinds (normal + 14 bully types).</td></tr>
 <tr><td>2 Clean &amp; encode</td><td>drop 16 columns, fix label-leak placeholder, dedupe, repair MITM, one-hot; +39 port/content/flow features &rarr; 1,985,768 &times; 130</td><td>Fix the hidden cheat sheet (&ldquo;0&rdquo; vs &ldquo;0.0&rdquo;), fix the broken MITM rows, add the 39 new clues (which door, what's inside the letter, the whole conversation; name tags and times are used only to group notes into conversations, then thrown away), remove exact copies, and turn words into numbers (&ldquo;one-hot&rdquo;: a yes/no column per word). Result: 2.0 million notes &times; 130 number clues.</td></tr>
-<tr><td>3 Split</td><td>Server calibration set 5% (stratified, labelled); pool subsampled to 60,000</td><td>The principal keeps 5% of the notes, with answers, to teach guard 1. From the rest, 60,000 are given out to classrooms (a smaller set so the 150 test runs finish in time).</td></tr>
+<tr><td>3 Split</td><td>Server calibration set 5% (labelled); the rest, or in the first runs a 60,000 sample, goes to the classrooms</td><td>The principal keeps 5% of the notes, with answers, to teach guard 1. From the rest, 60,000 are given out to classrooms (a smaller set so the 150 test runs finish in time).</td></tr>
 <tr><td>4 Boosting bootstrap</td><td>LightGBM on raw features, 300 rounds, sqrt class weights; trained before round 1; held-out accuracy 0.997</td><td>Guard 1 studies first, so classrooms never use an untrained guard. Rare bully types count a bit more (class weights). On a practice test it got 99.7% (96.3% before).</td></tr>
 <tr><td>5 Non-IID partition</td><td>Dirichlet &alpha;=0.3 &rarr; 10 clients; 15% test, 15% benign val; z-score per client, clip &plusmn;10</td><td>Share notes unevenly among 10 classrooms, as in real life where each site sees different traffic (&ldquo;non-IID&rdquo;). Each classroom keeps some notes for exams and some friendly ones for setting its alarm level, and rescales its numbers its own way, with extremes capped at 10.</td></tr>
 <tr><td>6 Client round (&times;10)</td><td>boosting filters; train autoencoder; 130&rarr;32&rarr;16&rarr;8; 5 epochs; MSE</td><td>Each classroom lets guard 1 remove the obvious bullies, then teaches guard 2 on what's left by squeezing 130 numbers into 8 and rebuilding them, 5 practice passes, scored by how big the rebuilding mistakes are (MSE).</td></tr>
@@ -422,7 +422,7 @@ return doors, row order (each would reveal which recording, and so which answer)
 
 <h3>Step 3: Split: server calibration set and federated pool</h3>
 <ul><li>5% of notes (same mix of types) go to the principal with answers; 20% of that is kept for testing each new version of guard 1, leaving 79,430 to teach with (76,388 with the old clues).
-The rest is trimmed to 60,000 notes for classrooms; after each classroom keeps some for exams and alarm-setting, 45,474 are left to learn from. So the whole-school system learns from about 125,000 notes. Only the stand-alone guard 1 in section 6 studied 1.43 million. Answers stay with the principal; classrooms never reveal their notes' answers.</li></ul>
+In the first runs the rest was trimmed to 60,000 notes for classrooms (45,474 left to learn from, about 125,000 in all). In the newest runs the classrooms get all the rest, about 1.89 million notes, with each conversation kept together. Only the stand-alone guard 1 in section 6 studied 1.43 million. Answers stay with the principal; classrooms never reveal their notes' answers.</li></ul>
 
 <h3>Step 4: Non-IID partition and per-client normalisation</h3>
 <ul>
@@ -541,7 +541,7 @@ system's normal ones (0.02%). Who won is still fair.</li>
 <li><b>The filter breaks at 50%;</b> trimmed mean alone also breaks once sneaky classrooms outnumber what it trims.</li>
 <li><b>Two kinds of sneaky classroom tested</b> (sign-flip, and a clever one that knows the filter and mostly slips past it); other clever ones are untested.</li>
 <li><b>Whole-school tests now use three seeds</b> for the main experiments (ablation, sweep, new-bully test); the pruning and clever-attacker tests use one. One odd pattern (20% vs 30%) disappeared with other seeds, so it was noise.</li>
-<li><b>The whole-school system uses a sample:</b> the stand-alone guard 1 studied 1.43 million notes, but the whole-school system learns from about 125,000, so the 150 or so test runs finish in time. Guard 1 studying only the principal's 5% still scored 99.7% / 0.979; guard 2 was never tried on all the notes.</li>
+<li><b>The whole-school system now uses all the notes</b> (about 1.89 million shared out, conversations kept together; see the Cumulative page, 7d), but guard 1 inside it still learns from the principal's 5% (about 72&ndash;80 thousand notes). The first 150 or so test runs used a 60,000-note sample, and those results are kept for comparison.</li>
 <li><b>Tiny classes:</b> MITM (358&ndash;406 notes) and Fingerprinting (853) give few exam notes, so their scores wobble.</li>
 <li><b>Novelty isn't proven:</b> our searches found no system with all five parts, but that's not a complete review.</li>
 </ol>
@@ -644,6 +644,7 @@ Attack detection stays about the same; the table lists every run.</li>
 <li><b>The whole journey, timed.</b> From raw notes to a locked door took about 219 seconds in one run: most of it is learning together, and the live part (replay, spot, lock) takes seconds.</li>
 <li><b>Real runs, three seeds (7b).</b> Each size was run three times with different shuffles. The one low score (0.978) is one missed note out of a group of 4.</li>
 <li><b>Follow-up experiments (7c).</b> The big tests were repeated with two more seeds (same story); a clever saboteur mostly slips past the filter; deleting 70% of the numbers in guard 2's brain works if done while learning, not after; and a stricter &ldquo;earlier teaches, later tests&rdquo; exam gives 99.4% accuracy.</li>
+<li><b>The whole dataset (7d).</b> Everything was run again with all the notes and with whole conversations kept together on one side of the exam. Known bullies: still about 99.6% caught. False alarms look worse note by note (2.5&ndash;16%) than conversation by conversation (under 1%), because a few long friendly conversations get flagged as a block. New bullies: 90&ndash;94% (was 94&ndash;95%). All 14 recordings are blocked in the demo; 12 are named correctly.</li>
 <li><b>What a table cell means.</b> &ldquo;0.745 / 0.727 / 0.688&rdquo; style cells list the three seeds in order (42 / 43 / 44) so you can see how much they differ.</li>
 </ul>
 <p class="eli5">When something still wobbles after three tries, we show you all three numbers instead of hiding it behind one.</p>

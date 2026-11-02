@@ -82,7 +82,7 @@ Figure~\ref{fig:flow} shows the complete sequence of steps, from loading the dat
 \section{Explanation Of Methodology In Details With Equations And Formulae}
 
 \subsection{How much data each part uses}
-Every packet of the dataset is cleaned and given the new features (2{,}219{,}216 rows, 1{,}985{,}768 unique after de-duplication). How many of them each model trains on differs, and Table~\ref{tab:datascale} lists it. The classifier that meets the accuracy target is trained on most of the data. The federated system uses a smaller share, because its pool is capped at 60{,}000 rows to keep the roughly 150 evaluation runs practical.
+Every packet of the dataset is cleaned and given the new features (2{,}219{,}216 rows, 1{,}985{,}768 unique after de-duplication). How many of them each model trains on differs, and Table~\ref{tab:datascale} lists it. The classifier that meets the accuracy target is trained on most of the data. The federated system was first run on a pool capped at 60{,}000 rows, to keep the roughly 150 evaluation runs practical; the main federated results (Section~\ref{sec:fullpool}) use the whole pool.
 \begin{table}[H]
 \centering
 \small
@@ -93,7 +93,9 @@ Every packet of the dataset is cleaned and given the new features (2{,}219{,}216
 Final classifier (accuracy target) & 1{,}429{,}825 rows (72\%), plus 158{,}870 for early stopping (8\%) & 397{,}073 unseen rows (20\%); whole connections held out \\ \hline
 Same classifier, 5\% share only & 89{,}359 rows, plus 9{,}929 for early stopping & the same 397{,}073 rows \\ \hline
 Federated: server bootstrap classifier & 79{,}430 rows (calibration set) & 19{,}858 rows held back \\ \hline
-Federated: client autoencoders & 45{,}474 rows across 10 clients (736 to 11{,}549 each), plus 5{,}530 benign rows for thresholds & 8{,}996 client test rows \\ \hline
+Federated, earlier 60k pool: client autoencoders & 45{,}474 rows across 10 clients (736 to 11{,}549 each), plus 5{,}530 benign rows for thresholds & 8{,}996 client test rows \\ \hline
+Federated, full pool: server bootstrap classifier & 71{,}853 to 79{,}866 rows (calibration set, whole connections) & a part held back for scoring boosting versions \\ \hline
+Federated, full pool: client autoencoders & the 1{,}885{,}587 to 1{,}885{,}744 pool rows across 10 or 20 clients, split by connection (training, benign-validation and test slices) & 283{,}090 to 295{,}566 client test rows \\ \hline
 \end{tabular}
 \caption{Training and evaluation rows for each part (130 features, seed 42)}
 \label{tab:datascale}
@@ -101,11 +103,11 @@ Federated: client autoencoders & 45{,}474 rows across 10 clients (736 to 11{,}54
 The 5\%-only row shows that the federated bootstrap loses little from its smaller training set: 99.7\% accuracy and 0.979 macro F1 on the same 397{,}073 test rows, against 0.983 for the full classifier.
 
 \subsection{Non-IID partition and per-client normalisation}
-A stratified 5\% of the rows is held on the server as the calibration set. The remaining federated pool (subsampled to 60{,}000 rows to keep the roughly 150 evaluation runs practical) is split across $N=10$ clients. For each class $k$ a proportion vector is drawn,
+A stratified 5\% of the rows is held on the server as the calibration set. The remaining federated pool (all of it in the main runs; subsampled to 60{,}000 rows in the earlier comparison runs) is split across $N=10$ clients. For each class $k$ a proportion vector is drawn,
 \begin{equation}
   \mathbf{p}_k \sim \mathrm{Dir}(\alpha\mathbf{1}_N), \qquad \alpha = 0.3,
 \end{equation}
-and the class's rows are divided in those proportions~\cite{hsu2019noniid}. Smaller $\alpha$ gives more skew. Each client keeps 15\% as a test slice and 15\% of its benign remainder as a benign validation slice. For the autoencoder only, client $i$ standardises features with its own training mean $\mu_i$ and standard deviation $\sigma_i$, clipped at $\pm10$:
+and the class's rows are divided in those proportions~\cite{hsu2019noniid}. Smaller $\alpha$ gives more skew. In the full-pool runs the unit that is divided is the connection, not the row: each connection goes to one client, and within a client it goes to exactly one of the training, benign-validation and test slices, so no test packet has a sibling from the same connection in training. Each client keeps 15\% as a test slice and 15\% of its benign remainder as a benign validation slice. For the autoencoder only, client $i$ standardises features with its own training mean $\mu_i$ and standard deviation $\sigma_i$, clipped at $\pm10$:
 \begin{equation}
   \tilde{x} = \mathrm{clip}\!\left(\frac{x-\mu_i}{\sigma_i},\,-10,\,10\right).
 \end{equation}

@@ -30,6 +30,7 @@ def main() -> None:
     parser.add_argument("--num-rounds", type=int, default=20)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--output-dir", default="results/clip")
+    parser.add_argument("--only", nargs="*", default=None, help="Run only these normalizations: \"clip 10\", \"no clip\"")
     args = parser.parse_args()
     setup_logging()
     base = load_config(args.config_path)
@@ -38,6 +39,8 @@ def main() -> None:
     )
     rows = []
     for label, clip in (("clip 10", base.data.normalized_clip), ("no clip", None)):
+        if args.only and label not in args.only:
+            continue
         config = dataclasses.replace(base, data=dataclasses.replace(base.data, normalized_clip=clip))
         setup = build_evaluation_setup_from_arrays(X, y, list(encoder.classes_), benign, config, args.seed)
         trained = train_variant(FULL_PIPELINE, setup, config, args.num_rounds, set(), args.seed)

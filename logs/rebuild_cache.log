@@ -1,0 +1,9 @@
+INFO:fl_ids.data.pipeline:Feature cache data/processed/encoded_extended.npz is stale; rebuilding
+INFO:fl_ids.data.pipeline:Loading 62/63 columns from data/raw/DNN-EdgeIIoT-dataset.csv (excluded 1)
+INFO:fl_ids.data.pipeline:Loading 62/63 columns from data/processed/MITM_reextracted.csv (excluded 1)
+INFO:fl_ids.data.repair:Repaired MITM: replaced 1214 dataset rows with 1229 re-extracted rows
+INFO:fl_ids.data.features:Derived extended features: 2219216 packets in 392782 flows
+INFO:fl_ids.data.pipeline:Cleaned dataframe: 2219216 -> 1985768 rows (dropped 0 NaN, 233448 duplicate)
+INFO:fl_ids.data.pipeline:Wrote feature cache data/processed/encoded_extended.npz
+REBUILT (1985768, 130) 1985768 392782
+X identical to previous cache: False y identical: False

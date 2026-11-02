@@ -294,6 +294,14 @@ brain smaller but does not shrink the mail.</div>
 on the later part. Overall accuracy stays 99.4%. The score for &ldquo;average over kinds&rdquo; looks lower (0.913) only because MITM is one single conversation,
 so all of it lands in the test and the model never saw any; without that, it is about 0.978. Backdoor and website-flood notes did get a little harder.</div>
 
+<div class="box teal"><b class="h">Using all the notes, with a fairer exam</b>At first, the learning-together part studied only a small share of the notes (about 6%). Now it
+studies all of them (nearly 2 million), 10 or 20 classrooms at a time. We also made the exam stricter: notes from the <i>same conversation</i> now always stay together, either all in practice or all in the exam, so
+the classroom cannot peek at a sibling note. The result: bullies it already knows are still caught about 99.6% of the time, so nothing was inflated before.
+<p class="eli5">It is like making sure no question on the exam comes from the very same page you practised on.</p></div>
+<div class="box coral"><b class="h">What got harder</b>(1) False alarms: counted note by note, between 2.5 and 16 in 100 friendly notes get flagged, but that is because a few very long friendly conversations get flagged as a whole;
+counted per conversation it is under 1 in 100. (2) The second guard and the principal's filter are weaker with this much data: brand-new bullies are caught 90&ndash;94% of the time (it was 94&ndash;95%).
+(3) On the live demo, all 14 kinds of recordings were blocked, but 2 were mislabelled (the MITM recording as Ransomware, and the fingerprinting recording as DDoS).</div>
+
 <h2>10. Mini glossary</h2>
 <dl>
   <dt>Packet</dt><dd>One small message on a network, like one note.</dd>

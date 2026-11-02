@@ -1,0 +1,68 @@
+2026-11-01 17:34:41,472 [INFO] fl_ids.utils.journey: [phase_a] stage 1/6 started: Load, clean and encode the dataset (t+0.0s)
+2026-11-01 17:34:42,183 [INFO] fl_ids.data.pipeline: Loaded extended features from cache data/processed/encoded_extended.npz: (1985768, 130)
+2026-11-01 17:34:42,677 [INFO] fl_ids.utils.journey: [phase_a] stage 1/6 done: Load, clean and encode the dataset in 1.2s
+2026-11-01 17:34:42,678 [INFO] fl_ids.utils.journey: [phase_a] stage 2/6 started: Calibration split, bootstrap classifier, client partition (t+1.2s)
+2026-11-01 17:34:43,267 [INFO] fl_ids.models.boosting: Training boosting classifier: 79866 samples, 15 classes, 300 rounds
+2026-11-01 17:34:59,851 [WARNING] fl_ids.data.pipeline: Client 5 has zero benign validation samples (heavy Dirichlet skew or too few benign samples in its shard)
+2026-11-01 17:35:01,971 [WARNING] fl_ids.data.pipeline: Client 14 has zero benign validation samples (heavy Dirichlet skew or too few benign samples in its shard)
+2026-11-01 17:35:02,349 [WARNING] fl_ids.data.pipeline: Client 18 has zero benign validation samples (heavy Dirichlet skew or too few benign samples in its shard)
+2026-11-01 17:35:02,471 [INFO] __main__: Prepared 79866 calibration rows, 1885587 federated rows across 20 clients; bootstrap boosting accuracy 0.995
+2026-11-01 17:35:02,474 [INFO] fl_ids.utils.journey: [phase_a] stage 2/6 done: Calibration split, bootstrap classifier, client partition in 19.8s
+2026-11-01 17:35:02,478 [INFO] fl_ids.utils.journey: [phase_a] stage 3/6 started: Federated training (t+21.0s)
+2026-11-01 17:35:06,334 [INFO] __main__: Started Flower server on 127.0.0.1:9091 and 20 clients (0 sign-flip attackers) for 20 rounds; logs in runs/full/c20_s42/phase_a
+2026-11-01 17:35:06,335 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 0/20 finished (t+24.9s)
+2026-11-01 17:47:22,000 [INFO] fl_ids.utils.journey: [phase_a] stage 1/6 started: Load, clean and encode the dataset (t+0.0s)
+2026-11-01 17:47:22,610 [INFO] fl_ids.data.pipeline: Loaded extended features from cache data/processed/encoded_extended.npz: (1985768, 130)
+2026-11-01 17:47:23,096 [INFO] fl_ids.utils.journey: [phase_a] stage 1/6 done: Load, clean and encode the dataset in 1.1s
+2026-11-01 17:47:23,097 [INFO] fl_ids.utils.journey: [phase_a] stage 2/6 started: Calibration split, bootstrap classifier, client partition (t+1.1s)
+2026-11-01 17:47:23,620 [INFO] fl_ids.models.boosting: Training boosting classifier: 79866 samples, 15 classes, 300 rounds
+2026-11-01 17:47:37,677 [WARNING] fl_ids.data.pipeline: Client 5 has zero benign validation samples (heavy Dirichlet skew or too few benign samples in its shard)
+2026-11-01 17:47:39,176 [WARNING] fl_ids.data.pipeline: Client 14 has zero benign validation samples (heavy Dirichlet skew or too few benign samples in its shard)
+2026-11-01 17:47:39,465 [WARNING] fl_ids.data.pipeline: Client 18 has zero benign validation samples (heavy Dirichlet skew or too few benign samples in its shard)
+2026-11-01 17:47:39,558 [INFO] __main__: Prepared 79866 calibration rows, 1885587 federated rows across 20 clients; bootstrap boosting accuracy 0.995
+2026-11-01 17:47:39,560 [INFO] fl_ids.utils.journey: [phase_a] stage 2/6 done: Calibration split, bootstrap classifier, client partition in 16.5s
+2026-11-01 17:47:39,564 [INFO] fl_ids.utils.journey: [phase_a] stage 3/6 started: Federated training (t+17.6s)
+2026-11-01 17:47:48,751 [INFO] __main__: Started Flower server on 127.0.0.1:9091 and 20 clients (0 sign-flip attackers) for 20 rounds; logs in runs/full/c20_s42/phase_a
+2026-11-01 17:47:48,752 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 0/20 finished (t+26.8s)
+2026-11-01 17:48:59,301 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 1/20 finished (t+97.3s)
+2026-11-01 17:49:13,814 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 2/20 finished (t+111.8s)
+2026-11-01 17:49:44,842 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 3/20 finished (t+142.8s)
+2026-11-01 17:51:02,447 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 4/20 finished (t+220.4s)
+2026-11-01 17:51:16,964 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 5/20 finished (t+235.0s)
+2026-11-01 17:51:51,506 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 6/20 finished (t+269.5s)
+2026-11-01 17:53:21,172 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 7/20 finished (t+359.2s)
+2026-11-01 17:53:35,693 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 8/20 finished (t+373.7s)
+2026-11-01 17:54:14,253 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 9/20 finished (t+412.3s)
+2026-11-01 17:55:54,480 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 10/20 finished (t+512.5s)
+2026-11-01 17:56:09,507 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 11/20 finished (t+527.5s)
+2026-11-01 17:56:50,579 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 12/20 finished (t+568.6s)
+2026-11-01 17:58:42,875 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 13/20 finished (t+680.9s)
+2026-11-01 17:58:58,406 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 14/20 finished (t+696.4s)
+2026-11-01 17:59:42,999 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 15/20 finished (t+741.0s)
+2026-11-01 18:01:49,369 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 16/20 finished (t+867.4s)
+2026-11-01 18:02:04,404 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 17/20 finished (t+882.4s)
+2026-11-01 18:02:52,015 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 18/20 finished (t+930.0s)
+2026-11-01 18:05:14,008 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 19/20 finished (t+1072.0s)
+2026-11-01 18:05:29,549 [INFO] fl_ids.utils.journey: [phase_a] Federated training: round 20/20 finished (t+1087.5s)
+2026-11-01 18:05:32,119 [INFO] fl_ids.utils.journey: [phase_a] stage 3/6 done: Federated training in 1072.6s
+2026-11-01 18:05:32,122 [INFO] fl_ids.utils.journey: [phase_a] stage 4/6 started: Calibrate client anomaly thresholds (t+1090.1s)
+2026-11-01 18:05:32,247 [INFO] __main__: Per-client thresholds match the 20 values clients reported in the final round
+2026-11-01 18:05:32,248 [INFO] fl_ids.utils.journey: [phase_a] stage 4/6 done: Calibrate client anomaly thresholds in 0.1s
+2026-11-01 18:05:32,248 [INFO] fl_ids.utils.journey: [phase_a] stage 5/6 started: Evaluate on the clients' test slices (t+1090.2s)
+2026-11-01 18:08:20,542 [INFO] fl_ids.utils.journey: [phase_a] stage 5/6 done: Evaluate on the clients' test slices in 168.3s
+2026-11-01 18:08:21,545 [INFO] fl_ids.utils.journey: [phase_a] stage 6/6 started: Save the model bundle (t+1259.5s)
+2026-11-01 18:08:22,309 [INFO] fl_ids.orchestration.artifacts: Saved Phase A bundle to saved_models/full/c20_s42 (20 clients)
+2026-11-01 18:08:22,309 [INFO] fl_ids.utils.journey: [phase_a] stage 6/6 done: Save the model bundle in 0.8s
+2026-11-01 18:08:22,309 [INFO] __main__: Phase A done in 1260.3s: cascade attack macro-recall 0.998, benign FPR 0.0588 on 20 clients' held-out test slices; bundle at saved_models/full/c20_s42
+2026-11-01 18:11:11,787 [INFO] fl_ids.utils.journey: [phase_b] stage 1/4 started: Load the model bundle (t+0.0s)
+2026-11-01 18:11:11,857 [INFO] fl_ids.utils.journey: [phase_b] stage 1/4 done: Load the model bundle in 0.1s
+2026-11-01 18:11:11,857 [INFO] __main__: Phase A bundle /home/flids/FL-IDS-clean/saved_models/full/c20_s42: 20 clients -> 20 Mininet hosts
+2026-11-01 18:11:11,859 [INFO] fl_ids.utils.journey: [phase_b] stage 2/4 started: Start the SDN bridge and controller (t+0.1s)
+2026-11-01 18:11:14,369 [INFO] __main__: Controller + bridge up at http://127.0.0.1:8080 (OpenFlow port 6653)
+2026-11-01 18:11:14,369 [INFO] fl_ids.utils.journey: [phase_b] stage 2/4 done: Start the SDN bridge and controller in 2.5s
+2026-11-01 18:11:14,370 [INFO] __main__: Running the topology as root: sudo -n /usr/bin/python3 /home/flids/FL-IDS-clean/fl_ids/sdn/topology.py
+2026-11-01 18:11:14,370 [INFO] fl_ids.utils.journey: [phase_b] stage 3/4 started: Network, replay, classify and block (root process) (t+2.6s)
+2026-11-01 18:11:22,389 [INFO] fl_ids.utils.journey: [phase_b] stage 3/4 done: Network, replay, classify and block (root process) in 8.0s
+2026-11-01 18:11:22,421 [INFO] fl_ids.utils.journey: [phase_b] stage 4/4 started: Check the switch's flow table (t+10.6s)
+2026-11-01 18:11:22,421 [INFO] fl_ids.utils.journey: [phase_b] stage 4/4 done: Check the switch's flow table in 0.0s
+2026-11-01 18:11:22,422 [INFO] __main__: Phase B done in 10.6s: h1 (client 0) -> Backdoor (confidence 0.996, boosting stage, 24808/24914 packets non-benign) -> block; flow rule: cookie=0x0, duration=0.004s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 actions=drop

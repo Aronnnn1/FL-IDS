@@ -54,7 +54,7 @@ def test_cold_start_bootstrap_metrics_on_real_data():
         # The production feature set: the boosting config below is tuned for it
         # (class weighting on the 91 base features alone gives weighted F1 0.946).
         extended_features=PRODUCTION_CONFIG.data.extended_features,
-        feature_cache=PRODUCTION_CONFIG.data.feature_cache,
+        feature_cache="data/processed/encoded_extended_test_norepair.npz",  # own cache: this test builds without the MITM repair
     )
     boosting_config = PRODUCTION_CONFIG.boosting
 
@@ -116,7 +116,7 @@ def test_boosting_distribution_mechanism_on_real_data():
         # The production feature set: the boosting config below is tuned for it
         # (class weighting on the 91 base features alone gives weighted F1 0.946).
         extended_features=PRODUCTION_CONFIG.data.extended_features,
-        feature_cache=PRODUCTION_CONFIG.data.feature_cache,
+        feature_cache="data/processed/encoded_extended_test_norepair.npz",  # own cache: this test builds without the MITM repair
     )
     boosting_config = PRODUCTION_CONFIG.boosting
 

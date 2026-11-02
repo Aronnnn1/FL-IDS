@@ -1,0 +1,157 @@
+{
+  "pcap": "/home/flids/FL-IDS-clean/data/raw/pcaps/SQL injection attack.pcap",
+  "artifact_dir": "/home/flids/FL-IDS-clean/saved_models/full/c10_s42",
+  "device_ip": "10.0.0.1",
+  "classification": {
+    "device_id": "h1",
+    "classification": "SQL_injection",
+    "confidence": 0.9998087301843067,
+    "stage": "boosting",
+    "client_id": 0,
+    "num_packets": 51228,
+    "num_non_benign": 51097
+  },
+  "mitigation": {
+    "action": "block",
+    "applied": true,
+    "classification": "SQL_injection",
+    "confidence": 0.9998087301843067,
+    "device_id": "h1",
+    "ip_address": "10.0.0.1",
+    "stage": "boosting",
+    "timestamp": 1793577288.8709383
+  },
+  "switch_packets_before": 41,
+  "switch_packets_after": 50757,
+  "flow_table": " cookie=0x0, duration=0.005s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 actions=drop\r\n cookie=0x0, duration=7.924s, table=0, n_packets=50770, n_bytes=7285718, priority=0 actions=NORMAL\r\n",
+  "journey": {
+    "name": "phase_b",
+    "started_at": "2026-11-01T23:54:36.777984+00:00",
+    "elapsed_s": 13.511,
+    "planned_stages": [
+      "Load the model bundle",
+      "Start the SDN bridge and controller",
+      "Network, replay, classify and block (root process)",
+      "Check the switch's flow table"
+    ],
+    "current_stage": null,
+    "stages": [
+      {
+        "index": 1,
+        "label": "Load the model bundle",
+        "start_s": 0.0,
+        "end_s": 0.07,
+        "duration_s": 0.07,
+        "status": "done",
+        "detail": null
+      },
+      {
+        "index": 2,
+        "label": "Start the SDN bridge and controller",
+        "start_s": 0.073,
+        "end_s": 3.088,
+        "duration_s": 3.015,
+        "status": "done",
+        "detail": null
+      },
+      {
+        "index": 3,
+        "label": "Network, replay, classify and block (root process)",
+        "start_s": 3.088,
+        "end_s": 13.478,
+        "duration_s": 10.39,
+        "status": "done",
+        "detail": null,
+        "substages": [
+          {
+            "index": 1,
+            "label": "Start the Mininet network",
+            "start_s": 0.0,
+            "end_s": 1.023,
+            "duration_s": 1.023,
+            "status": "done",
+            "detail": null
+          },
+          {
+            "index": 2,
+            "label": "Load the model bundle",
+            "start_s": 2.847,
+            "end_s": 2.904,
+            "duration_s": 0.057,
+            "status": "done",
+            "detail": null
+          },
+          {
+            "index": 3,
+            "label": "Register hosts with the bridge",
+            "start_s": 2.904,
+            "end_s": 2.932,
+            "duration_s": 0.028,
+            "status": "done",
+            "detail": null
+          },
+          {
+            "index": 4,
+            "label": "Replay the capture through the switch",
+            "start_s": 2.933,
+            "end_s": 3.318,
+            "duration_s": 0.385,
+            "status": "done",
+            "detail": null
+          },
+          {
+            "index": 5,
+            "label": "Extract features with tshark",
+            "start_s": 3.318,
+            "end_s": 6.835,
+            "duration_s": 3.517,
+            "status": "done",
+            "detail": null
+          },
+          {
+            "index": 6,
+            "label": "Classify with the cascade",
+            "start_s": 6.835,
+            "end_s": 8.936,
+            "duration_s": 2.101,
+            "status": "done",
+            "detail": null
+          },
+          {
+            "index": 7,
+            "label": "Send the verdict, install the drop rule",
+            "start_s": 8.936,
+            "end_s": 8.94,
+            "duration_s": 0.004,
+            "status": "done",
+            "detail": null
+          },
+          {
+            "index": 8,
+            "label": "Read back the switch's flow table",
+            "start_s": 8.94,
+            "end_s": 8.953,
+            "duration_s": 0.013,
+            "status": "done",
+            "detail": null
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "label": "Check the switch's flow table",
+        "start_s": 13.51,
+        "end_s": 13.511,
+        "duration_s": 0.001,
+        "status": "done",
+        "detail": null
+      }
+    ]
+  },
+  "check": {
+    "action": "block",
+    "expected_rule": true,
+    "observed_rule": "cookie=0x0, duration=0.005s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 actions=drop",
+    "consistent": true
+  }
+}

@@ -13,7 +13,7 @@
 >
 > This is notes, not prose. The paper gets written from this.
 
-Last updated: 2026-11-01 (later) -- §8.14: seeds 43/44 of the sweeps, adaptive attacker, pruning, time-ordered split. Earlier: real 20-client run, seeds 43/44 and the VMware re-host are in §8.13.
+Last updated: 2026-11-02 -- §8.15: the whole federated system on all 1.99M rows, split by connection (the headline federated results now). Earlier: 2026-11-01 (later) -- §8.14: seeds 43/44 of the sweeps, adaptive attacker, pruning, time-ordered split. Earlier: real 20-client run, seeds 43/44 and the VMware re-host are in §8.13.
 Previous: 2026-10-16 -- **project complete.** Every phase is done
 (§0), the code and results are committed and pushed (`a06711e`,
 `4e19944`), and the full test suite passes (233 passed, 2 skipped). The
@@ -66,6 +66,7 @@ standard launch prefix for any future real multi-process run.
 | 12 Accuracy + integration | `11c1cfa` (classifier, §8.10), `a06711e` (federated + Phase B, §8.11), `4e19944` (site/notes) | **done**: 99.7% / 0.983 on held-out connections; all federated experiments re-run |
 | 13 VMware re-host + real 20 clients | `e5453c7` (2026-11-01) | **done**: VM built by script, `pytest` 233 passed / 2 skipped there, real 1+20 process Phase A and Phase B, seeds 42-44 at 10 and 20 clients (§8.13) |
 | 14 Follow-ups | 2026-11-01 (§8.14) | **done**: seeds 43/44 of ablation/sweep/zero-day, real attacker runs, adaptive attacker, weight pruning, clip comparison, time-ordered split, per-class breakdown of the 20-client dip |
+| 15 Full pool | 2026-11-02 (§8.15) | **done**: whole federated system on 1.99M rows split by connection: 6 real runs, 77 in-process jobs, 14-capture Phase B |
 
 ---
 
@@ -486,6 +487,9 @@ Reviewers will ask about these. Each has a commit.
   generate after the regeneration (memory-bound while it runs).
 
 ---
+
+> **Update 2026-11-02 (§8.15):** the main federated results now use the whole pool: 1,885,587-1,885,744 rows across the clients (split by connection) and a
+> 71,853-79,866-row server calibration set. The numbers below describe the earlier 60k-pool runs.
 
 ### 5.5 Data scale: how many rows each part trains on (2026-10-16)
 All counts are for the 130-feature pipeline and were read from the run
@@ -1528,6 +1532,217 @@ flow features, which reach 0.88; they are connection summaries, not label-spelli
 **Still not done after this section:** inline/streaming mitigation (§10.16); zero-day detection under the adaptive attacker and of pruned
 models; the zero-day columns inside the ablation/sweep tables at seeds 43/44; a second dataset; the team's guide checklist (never received).
 
+### 8.15 Full pool, split by connection: the whole federated system on all 1.99M usable rows (2026-11-01/02)
+**What changed (decision of the project owner, 2026-11-01: train and test the whole pipeline on all usable rows, split by connection).**
+- *Data.* All 1,985,768 unique rows go through the federated system. The server keeps a labelled calibration set (79,866 / 72,803 /
+  71,853 rows for seeds 42 / 43 / 44, about 5%; the number varies because whole connections are chosen) to bootstrap the classifier. The
+  rest (1,885,587 / 1,885,744 / 1,885,673 rows) is split across 10 or 20 clients. Client test slices hold 283,090-295,566 rows (was ~9,000).
+  The zero-day experiment scores *every* row of the held-out class (up to 121,567; was capped at 5,000).
+- *Split by connection* (`data.group_by_flow`, `fl_ids.data.pipeline.grouped_*`, `server_pool_split`). Packets of one connection share their
+  flow-level features, so a row-level split put near-identical siblings on both sides. Now a connection stays whole in the calibration set,
+  in exactly one client, and in exactly one of that client's train / benign-validation / test slices (`tests/test_grouped_split.py`).
+  `data.min_flows_per_class: 20`: a class with fewer connections cannot be split. Only **MITM** (406 rows, **one connection**) is affected:
+  all of it goes to the server's calibration set, so the classifier learns it, and no MITM row is in any client pool or test slice. MITM is
+  therefore scored only by the zero-day experiment (and Phase B). 24 connections (655 rows) carry two labels; they are split per label.
+- *Speed.* Each client caches its boosting-filter result per broadcast model version (the model changes every third round), which
+  makes a full-pool round about 21 s instead of ~100 s; results are identical (tests unchanged). `encoded_extended.npz` also
+  stores the connection id of every row (cache version 2).
+- *Runs.* Real multi-process Phase A (1 server + 10 or 20 client processes, 20 rounds), seeds 42 / 43 / 44, plus 77 in-process jobs
+  (`tools/run_full_experiments.py`: sweep, ablation variants, zero-day per class, stealth attacker, pruning, no-clip), and Phase B on all 14
+  captures. Configs: `configs/full/`; outputs `results/full/`, `logs/full/`, `runs/full/`, `saved_models/full/`. Tables below come from
+  `tools/summarize_full.py` + `tools/build_full_tables.py`. The earlier 60k-pool, row-split results (§8.1-8.14) are kept as the comparison.
+- *Run history (for the record).* At 17:35 on 2026-11-01 a 20-client run was started next to 7 in-process jobs and the VM ran out of memory;
+  the kernel killed every process. Work was restarted in stages (real runs alone, then 9 in-process jobs at ~4.4 GB each). Also found: one
+  test (`tests/test_boosting_real_data.py`) overwrote the shared feature cache with a no-MITM-repair build; it now uses its own cache file.
+  Neither affected a reported number (every run logs the matrix shape it loaded: 1,985,768 x 130).
+
+**Leak check first** (`configs/config_leakcheck.yaml`, 60k pool, split by connection, seed 42; `results/real_runs/leakcheck_c10_s42/`): known-attack
+micro recall of the classifier alone 0.9962 against 0.9968 for the row-split run: **splitting by connection did not lower known-attack recall**, so the
+earlier federated recall numbers were not inflated by sibling packets. Packet-level false alarms were 0.0443 against 0.0340.
+
+**Real multi-process Phase A on the full pool (1.89M rows), split by connection, 20 rounds, no attackers**
+
+| Run | Phase A s | Attack macro-recall | Attack micro recall | Classifier-only micro recall | Packet-level false alarms | Connection-level false alarms | Test rows | Clients with no benign validation rows |
+|---|---|---|---|---|---|---|---|---|
+| 10 clients, seed 42 | 1844 | 0.9958 | 0.9974 | 0.9970 | 0.1275 | 0.0034 | 288,416 | 1 |
+| 10 clients, seed 43 | 1397 | 0.9947 | 0.9978 | 0.9971 | 0.0884 | 0.0074 | 283,090 | 0 |
+| 10 clients, seed 44 | 1754 | 0.9939 | 0.9956 | 0.9954 | 0.0248 | 0.0039 | 288,366 | 2 |
+| 20 clients, seed 42 | 1260 | 0.9981 | 0.9989 | 0.9981 | 0.0588 | 0.0104 | 283,427 | 3 |
+| 20 clients, seed 43 | 1063 | 0.9970 | 0.9980 | 0.9974 | 0.1628 | 0.0076 | 292,222 | 2 |
+| 20 clients, seed 44 | 1225 | 0.9972 | 0.9978 | 0.9972 | 0.1089 | 0.0081 | 295,566 | 0 |
+
+**The same runs at the earlier scale and now (macro-recall includes only attack types present in the test slices)**
+
+| Setting | Attack macro-recall | Attack micro recall | Classifier-only micro recall | Benign FPR (packets) |
+|---|---|---|---|---|
+| 10 clients, seed 42: 60k pool, split by row | 0.9990 | 0.9992 | 0.9968 | 0.0340 |
+| 10 clients, seed 42: full pool, split by connection | 0.9958 | 0.9974 | 0.9970 | 0.1275 |
+| 10 clients, seed 42: 60k pool, split by connection | 1.0000 | 1.0000 | 0.9962 | 0.0443 |
+| 10 clients, seed 43: 60k pool, split by row | 0.9985 | 0.9992 | 0.9976 | 0.0311 |
+| 10 clients, seed 43: full pool, split by connection | 0.9947 | 0.9978 | 0.9971 | 0.0884 |
+| 10 clients, seed 44: 60k pool, split by row | 0.9962 | 0.9960 | 0.9939 | 0.0284 |
+| 10 clients, seed 44: full pool, split by connection | 0.9939 | 0.9956 | 0.9954 | 0.0248 |
+| 20 clients, seed 42: 60k pool, split by row | 0.9784 | 0.9964 | 0.9952 | 0.0362 |
+| 20 clients, seed 42: full pool, split by connection | 0.9981 | 0.9989 | 0.9981 | 0.0588 |
+| 20 clients, seed 43: 60k pool, split by row | 0.9993 | 0.9992 | 0.9980 | 0.0284 |
+| 20 clients, seed 43: full pool, split by connection | 0.9970 | 0.9980 | 0.9974 | 0.1628 |
+| 20 clients, seed 44: 60k pool, split by row | 0.9991 | 0.9988 | 0.9968 | 0.0396 |
+| 20 clients, seed 44: full pool, split by connection | 0.9972 | 0.9978 | 0.9972 | 0.1089 |
+
+**Reading the real runs.**
+- **Known attacks are unchanged.** Micro recall 0.9956-0.9989, classifier alone 0.9954-0.9981 (earlier runs: 0.9939-0.9980). Macro-recall
+  0.9939-0.9981 over the 13 attack types present in the test slices (MITM is absent by construction). The 20-client seed-42 dip (0.978) does not recur.
+- **False alarms: two different numbers.** Packets flagged among normal test packets: 2.5%-16.3% (earlier: 2.8%-4.0%). But the *median
+  client* is 2.9%-3.2% in all six runs, and counted per connection the rate is 0.34%-1.04% (`fl_ids.eval.flow_fpr`;
+  `results/full/<run>/flow_fpr/`). The packet-level figure is dominated by a few very long normal connections (7,000-11,800 packets each,
+  e.g. one flow of 11,764 packets flagged entirely): in five of six runs 80%-94% of the false-alarm packets come from the ten largest
+  connections (52% in the sixth). Report both; do not quote 3% for the whole test set.
+- **The autoencoder backstop is weaker at scale.** Autoencoder-alone attack recall with no attackers: 0.457 / 0.492 / 0.221 (earlier 0.737 / 0.765 /
+  0.612). The cause is not established (candidates: a harder, connection-split benign threshold; larger, more homogeneous local data).
+- **Phase A time** 1,063-1,844 s for 20 rounds (runs overlapped other jobs at times).
+
+**Recall per attack type, 10 clients, seed 42, full pool, by stage (held-out test slices)**
+
+| Class | Test rows | Classifier alone | Autoencoder alone | Cascade |
+|---|---|---|---|---|
+| Backdoor | 2263 | 0.9885 | 0.0367 | 0.9929 |
+| DDoS_HTTP | 6915 | 0.9899 | 0.4807 | 0.9899 |
+| DDoS_ICMP | 9520 | 1.0000 | 0.3171 | 1.0000 |
+| DDoS_TCP | 6717 | 1.0000 | 0.9394 | 1.0000 |
+| DDoS_UDP | 17755 | 0.9999 | 0.3063 | 1.0000 |
+| Fingerprinting | 129 | 0.9845 | 0.0698 | 0.9922 |
+| Password | 7795 | 0.9913 | 0.2517 | 0.9914 |
+| Port_Scanning | 2929 | 1.0000 | 0.6842 | 1.0000 |
+| Ransomware | 691 | 0.9841 | 0.4877 | 0.9870 |
+| SQL_injection | 7228 | 0.9990 | 0.8944 | 0.9996 |
+| Uploading | 5567 | 0.9998 | 0.5493 | 0.9998 |
+| Vulnerability_scanner | 7216 | 0.9946 | 0.5006 | 0.9961 |
+| XSS | 2274 | 0.9960 | 0.4714 | 0.9969 |
+
+**Poisoning sweep, full pool**
+
+| Attackers | Attack macro-recall | Autoencoder-alone recall | Attacker survival |
+|---|---|---|---|
+| 0% | 0.996 / 0.996 / 0.994 | 0.457 / 0.492 / 0.221 | n/a / n/a / n/a |
+| 20% | 0.995 / 0.996 / 0.994 | 0.466 / 0.483 / 0.258 | 0.30 / 0.40 / 0.23 |
+| 30% | 0.995 / 0.997 / 0.995 | 0.490 / 0.373 / 0.245 | 0.50 / 0.55 / 0.62 |
+| 40% | 0.994 / 0.994 / 0.992 | 0.297 / 0.139 / 0.074 | 0.60 / 0.64 / 0.61 |
+| 50% | 0.995 / 0.990 / 0.985 | 0.249 / 0.000 / 0.000 | 0.64 / 1.00 / 0.99 |
+
+**Ablation at 30% sign-flip attackers, full pool, seeds 42 / 43 / 44**
+
+| Variant | Attack macro-recall | Autoencoder-alone recall | Benign FPR |
+|---|---|---|---|
+| full_pipeline | 0.995 / 0.997 / 0.995 | 0.490 / 0.373 / 0.245 | 0.1112 / 0.0653 / 0.0075 |
+| autoencoder_only | 0.105 / 0.073 / 0.051 | 0.105 / 0.073 / 0.051 | 0.0473 / 0.0411 / 0.0445 |
+| boosting_only | 0.990 / 0.989 / 0.982 | n/a / n/a / n/a | 0.0001 / 0.0001 / 0.0003 |
+| plain_fedavg | 0.992 / 0.994 / 0.990 | 0.013 / 0.002 / 0.092 | 0.0947 / 0.0301 / 0.0301 |
+| trimmed_mean_only | 0.995 / 0.995 / 0.993 | 0.205 / 0.000 / 0.025 | 0.1070 / 0.0261 / 0.0299 |
+
+**Reading the sweep and ablation (full pool, three seeds).**
+- Known-attack recall stays 0.985-0.997 at every fraction up to 50%.
+- **The trust filter lets more attackers through at scale.** Attacker survival at 30%: 0.50 / 0.55 / 0.62 (earlier 0.12 / 0.12 / 0.27); at 50%: 0.64 / 1.00 / 0.99.
+  Robust aggregation still protects the autoencoder: at 30% attackers the full pipeline's autoencoder-alone recall is 0.490 / 0.373 / 0.245, plain
+  FedAvg's 0.013 / 0.002 / 0.092, trimmed-mean-only 0.205 / 0.000 / 0.025. Those ranges are wide; with three seeds no interval is claimed. Why survival rose
+  is not established.
+- The 30% ablation's full-pipeline row is the sweep's 30% point (same data, seed and attackers); it was not trained twice.
+
+**Zero-day (leave one attack class out), full pool: mean over the held-out classes**
+
+| Stage | Mean detection rate |
+|---|---|
+| Classifier alone | 0.735 / 0.757 / 0.723 (classes: 14, 14, 14) |
+| Autoencoder alone | 0.681 / 0.728 / 0.590 (classes: 14, 14, 14) |
+| Cascade | 0.910 / 0.944 / 0.895 (classes: 14, 14, 14) |
+
+**Zero-day (leave one attack class out), full pool: mean over the held-out classes: per held-out class**
+
+| Held-out class | Rows scored | Cascade detection | Classifier alone | Autoencoder alone |
+|---|---|---|---|---|
+| Backdoor | 24167 | 0.743 / 0.998 / 0.998 | 0.486 / 0.996 / 0.997 | 0.493 / 0.550 / 0.810 |
+| DDoS_HTTP | 49768 | 0.879 / 0.932 / 0.885 | 0.695 / 0.764 / 0.719 | 0.572 / 0.698 / 0.560 |
+| DDoS_ICMP | 68758 | 1.000 / 1.000 / 1.000 | 1.000 / 1.000 / 0.999 | 0.786 / 0.802 / 0.800 |
+| DDoS_TCP | 50062 | 0.933 / 0.953 / 0.921 | 0.865 / 0.921 / 0.879 | 0.640 / 0.686 / 0.615 |
+| DDoS_UDP | 121567 | 0.905 / 0.803 / 0.866 | 0.416 / 0.021 / 0.334 | 0.849 / 0.799 / 0.799 |
+| Fingerprinting | 872 | 0.998 / 0.998 / 0.997 | 0.995 / 0.994 / 0.994 | 0.826 / 0.747 / 0.492 |
+| MITM | 406 | 0.803 / 1.000 / 0.751 | 0.148 / 0.200 / 0.005 | 0.764 / 1.000 / 0.751 |
+| Password | 50033 | 0.932 / 0.935 / 0.880 | 0.872 / 0.865 / 0.813 | 0.505 / 0.407 / 0.307 |
+| Port_Scanning | 20213 | 0.999 / 0.993 / 0.992 | 0.998 / 0.988 / 0.989 | 0.570 / 0.745 / 0.409 |
+| Ransomware | 9885 | 0.990 / 0.994 / 0.988 | 0.984 / 0.990 / 0.982 | 0.621 / 0.753 / 0.374 |
+| SQL_injection | 50981 | 0.961 / 0.970 / 0.999 | 0.828 / 0.713 / 0.999 | 0.764 / 0.871 / 0.787 |
+| Uploading | 37243 | 0.665 / 0.652 / 0.527 | 0.204 / 0.266 / 0.304 | 0.581 / 0.512 / 0.295 |
+| Vulnerability_scanner | 50044 | 0.992 / 0.993 / 0.859 | 0.980 / 0.894 / 0.335 | 0.880 / 0.976 / 0.772 |
+| XSS | 15172 | 0.943 / 0.991 / 0.867 | 0.823 / 0.986 / 0.767 | 0.680 / 0.650 / 0.483 |
+
+**Reading zero-day (full pool).** Cascade detection of an unseen attack type averages 0.910 / 0.944 / 0.895 (earlier 0.943 / 0.952 / 0.952); classifier alone 0.735 /
+0.757 / 0.723. Weakest: Uploading (0.527-0.665 for the cascade), then MITM (0.751-1.000; one connection) and, seed-dependent, Backdoor (0.743 in seed 42, 0.998 otherwise)
+and Vulnerability_scanner (0.859 in seed 44). Every row of each held-out class is scored.
+
+**Stealth attacker vs. sign-flip, full pool**
+
+| Attackers | Sign-flip survival | Stealth survival | Sign-flip AE-alone recall | Stealth AE-alone recall | Stealth known-attack recall |
+|---|---|---|---|---|---|
+| 20% | 0.30 / 0.40 / 0.23 | 0.60 / n/a / n/a | 0.466 / 0.483 / 0.258 | 0.454 / n/a / n/a | 0.9956 / n/a / n/a |
+| 30% | 0.50 / 0.55 / 0.62 | 0.73 / n/a / n/a | 0.490 / 0.373 / 0.245 | 0.427 / n/a / n/a | 0.9961 / n/a / n/a |
+| 40% | 0.60 / 0.64 / 0.61 | 0.80 / n/a / n/a | 0.297 / 0.139 / 0.074 | 0.334 / n/a / n/a | 0.9949 / n/a / n/a |
+
+**Pruning during federated training, full pool (no attackers)**
+
+| Sparsity | Non-zero weights | Autoencoder-alone recall | Cascade macro-recall | Benign FPR |
+|---|---|---|---|---|
+| 0% | 9600 | 0.457 / 0.492 / 0.221 | 0.996 / 0.996 / 0.994 | 0.1182 / 0.0414 / 0.0352 |
+| 50% | 4800 | 0.439 / n/a / n/a | 0.995 / n/a / n/a | 0.1400 / n/a / n/a |
+| 70% | 2880 | 0.350 / n/a / n/a | 0.993 / n/a / n/a | 0.1201 / n/a / n/a |
+| 80% | 1920 | 0.338 / n/a / n/a | 0.993 / n/a / n/a | 0.1451 / n/a / n/a |
+| 90% | 960 | 0.198 / n/a / n/a | 0.993 / n/a / n/a | 0.1151 / n/a / n/a |
+
+**Per-client z-score clip, final-round benign validation loss**
+
+| Normalisation | seed 42 | seed 43 | seed 44 |
+|---|---|---|---|
+| clip 10 | 0.1292 | 0.05736 | 0.2644 |
+| no clip | 0.242 | n/a | n/a |
+
+**Reading stealth, pruning and clip (seed 42 only; the seed 43/44 jobs were not run).**
+- *Stealth attacker.* Survival 0.60 / 0.73 / 0.80 against 0.30 / 0.50 / 0.60 for sign-flip; autoencoder-alone recall 0.454 / 0.427 / 0.334 against
+  0.466 / 0.490 / 0.297 (no clear extra harm); known-attack recall >= 0.9949. Zero-day under this attacker was not measured.
+- *Pruning during training.* Autoencoder-alone recall 0.457 -> 0.439 (50%) -> 0.350 (70%) -> 0.338 (80%) -> 0.198 (90%), cascade macro-recall 0.996 -> 0.993. At full
+  scale pruning costs more than at 60k (70%: -0.107 against -0.056). *Pruning after training* (`results/full/pruning_post_c10_s42/`): autoencoder recall
+  0.461 -> 0.375 (50%) -> 0.098 (70%), AUROC 0.892 -> 0.788 -> 0.495.
+- *Clip.* Without the per-client z-score clip the final benign validation loss is 0.242 against 0.129 with it (1.9x); at 60k it was about 1,500x. The clip matters much
+  less at full scale.
+
+**Phase B on every attack capture (10 clients, seed 42, full-pool bundle): class chosen, confidence, deciding stage, packets flagged, action**
+
+| Capture | Classified as | Confidence | Stage | Packets flagged | Action | Wall time |
+|---|---|---|---|---|---|---|
+| Backdoor attack | Backdoor | 0.997 | boosting | 24,543 / 24,914 | block | 12 s |
+| DDoS HTTP Flood Attacks | DDoS_HTTP | 0.966 | boosting | 119,748 / 229,142 | block | 29 s |
+| DDoS ICMP Flood Attacks | DDoS_ICMP | 1.000 | boosting | 2,914,156 / 2,914,356 | block | 232 s |
+| DDoS TCP SYN Flood Attacks | DDoS_TCP | 0.999 | boosting | 2,020,023 / 2,020,152 | block | 211 s |
+| DDoS UDP Flood Attacks | DDoS_UDP | 0.999 | boosting | 2,899,758 / 3,215,732 | block | 268 s |
+| MITM ARP spoofing DNS Attack | Ransomware | 0.991 | boosting | 542 / 1,229 | block | 8 s |
+| OS Fingerprinting attack | DDoS_ICMP | 0.980 | boosting | 1,134 / 1,176 | block | 9 s |
+| Password attacks | Password | 0.957 | boosting | 919,469 / 1,053,893 | block | 130 s |
+| Port Scanning attack | Port_Scanning | 0.999 | boosting | 22,495 / 23,329 | block | 12 s |
+| Ransomware attack | Ransomware | 0.994 | boosting | 10,620 / 11,030 | block | 11 s |
+| SQL injection attack | SQL_injection | 1.000 | boosting | 51,097 / 51,228 | block | 17 s |
+| Uploading attack | Uploading | 0.999 | boosting | 37,592 / 37,644 | block | 15 s |
+| XSS attacks | XSS | 0.999 | boosting | 15,677 / 16,215 | block | 12 s |
+| Vulnerability scanner attack | Vulnerability_scanner | 0.996 | boosting | 262,922 / 265,827 | block | 60 s |
+
+**Reading Phase B on all captures** (`scripts/reruns/run_phase_b_all.sh`; `logs/full/phase_b_all/`). All 14 captures end in a *block* decision with the
+`priority=100,ip,nw_src=10.0.0.1 actions=drop` rule read back from the switch. **12 of 14 are classified as the right attack type**; the MITM capture is called
+Ransomware (0.991; only 542 of its 1,229 packets flagged) and the OS-fingerprinting capture is called DDoS_ICMP (0.980). The replays are of the dataset's own
+captures, so they demonstrate the pipeline; they are not a held-out test. The released Vulnerability-scanner capture is damaged (a record claims a 136 MB packet):
+`extract_raw_fields` now uses the packets before the damage (265,827) and logs a warning; the other captures are intact. Largest replay: DDoS UDP, 3.2M packets, 268 s.
+
+**Tests.** 244 passed, 1 skipped in 527 s (): the earlier 236 plus the grouped-split tests and the damaged-capture test; the second skip of earlier runs now executes because the real captures are present.
+
+**New limitations from this run** (also in §10): packet-level false alarms are dominated by a few long connections; the trust filter excludes fewer attackers
+at full scale; MITM cannot be split by connection and is scored only by zero-day and Phase B; the pipeline's classifier still starts from the 5% server set (the
+full 1.43M-row classifier is a separate experiment, §8.10); stealth / pruning / clip are single-seed at full scale; the full-scale seeds are 42-44 only.
+
 ## 9. Do not cite (superseded numbers, with reason)
 
 - Every real-data number from before `c1cc656` (label leak): Phase 5
@@ -1586,9 +1801,8 @@ models; the zero-day columns inside the ablation/sweep tables at seeds 43/44; a 
     so the headline cascade number is more trustworthy at a single seed
     than the AE-alone diagnostic column is. Seeds 43 and 44 now repeat
     the ablation, sweep and zero-day experiments (§8.14a), except the zero-day columns inside the ablation/sweep tables.
-11. **Subsampled federated pool** (60k rows) for runtime. The federated
-    system trains on ~125k rows (~6%); only the standalone classifier
-    trained on 1.43M (§5.5).
+11. **Subsampled federated pool** (60k rows) in the runs of §8.1-8.14, for runtime. **Resolved in §8.15:** the main federated results now use the
+    whole pool (1.89M rows) split by connection. The pipeline's bootstrap classifier still trains on the 5% server set (72-80k rows).
 12. **Evaluation runs in-process**: same code, but no network effects;
     the real multi-process path is covered by tests and Phase A.
 13. **Boosting broadcast size** (~11 MB/round) isn't in the
@@ -1616,6 +1830,14 @@ models; the zero-day columns inside the ablation/sweep tables at seeds 43/44; a 
     zero-day detection fell (0.894 -> 0.695); attacker survival at 40% rose
     (0.238 -> 0.362, single seed). svc_port is partly a testbed effect, and
     flow features summarise whole (<=120 s) records.
+
+---
+
+19. **Packet-level false alarms are dominated by a few long normal connections** (§8.15): 2.5%-16.3% of normal packets, but 0.34%-1.04% of normal connections and ~3% for the median client.
+20. **The trust filter excludes fewer attackers at full scale** (survival 0.50-0.62 at 30%, earlier 0.12-0.27); cause not established.
+21. **MITM cannot be split by connection** (one flow); it is scored only by zero-day and Phase B.
+22. **Phase B captures are the dataset's own**, and the released Vulnerability-scanner capture is damaged (readable prefix used); two of 14 captures are classified as the wrong type (still blocked).
+23. **Stealth, pruning and clip are single-seed at full scale**; the autoencoder backstop is weaker at full scale (recall alone 0.22-0.49).
 
 ---
 
@@ -1676,6 +1898,8 @@ Checked: CLAUDE.md "What done looks like", §0 status, §10 limitations, §11 fi
 - **Live Simulation dashboard view.** Checked on 2026-11-01 with Phase B holding (`--hold-seconds 75`) and `tools/live_view_check.py` (Streamlit AppTest, auto-refresh off):
   bridge status ok, 1 switch, 1 classification, 1 device under mitigation, five tables populated, no errors (`logs/audit/live_view_check.log`).
   This is a headless render of the real bridge's responses, not a person watching it in a browser.
+- **Closed on 2026-11-02, §8.15:** the whole federated system trains and is tested on all usable rows, split by connection; real Phase A at 10 and 20 clients, three seeds;
+  sweep, ablation, zero-day, stealth, pruning, clip at full scale; Phase B on all 14 captures. Still open: the items below plus stealth/pruning/clip at seeds 43/44.
 - **Closed on 2026-11-01 (later), §8.14:** (a) multi-seed repeats of the ablation, sweep and zero-day (zero-day columns inside the first two excepted);
   (b) the 20-client dip explained; (c) adaptive attacker tested; (g) weight pruning implemented and measured; (e) all §11 figures generated
   (zero-day class absent from the reconstruction-error figure); time-ordered split run; Phase B on the seed bundles; explainer PDFs regenerated.

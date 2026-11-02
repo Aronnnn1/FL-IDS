@@ -1,0 +1,9 @@
+2026-11-01 21:04:41,659 [INFO] fl_ids.data.pipeline: Loaded extended features from cache data/processed/encoded_extended.npz: (1985768, 130)
+2026-11-01 21:04:42,709 [INFO] fl_ids.models.boosting: Training boosting classifier: 100181 samples, 15 classes, 300 rounds
+2026-11-01 21:04:58,839 [WARNING] fl_ids.data.pipeline: Client 4 has zero benign validation samples (heavy Dirichlet skew or too few benign samples in its shard)
+2026-11-01 21:05:03,369 [INFO] fl_ids.eval.common: Evaluation setup: 100181 calibration, 1885587 federated pool (subsampled), 288416 test rows across 10 clients
+2026-11-01 21:05:03,372 [INFO] __main__: Ablation: poisoning_fraction=0.30 -> malicious clients=[0, 6, 9]
+2026-11-01 21:05:51,646 [INFO] __main__: variant=boosting_only: attack_macro_recall=0.990 benign_fpr=0.0001 autoencoder_alone=nan
+2026-11-01 21:05:51,660 [INFO] __main__: Saved /home/flids/FL-IDS-clean/results/full/inprocess/s42/shards/ablation_s42_boosting_only/ablation_table.csv
+      variant  attack_macro_recall  attack_micro_recall  benign_fpr  detection_f1  zero_day_macro_recall  autoencoder_alone_attack_macro_recall  final_val_loss  rounds_to_convergence  total_communication_bytes
+boosting_only             0.989948             0.995078    0.000114      0.997377                    NaN                                    NaN             NaN                    NaN                          0

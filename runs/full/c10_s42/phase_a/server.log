@@ -1,0 +1,409 @@
+2026-11-01 17:00:43,099 [INFO] __main__: Starting Flower server on 127.0.0.1:9091 for 20 rounds
+[93mWARNING [0m:   DEPRECATED FEATURE: flwr.server.start_server() is deprecated.
+	Instead, use the `flower-superlink` CLI command to start a SuperLink as shown below:
+
+		$ flower-superlink --insecure
+
+	To view usage and all available options, run:
+
+		$ flower-superlink --help
+
+	Using `start_server()` is deprecated.
+
+            This is a deprecated feature. It will be removed
+            entirely in future versions of Flower.
+        
+2026-11-01 17:00:43,099 [WARNING] flwr: DEPRECATED FEATURE: flwr.server.start_server() is deprecated.
+	Instead, use the `flower-superlink` CLI command to start a SuperLink as shown below:
+
+		$ flower-superlink --insecure
+
+	To view usage and all available options, run:
+
+		$ flower-superlink --help
+
+	Using `start_server()` is deprecated.
+
+            This is a deprecated feature. It will be removed
+            entirely in future versions of Flower.
+        
+[92mINFO [0m:      Starting Flower server, config: num_rounds=20, no round_timeout
+2026-11-01 17:00:43,100 [INFO] flwr: Starting Flower server, config: num_rounds=20, no round_timeout
+[92mINFO [0m:      Flower ECE: gRPC server running (20 rounds), SSL is disabled
+2026-11-01 17:00:43,112 [INFO] flwr: Flower ECE: gRPC server running (20 rounds), SSL is disabled
+[92mINFO [0m:      [INIT]
+2026-11-01 17:00:43,112 [INFO] flwr: [INIT]
+[92mINFO [0m:      Using initial global parameters provided by strategy
+2026-11-01 17:00:43,112 [INFO] flwr: Using initial global parameters provided by strategy
+[92mINFO [0m:      Starting evaluation of initial global parameters
+2026-11-01 17:00:43,112 [INFO] flwr: Starting evaluation of initial global parameters
+[92mINFO [0m:      Evaluation returned no results (`None`)
+2026-11-01 17:00:43,112 [INFO] flwr: Evaluation returned no results (`None`)
+[92mINFO [0m:      
+2026-11-01 17:00:43,112 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 1]
+2026-11-01 17:00:43,112 [INFO] flwr: [ROUND 1]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:00:46,743 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:02:22,027 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:02:22,032 [INFO] fl_ids.fl.strategy: Round 1 trust filter: 8/10 clients survived, excluded {4: ['mad_outlier'], 0: ['mad_outlier']}. Trust scores: {3: 0.942, 6: 0.951, 9: 0.929, 2: 0.952, 5: 0.956, 1: 0.943, 8: 0.956, 4: 0.865, 0: 0.908, 7: 0.952}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:02:22,033 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:02:22,139 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[93mWARNING [0m:   No evaluate_metrics_aggregation_fn provided
+2026-11-01 17:02:22,139 [WARNING] flwr: No evaluate_metrics_aggregation_fn provided
+[92mINFO [0m:      
+2026-11-01 17:02:22,140 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 2]
+2026-11-01 17:02:22,140 [INFO] flwr: [ROUND 2]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:02:22,140 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:02:42,633 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:02:42,638 [INFO] fl_ids.fl.strategy: Round 2 trust filter: 7/10 clients survived, excluded {4: ['mad_outlier'], 9: ['mad_outlier'], 0: ['mad_outlier']}. Trust scores: {8: 0.93, 5: 0.918, 4: 0.788, 6: 0.91, 7: 0.918, 9: 0.871, 1: 0.901, 0: 0.847, 3: 0.914, 2: 0.915}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:02:42,640 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:02:42,750 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:02:42,751 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 3]
+2026-11-01 17:02:42,751 [INFO] flwr: [ROUND 3]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:02:42,751 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:03:04,447 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:03:04,451 [INFO] fl_ids.fl.strategy: Round 3 trust filter: 8/10 clients survived, excluded {0: ['mad_outlier'], 4: ['mad_outlier']}. Trust scores: {0: 0.786, 1: 0.862, 5: 0.869, 4: 0.735, 2: 0.871, 6: 0.883, 9: 0.831, 7: 0.882, 3: 0.883, 8: 0.87}
+2026-11-01 17:03:17,088 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 80265 rows (now 350 trees)
+2026-11-01 17:03:20,296 [INFO] fl_ids.models.boosting_update: Round 3: boosting v2 (continue) from 399 alerts ({'Backdoor': 1, 'DDoS_HTTP': 2, 'Normal': 381, 'Password': 1, 'Port_Scanning': 2, 'Ransomware': 10, 'XSS': 2}); 1 from excluded clients ignored
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:03:20,396 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:03:20,501 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:03:20,502 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 4]
+2026-11-01 17:03:20,502 [INFO] flwr: [ROUND 4]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:03:20,503 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:05:12,425 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:05:12,430 [INFO] fl_ids.fl.strategy: Round 4 trust filter: 9/10 clients survived, excluded {4: ['mad_outlier']}. Trust scores: {8: 0.82, 6: 0.847, 5: 0.82, 4: 0.689, 7: 0.851, 2: 0.831, 9: 0.797, 1: 0.819, 0: 0.74, 3: 0.846}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:05:12,432 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:05:12,556 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:05:12,557 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 5]
+2026-11-01 17:05:12,557 [INFO] flwr: [ROUND 5]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:05:12,557 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:05:38,395 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:05:38,400 [INFO] fl_ids.fl.strategy: Round 5 trust filter: 8/10 clients survived, excluded {0: ['mad_outlier'], 4: ['mad_outlier']}. Trust scores: {0: 0.692, 6: 0.813, 4: 0.651, 3: 0.81, 9: 0.767, 5: 0.784, 8: 0.791, 2: 0.795, 7: 0.824, 1: 0.771}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:05:38,401 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:05:38,538 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:05:38,538 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 6]
+2026-11-01 17:05:38,539 [INFO] flwr: [ROUND 6]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:05:38,539 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:06:04,444 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:06:04,448 [INFO] fl_ids.fl.strategy: Round 6 trust filter: 9/10 clients survived, excluded {4: ['mad_outlier']}. Trust scores: {5: 0.744, 1: 0.728, 0: 0.67, 8: 0.752, 7: 0.79, 6: 0.779, 3: 0.761, 9: 0.741, 2: 0.756, 4: 0.627}
+2026-11-01 17:06:22,901 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 80618 rows (now 400 trees)
+2026-11-01 17:06:28,257 [INFO] fl_ids.models.boosting_update: Round 6: boosting v3 (continue) from 353 alerts ({'Backdoor': 4, 'DDoS_HTTP': 2, 'Normal': 334, 'Password': 2, 'Ransomware': 3, 'Vulnerability_scanner': 6, 'XSS': 2}); 0 from excluded clients ignored
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:06:28,380 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:06:28,510 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:06:28,511 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 7]
+2026-11-01 17:06:28,512 [INFO] flwr: [ROUND 7]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:06:28,514 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:09:13,716 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:09:13,720 [INFO] fl_ids.fl.strategy: Round 7 trust filter: 10/10 clients survived, excluded {}. Trust scores: {8: 0.711, 4: 0.614, 1: 0.692, 6: 0.753, 2: 0.723, 7: 0.767, 3: 0.729, 5: 0.708, 9: 0.724, 0: 0.635}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:09:13,722 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:09:13,851 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:09:13,852 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 8]
+2026-11-01 17:09:13,852 [INFO] flwr: [ROUND 8]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:09:13,853 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:09:41,569 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:09:41,573 [INFO] fl_ids.fl.strategy: Round 8 trust filter: 10/10 clients survived, excluded {}. Trust scores: {5: 0.679, 3: 0.723, 0: 0.605, 2: 0.704, 4: 0.591, 6: 0.744, 1: 0.657, 7: 0.76, 9: 0.723, 8: 0.667}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:09:41,575 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:09:41,694 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:09:41,695 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 9]
+2026-11-01 17:09:41,695 [INFO] flwr: [ROUND 9]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:09:41,696 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:10:05,610 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:10:05,614 [INFO] fl_ids.fl.strategy: Round 9 trust filter: 10/10 clients survived, excluded {}. Trust scores: {3: 0.721, 4: 0.575, 9: 0.722, 1: 0.626, 0: 0.582, 2: 0.692, 5: 0.654, 6: 0.748, 7: 0.753, 8: 0.633}
+2026-11-01 17:10:23,176 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 80968 rows (now 450 trees)
+2026-11-01 17:10:27,545 [INFO] fl_ids.models.boosting_update: Round 9: boosting v4 (continue) from 350 alerts ({'Normal': 338, 'Password': 2, 'Ransomware': 2, 'Vulnerability_scanner': 4, 'XSS': 4}); 0 from excluded clients ignored
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:10:27,679 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:10:27,795 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:10:27,796 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 10]
+2026-11-01 17:10:27,796 [INFO] flwr: [ROUND 10]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:10:27,797 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:12:59,021 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:12:59,026 [INFO] fl_ids.fl.strategy: Round 10 trust filter: 10/10 clients survived, excluded {}. Trust scores: {1: 0.611, 7: 0.741, 8: 0.613, 5: 0.645, 4: 0.569, 0: 0.573, 2: 0.684, 6: 0.749, 9: 0.714, 3: 0.71}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:12:59,028 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:12:59,157 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:12:59,158 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 11]
+2026-11-01 17:12:59,158 [INFO] flwr: [ROUND 11]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:12:59,159 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:13:26,111 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:13:26,116 [INFO] fl_ids.fl.strategy: Round 11 trust filter: 10/10 clients survived, excluded {}. Trust scores: {9: 0.709, 1: 0.598, 4: 0.563, 3: 0.696, 2: 0.666, 6: 0.747, 7: 0.725, 0: 0.571, 8: 0.594, 5: 0.637}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:13:26,118 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:13:26,267 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:13:26,268 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 12]
+2026-11-01 17:13:26,269 [INFO] flwr: [ROUND 12]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:13:26,269 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:13:54,096 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:13:54,101 [INFO] fl_ids.fl.strategy: Round 12 trust filter: 10/10 clients survived, excluded {}. Trust scores: {0: 0.566, 7: 0.717, 2: 0.647, 9: 0.701, 5: 0.635, 1: 0.592, 3: 0.681, 6: 0.746, 8: 0.578, 4: 0.559}
+2026-11-01 17:14:18,503 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 81318 rows (now 500 trees)
+2026-11-01 17:14:24,587 [INFO] fl_ids.models.boosting_update: Round 12: boosting v5 (continue) from 350 alerts ({'Backdoor': 3, 'DDoS_HTTP': 1, 'Normal': 340, 'Password': 2, 'Ransomware': 1, 'Vulnerability_scanner': 2, 'XSS': 1}); 0 from excluded clients ignored
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:14:24,760 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:14:24,887 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:14:24,888 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 13]
+2026-11-01 17:14:24,888 [INFO] flwr: [ROUND 13]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:14:24,889 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:17:40,764 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:17:40,768 [INFO] fl_ids.fl.strategy: Round 13 trust filter: 10/10 clients survived, excluded {}. Trust scores: {4: 0.556, 8: 0.565, 2: 0.634, 6: 0.747, 9: 0.692, 3: 0.665, 5: 0.629, 0: 0.564, 7: 0.716, 1: 0.591}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:17:40,770 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:17:40,890 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:17:40,891 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 14]
+2026-11-01 17:17:40,892 [INFO] flwr: [ROUND 14]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:17:40,892 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:18:05,307 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:18:05,311 [INFO] fl_ids.fl.strategy: Round 14 trust filter: 10/10 clients survived, excluded {}. Trust scores: {6: 0.746, 2: 0.623, 0: 0.559, 8: 0.556, 5: 0.623, 7: 0.714, 9: 0.678, 1: 0.59, 3: 0.65, 4: 0.556}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:18:05,313 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:18:05,429 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:18:05,430 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 15]
+2026-11-01 17:18:05,431 [INFO] flwr: [ROUND 15]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:18:05,431 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:18:28,557 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:18:28,561 [INFO] fl_ids.fl.strategy: Round 15 trust filter: 10/10 clients survived, excluded {}. Trust scores: {1: 0.594, 6: 0.741, 3: 0.636, 8: 0.547, 0: 0.554, 9: 0.664, 7: 0.706, 5: 0.617, 2: 0.613, 4: 0.553}
+2026-11-01 17:18:50,730 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 81673 rows (now 550 trees)
+2026-11-01 17:18:56,208 [INFO] fl_ids.models.boosting_update: Round 15: boosting v6 (continue) from 355 alerts ({'Backdoor': 1, 'Normal': 347, 'Password': 2, 'Ransomware': 5}); 0 from excluded clients ignored
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:18:56,372 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:18:56,504 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:18:56,505 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 16]
+2026-11-01 17:18:56,505 [INFO] flwr: [ROUND 16]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:18:56,506 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:22:10,508 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:22:10,514 [INFO] fl_ids.fl.strategy: Round 16 trust filter: 10/10 clients survived, excluded {}. Trust scores: {3: 0.626, 5: 0.61, 4: 0.549, 1: 0.59, 0: 0.552, 2: 0.607, 7: 0.698, 6: 0.731, 9: 0.657, 8: 0.537}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:22:10,516 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:22:10,644 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:22:10,645 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 17]
+2026-11-01 17:22:10,645 [INFO] flwr: [ROUND 17]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:22:10,646 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:22:39,048 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:22:39,054 [INFO] fl_ids.fl.strategy: Round 17 trust filter: 9/10 clients survived, excluded {8: ['opposes_consensus']}. Trust scores: {6: 0.722, 9: 0.653, 1: 0.585, 3: 0.622, 5: 0.605, 0: 0.549, 8: 0.525, 2: 0.598, 7: 0.689, 4: 0.548}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:22:39,056 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:22:39,192 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:22:39,194 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 18]
+2026-11-01 17:22:39,194 [INFO] flwr: [ROUND 18]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:22:39,195 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:23:08,933 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:23:08,938 [INFO] fl_ids.fl.strategy: Round 18 trust filter: 10/10 clients survived, excluded {}. Trust scores: {5: 0.595, 8: 0.53, 2: 0.597, 3: 0.62, 6: 0.718, 7: 0.682, 9: 0.649, 1: 0.575, 4: 0.544, 0: 0.54}
+2026-11-01 17:23:37,523 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 82027 rows (now 600 trees)
+2026-11-01 17:23:44,979 [INFO] fl_ids.models.boosting_update: Round 18: boosting v7 (continue) from 354 alerts ({'Normal': 352, 'Ransomware': 2}); 0 from excluded clients ignored
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:23:45,164 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:23:45,291 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:23:45,293 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 19]
+2026-11-01 17:23:45,293 [INFO] flwr: [ROUND 19]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:23:45,293 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:27:28,620 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:27:28,626 [INFO] fl_ids.fl.strategy: Round 19 trust filter: 10/10 clients survived, excluded {}. Trust scores: {5: 0.594, 2: 0.591, 7: 0.671, 0: 0.539, 8: 0.522, 3: 0.615, 4: 0.549, 1: 0.565, 6: 0.71, 9: 0.642}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:27:28,628 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:27:28,745 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:27:28,746 [INFO] flwr: 
+[92mINFO [0m:      [ROUND 20]
+2026-11-01 17:27:28,746 [INFO] flwr: [ROUND 20]
+[92mINFO [0m:      configure_fit: strategy sampled 10 clients (out of 10)
+2026-11-01 17:27:28,747 [INFO] flwr: configure_fit: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:27:51,694 [INFO] flwr: aggregate_fit: received 10 results and 0 failures
+2026-11-01 17:27:51,698 [INFO] fl_ids.fl.strategy: Round 20 trust filter: 10/10 clients survived, excluded {}. Trust scores: {4: 0.551, 6: 0.703, 3: 0.607, 0: 0.535, 1: 0.558, 5: 0.593, 2: 0.585, 7: 0.659, 9: 0.636, 8: 0.516}
+[92mINFO [0m:      configure_evaluate: strategy sampled 10 clients (out of 10)
+2026-11-01 17:27:51,700 [INFO] flwr: configure_evaluate: strategy sampled 10 clients (out of 10)
+[92mINFO [0m:      aggregate_evaluate: received 10 results and 0 failures
+2026-11-01 17:27:51,813 [INFO] flwr: aggregate_evaluate: received 10 results and 0 failures
+[92mINFO [0m:      
+2026-11-01 17:27:51,814 [INFO] flwr: 
+[92mINFO [0m:      [SUMMARY]
+2026-11-01 17:27:51,814 [INFO] flwr: [SUMMARY]
+[92mINFO [0m:      Run finished 20 round(s) in 1628.70s
+2026-11-01 17:27:51,814 [INFO] flwr: Run finished 20 round(s) in 1628.70s
+[92mINFO [0m:      	History (loss, distributed):
+2026-11-01 17:27:51,815 [INFO] flwr: 	History (loss, distributed):
+[92mINFO [0m:      		round 1: 0.32811822246679534
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 1: 0.32811822246679534
+[92mINFO [0m:      		round 2: 0.18099812738216753
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 2: 0.18099812738216753
+[92mINFO [0m:      		round 3: 0.11262210862608721
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 3: 0.11262210862608721
+[92mINFO [0m:      		round 4: 0.10192654002974973
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 4: 0.10192654002974973
+[92mINFO [0m:      		round 5: 0.09319057615104545
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 5: 0.09319057615104545
+[92mINFO [0m:      		round 6: 0.09715887349947584
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 6: 0.09715887349947584
+[92mINFO [0m:      		round 7: 0.09714762579541894
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 7: 0.09714762579541894
+[92mINFO [0m:      		round 8: 0.09387041774290245
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 8: 0.09387041774290245
+[92mINFO [0m:      		round 9: 0.09382294629258399
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 9: 0.09382294629258399
+[92mINFO [0m:      		round 10: 0.09344037388953381
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 10: 0.09344037388953381
+[92mINFO [0m:      		round 11: 0.09329595729761751
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 11: 0.09329595729761751
+[92mINFO [0m:      		round 12: 0.09126936088962187
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 12: 0.09126936088962187
+[92mINFO [0m:      		round 13: 0.08609755083360532
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 13: 0.08609755083360532
+[92mINFO [0m:      		round 14: 0.08406801828486539
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 14: 0.08406801828486539
+[92mINFO [0m:      		round 15: 0.08395001995416836
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 15: 0.08395001995416836
+[92mINFO [0m:      		round 16: 0.08376052750881681
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 16: 0.08376052750881681
+[92mINFO [0m:      		round 17: 0.08349636987639532
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 17: 0.08349636987639532
+[92mINFO [0m:      		round 18: 0.08330597765573589
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 18: 0.08330597765573589
+[92mINFO [0m:      		round 19: 0.08440418548165068
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 19: 0.08440418548165068
+[92mINFO [0m:      		round 20: 0.08539973507617225
+2026-11-01 17:27:51,815 [INFO] flwr: 		round 20: 0.08539973507617225
+[92mINFO [0m:      	History (metrics, distributed, fit):
+2026-11-01 17:27:51,815 [INFO] flwr: 	History (metrics, distributed, fit):
+[92mINFO [0m:      	{'num_survivors': [(1, 8),
+2026-11-01 17:27:51,815 [INFO] flwr: 	{'num_survivors': [(1, 8),
+[92mINFO [0m:      	                   (2, 7),
+2026-11-01 17:27:51,815 [INFO] flwr: 	                   (2, 7),
+[92mINFO [0m:      	                   (3, 8),
+2026-11-01 17:27:51,815 [INFO] flwr: 	                   (3, 8),
+[92mINFO [0m:      	                   (4, 9),
+2026-11-01 17:27:51,815 [INFO] flwr: 	                   (4, 9),
+[92mINFO [0m:      	                   (5, 8),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (5, 8),
+[92mINFO [0m:      	                   (6, 9),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (6, 9),
+[92mINFO [0m:      	                   (7, 10),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (7, 10),
+[92mINFO [0m:      	                   (8, 10),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (8, 10),
+[92mINFO [0m:      	                   (9, 10),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (9, 10),
+[92mINFO [0m:      	                   (10, 10),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (10, 10),
+[92mINFO [0m:      	                   (11, 10),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (11, 10),
+[92mINFO [0m:      	                   (12, 10),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (12, 10),
+[92mINFO [0m:      	                   (13, 10),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (13, 10),
+[92mINFO [0m:      	                   (14, 10),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (14, 10),
+[92mINFO [0m:      	                   (15, 10),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (15, 10),
+[92mINFO [0m:      	                   (16, 10),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (16, 10),
+[92mINFO [0m:      	                   (17, 9),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (17, 9),
+[92mINFO [0m:      	                   (18, 10),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (18, 10),
+[92mINFO [0m:      	                   (19, 10),
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (19, 10),
+[92mINFO [0m:      	                   (20, 10)]}
+2026-11-01 17:27:51,816 [INFO] flwr: 	                   (20, 10)]}
+[92mINFO [0m:      
+2026-11-01 17:27:51,816 [INFO] flwr: 
+2026-11-01 17:27:51,840 [INFO] __main__: Saved final boosting model to runs/full/c10_s42/phase_a/final_boosting_model.txt
+2026-11-01 17:27:51,842 [INFO] __main__: Saved final global weights to runs/full/c10_s42/phase_a/final_weights.npz

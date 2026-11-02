@@ -1,0 +1,19 @@
+c10_s42 phase_a OK 1846s Phase A done in 1843.6s: cascade attack macro-recall 0.996, benign FPR 0.1275 on 10 clients' held-out test slices; bundle at saved_models/full/c10_s42
+c10_s42 breakdown OK
+c10_s42 phase_b OK Phase B done in 12.0s: h1 (client 0) -> Backdoor (confidence 0.997, boosting stage, 24543/24914 packets non-benign) -> block; flow rule: cookie=0x0, duration=0.004s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1
+c20_s42 phase_a OK 1266s Phase A done in 1260.3s: cascade attack macro-recall 0.998, benign FPR 0.0588 on 20 clients' held-out test slices; bundle at saved_models/full/c20_s42
+c20_s42 breakdown OK
+c20_s42 phase_b OK Phase B done in 10.6s: h1 (client 0) -> Backdoor (confidence 0.996, boosting stage, 24808/24914 packets non-benign) -> block; flow rule: cookie=0x0, duration=0.004s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1
+c10_s43 phase_a OK 1399s Phase A done in 1397.2s: cascade attack macro-recall 0.995, benign FPR 0.0884 on 10 clients' held-out test slices; bundle at saved_models/full/c10_s43
+c10_s43 breakdown OK
+c10_s43 phase_b OK Phase B done in 8.2s: h1 (client 0) -> Backdoor (confidence 0.997, boosting stage, 24811/24914 packets non-benign) -> block; flow rule: cookie=0x0, duration=0.004s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 
+c20_s43 phase_a OK 1066s Phase A done in 1063.4s: cascade attack macro-recall 0.997, benign FPR 0.1628 on 20 clients' held-out test slices; bundle at saved_models/full/c20_s43
+c20_s43 breakdown OK
+c20_s43 phase_b OK Phase B done in 9.0s: h1 (client 0) -> Backdoor (confidence 0.996, boosting stage, 24685/24914 packets non-benign) -> block; flow rule: cookie=0x0, duration=0.005s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 
+c10_s44 phase_a OK 1756s Phase A done in 1753.6s: cascade attack macro-recall 0.994, benign FPR 0.0248 on 10 clients' held-out test slices; bundle at saved_models/full/c10_s44
+c10_s44 breakdown OK
+c10_s44 phase_b OK Phase B done in 8.2s: h1 (client 0) -> Backdoor (confidence 0.996, boosting stage, 24374/24914 packets non-benign) -> block; flow rule: cookie=0x0, duration=0.004s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 
+c20_s44 phase_a OK 1227s Phase A done in 1225.0s: cascade attack macro-recall 0.997, benign FPR 0.1089 on 20 clients' held-out test slices; bundle at saved_models/full/c20_s44
+c20_s44 breakdown OK
+c20_s44 phase_b OK Phase B done in 9.2s: h1 (client 0) -> Backdoor (confidence 0.995, boosting stage, 24529/24914 packets non-benign) -> block; flow rule: cookie=0x0, duration=0.004s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 
+QUEUE_DONE

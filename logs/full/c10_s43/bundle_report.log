@@ -1,0 +1,45 @@
+{
+  "boosting_only": {
+    "attack_macro_recall": 0.9934131822466963,
+    "attack_micro_recall": 0.9970728778364314,
+    "benign_fpr": 0.00012306298856006457,
+    "detection_f1": 0.9983779552215437
+  },
+  "autoencoder_only": {
+    "attack_macro_recall": 0.46324913627636904,
+    "attack_micro_recall": 0.48580220659978485,
+    "benign_fpr": 0.08831984562978715,
+    "detection_f1": 0.5681100058513752
+  },
+  "cascade": {
+    "attack_macro_recall": 0.9946610015595744,
+    "attack_micro_recall": 0.9978359310500112,
+    "benign_fpr": 0.08836414830566877,
+    "detection_f1": 0.8979860634238047
+  }
+}
+                class  test_rows  boosting_only  autoencoder_only  cascade
+             Backdoor       3515       0.989189          0.173257 0.991465
+            DDoS_HTTP       6633       0.989899          0.547867 0.991859
+            DDoS_ICMP       9813       1.000000          0.253032 1.000000
+             DDoS_TCP       7173       1.000000          0.472187 1.000000
+             DDoS_UDP      18392       1.000000          0.418280 1.000000
+       Fingerprinting         37       0.972973          0.135135 0.972973
+             Password       7823       0.993992          0.332353 0.994631
+        Port_Scanning       2744       0.997449          0.608236 0.998178
+           Ransomware       1536       0.988281          0.476562 0.994141
+        SQL_injection       8491       0.998233          0.890943 1.000000
+            Uploading       5280       0.999811          0.185985 0.999811
+Vulnerability_scanner       6726       0.997472          0.961790 0.998216
+                  XSS       1779       0.987071          0.566610 0.989320
+ client  test_rows  attack_rows  benign_rows  benign_val_rows  threshold_infinite  cascade_attack_recall  boosting_attack_recall  cascade_fpr
+      0      11416         9092         2324             2018               False               0.999780                0.999780     0.028830
+      1      89459         7834        81625            70440               False               0.997702                0.997064     0.031204
+      2       5691         5677           14               14               False               0.996477                0.996477     0.071429
+      3      24277        17376         6901             8378               False               0.997410                0.996087     0.031155
+      4      27268         1280        25988            21673               False               0.998437                0.997656     0.223642
+      5      49429         3106        46323            40842               False               0.998068                0.996137     0.007728
+      6      25544         3470        22074            17604               False               0.998847                0.991931     0.400063
+      7       6082         6054           28               28               False               0.998018                0.998018     0.035714
+      8      16447        13175         3272             3868               False               0.996205                0.996053     0.031479
+      9      27477        12878        14599            14688               False               0.998913                0.998913     0.001096

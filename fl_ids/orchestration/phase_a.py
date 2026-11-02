@@ -37,7 +37,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from fl_ids.data.pipeline import load_and_encode, partition_and_normalize_clients
+from fl_ids.data.pipeline import calibration_eval_split, load_and_encode, partition_and_normalize_clients, server_pool_split
 from fl_ids.utils.journey import Journey
 from fl_ids.eval.common import concat_client_test_slices, per_row_thresholds, select_malicious_clients
 from fl_ids.eval.metrics import detection_metrics, evaluate_boosting_alone, flag_attacks, stage_report_summary
@@ -103,18 +103,12 @@ def prepare_data(
         later boosting version is scored on — which the dashboard shows
         next to each round.
     """
-    X_calib, X_pool, y_calib, y_pool = train_test_split(
-        X, y, train_size=config.boosting.calibration_fraction, random_state=config.seed, stratify=y
+    X_calib, y_calib, X_pool, y_pool, groups_calib, groups_pool = server_pool_split(
+        X, y, config, config.seed, config.orchestration.pool_subsample_size
     )
     # Part of the calibration set stays with the server purely to score each
     # boosting version, so the dashboard compares versions on the same data.
-    X_calib, X_calib_eval, y_calib, y_calib_eval = train_test_split(
-        X_calib, y_calib, test_size=config.boosting.calibration_eval_fraction,
-        random_state=config.seed, stratify=y_calib,
-    )
-    cap = config.orchestration.pool_subsample_size
-    if len(X_pool) > cap:
-        X_pool, _, y_pool, _ = train_test_split(X_pool, y_pool, train_size=cap, random_state=config.seed, stratify=y_pool)
+    X_calib, X_calib_eval, y_calib, y_calib_eval = calibration_eval_split(X_calib, y_calib, groups_calib, config, config.seed)
 
     boosting_model = BoostingClassifier(
         config.boosting, len(class_names), benign_class, config.seed, config.cascade.confidence_threshold
@@ -124,7 +118,7 @@ def prepare_data(
         evaluate_boosting_alone(boosting_model, X_calib_eval, y_calib_eval, class_names, benign_class)
     )
 
-    client_data = partition_and_normalize_clients(X_pool, y_pool, benign_class, config.data, config.seed)
+    client_data = partition_and_normalize_clients(X_pool, y_pool, benign_class, config.data, config.seed, groups=groups_pool)
     logger.info(
         "Prepared %d calibration rows, %d federated rows across %d clients; bootstrap boosting accuracy %.3f",
         len(y_calib), len(y_pool), len(client_data), boosting_metrics["accuracy"],
