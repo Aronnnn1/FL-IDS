@@ -1,0 +1,118 @@
+2026-11-01 21:02:16,275 [INFO] fl_ids.data.pipeline: Loaded extended features from cache data/processed/encoded_extended.npz: (1985768, 130)
+2026-11-01 21:02:16,923 [INFO] __main__: Zero-day run: holding out XSS
+2026-11-01 21:02:17,749 [INFO] fl_ids.eval.common: Excluded classes ['XSS'] from training
+2026-11-01 21:02:17,752 [INFO] fl_ids.models.boosting: Training boosting classifier: 99414 samples, 15 classes, 300 rounds
+2026-11-01 21:02:34,228 [WARNING] fl_ids.data.pipeline: Client 4 has zero benign validation samples (heavy Dirichlet skew or too few benign samples in its shard)
+2026-11-01 21:02:39,069 [INFO] fl_ids.eval.common: Evaluation setup: 99414 calibration, 1871182 federated pool (subsampled), 289877 test rows across 10 clients
+2026-11-01 21:07:07,625 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:07:07,784 [INFO] fl_ids.eval.simulation: Round 1: mean_val_loss=0.3516, comm_bytes=786720
+2026-11-01 21:07:59,200 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:07:59,351 [INFO] fl_ids.eval.simulation: Round 2: mean_val_loss=0.1575, comm_bytes=786720
+2026-11-01 21:07:59,368 [INFO] fl_ids.fl.client: Client 0 round 3: 0 of 8007 boosting-passed rows flagged; surfacing 0
+2026-11-01 21:07:59,773 [INFO] fl_ids.fl.client: Client 1 round 3: 6078 of 13472 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:08:00,570 [INFO] fl_ids.fl.client: Client 2 round 3: 2197 of 71049 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:08:04,317 [INFO] fl_ids.fl.client: Client 3 round 3: 8154 of 68217 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:08:07,776 [INFO] fl_ids.fl.client: Client 5 round 3: 132 of 11047 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:08:08,584 [INFO] fl_ids.fl.client: Client 6 round 3: 31845 of 153596 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:08:16,597 [INFO] fl_ids.fl.client: Client 7 round 3: 338 of 168693 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:08:25,486 [INFO] fl_ids.fl.client: Client 8 round 3: 583 of 16552 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:08:27,204 [INFO] fl_ids.fl.client: Client 9 round 3: 1310 of 470098 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:09:10,043 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 99764 rows (now 350 trees)
+2026-11-01 21:09:10,043 [INFO] fl_ids.models.boosting_update: Round 3: boosting v2 (continue) from 350 alerts ({'Backdoor': 3, 'DDoS_HTTP': 3, 'Normal': 326, 'Password': 8, 'Ransomware': 10}); 50 from excluded clients ignored
+2026-11-01 21:09:10,168 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:09:10,315 [INFO] fl_ids.eval.simulation: Round 3: mean_val_loss=0.1123, comm_bytes=786720
+2026-11-01 21:14:17,002 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:14:17,144 [INFO] fl_ids.eval.simulation: Round 4: mean_val_loss=0.1010, comm_bytes=786720
+2026-11-01 21:15:06,909 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:15:07,056 [INFO] fl_ids.eval.simulation: Round 5: mean_val_loss=0.0963, comm_bytes=786720
+2026-11-01 21:15:07,074 [INFO] fl_ids.fl.client: Client 0 round 6: 0 of 8000 boosting-passed rows flagged; surfacing 0
+2026-11-01 21:15:07,559 [INFO] fl_ids.fl.client: Client 1 round 6: 168 of 13427 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:15:08,486 [INFO] fl_ids.fl.client: Client 2 round 6: 2148 of 71049 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:15:12,584 [INFO] fl_ids.fl.client: Client 3 round 6: 5220 of 68203 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:15:16,568 [INFO] fl_ids.fl.client: Client 5 round 6: 96 of 11014 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:15:17,479 [INFO] fl_ids.fl.client: Client 6 round 6: 31820 of 153590 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:15:26,195 [INFO] fl_ids.fl.client: Client 7 round 6: 300 of 168692 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:15:34,825 [INFO] fl_ids.fl.client: Client 8 round 6: 584 of 16537 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:15:36,476 [INFO] fl_ids.fl.client: Client 9 round 6: 1174 of 470079 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:16:21,066 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 100164 rows (now 400 trees)
+2026-11-01 21:16:21,067 [INFO] fl_ids.models.boosting_update: Round 6: boosting v3 (continue) from 400 alerts ({'Backdoor': 2, 'DDoS_HTTP': 5, 'DDoS_TCP': 1, 'DDoS_UDP': 1, 'Normal': 356, 'Password': 5, 'Ransomware': 6, 'Uploading': 23, 'Vulnerability_scanner': 1}); 0 from excluded clients ignored
+2026-11-01 21:16:21,203 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:16:21,332 [INFO] fl_ids.eval.simulation: Round 6: mean_val_loss=0.0909, comm_bytes=786720
+2026-11-01 21:22:04,168 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:22:04,308 [INFO] fl_ids.eval.simulation: Round 7: mean_val_loss=0.0877, comm_bytes=786720
+2026-11-01 21:22:58,681 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:22:58,834 [INFO] fl_ids.eval.simulation: Round 8: mean_val_loss=0.0862, comm_bytes=786720
+2026-11-01 21:22:58,856 [INFO] fl_ids.fl.client: Client 0 round 9: 1 of 7984 boosting-passed rows flagged; surfacing 1
+2026-11-01 21:22:59,339 [INFO] fl_ids.fl.client: Client 1 round 9: 146 of 13394 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:23:00,267 [INFO] fl_ids.fl.client: Client 2 round 9: 2110 of 71020 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:23:05,056 [INFO] fl_ids.fl.client: Client 3 round 9: 1607 of 68198 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:23:10,179 [INFO] fl_ids.fl.client: Client 5 round 9: 102 of 11005 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:23:11,305 [INFO] fl_ids.fl.client: Client 6 round 9: 31864 of 153597 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:23:22,742 [INFO] fl_ids.fl.client: Client 7 round 9: 245 of 168659 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:23:32,375 [INFO] fl_ids.fl.client: Client 8 round 9: 555 of 16519 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:23:34,237 [INFO] fl_ids.fl.client: Client 9 round 9: 720 of 469616 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:24:23,559 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 100565 rows (now 450 trees)
+2026-11-01 21:24:23,559 [INFO] fl_ids.models.boosting_update: Round 9: boosting v4 (continue) from 401 alerts ({'DDoS_HTTP': 2, 'DDoS_UDP': 1, 'Normal': 391, 'Ransomware': 4, 'Vulnerability_scanner': 3}); 0 from excluded clients ignored
+2026-11-01 21:24:23,710 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:24:23,847 [INFO] fl_ids.eval.simulation: Round 9: mean_val_loss=0.0850, comm_bytes=786720
+2026-11-01 21:30:52,669 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:30:52,795 [INFO] fl_ids.eval.simulation: Round 10: mean_val_loss=0.0843, comm_bytes=786720
+2026-11-01 21:31:48,799 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:31:48,930 [INFO] fl_ids.eval.simulation: Round 11: mean_val_loss=0.0837, comm_bytes=786720
+2026-11-01 21:31:48,950 [INFO] fl_ids.fl.client: Client 0 round 12: 0 of 7993 boosting-passed rows flagged; surfacing 0
+2026-11-01 21:31:49,419 [INFO] fl_ids.fl.client: Client 1 round 12: 152 of 13361 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:31:50,274 [INFO] fl_ids.fl.client: Client 2 round 12: 2067 of 70995 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:31:54,293 [INFO] fl_ids.fl.client: Client 3 round 12: 395 of 68195 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:31:58,294 [INFO] fl_ids.fl.client: Client 5 round 12: 113 of 11012 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:31:59,253 [INFO] fl_ids.fl.client: Client 6 round 12: 31648 of 153601 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:32:09,205 [INFO] fl_ids.fl.client: Client 7 round 12: 267 of 168655 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:32:19,880 [INFO] fl_ids.fl.client: Client 8 round 12: 545 of 16512 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:32:21,827 [INFO] fl_ids.fl.client: Client 9 round 12: 716 of 469618 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:33:20,996 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 100965 rows (now 500 trees)
+2026-11-01 21:33:20,996 [INFO] fl_ids.models.boosting_update: Round 12: boosting v5 (continue) from 400 alerts ({'Backdoor': 3, 'Normal': 391, 'Password': 1, 'Ransomware': 4, 'Uploading': 1}); 0 from excluded clients ignored
+2026-11-01 21:33:21,163 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:33:21,289 [INFO] fl_ids.eval.simulation: Round 12: mean_val_loss=0.0831, comm_bytes=786720
+2026-11-01 21:40:44,520 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:40:44,648 [INFO] fl_ids.eval.simulation: Round 13: mean_val_loss=0.0840, comm_bytes=786720
+2026-11-01 21:41:41,555 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:41:41,684 [INFO] fl_ids.eval.simulation: Round 14: mean_val_loss=0.0839, comm_bytes=786720
+2026-11-01 21:41:41,703 [INFO] fl_ids.fl.client: Client 0 round 15: 0 of 7977 boosting-passed rows flagged; surfacing 0
+2026-11-01 21:41:42,184 [INFO] fl_ids.fl.client: Client 1 round 15: 127 of 13323 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:41:43,122 [INFO] fl_ids.fl.client: Client 2 round 15: 2042 of 70984 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:41:47,961 [INFO] fl_ids.fl.client: Client 3 round 15: 215 of 68192 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:41:52,294 [INFO] fl_ids.fl.client: Client 5 round 15: 122 of 11034 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:41:53,266 [INFO] fl_ids.fl.client: Client 6 round 15: 31923 of 153597 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:42:03,077 [INFO] fl_ids.fl.client: Client 7 round 15: 264 of 168652 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:42:14,132 [INFO] fl_ids.fl.client: Client 8 round 15: 481 of 16496 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:42:16,141 [INFO] fl_ids.fl.client: Client 9 round 15: 726 of 469625 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:43:16,630 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 101365 rows (now 550 trees)
+2026-11-01 21:43:16,631 [INFO] fl_ids.models.boosting_update: Round 15: boosting v6 (continue) from 400 alerts ({'Backdoor': 2, 'DDoS_HTTP': 2, 'Normal': 386, 'Password': 2, 'Ransomware': 8}); 0 from excluded clients ignored
+2026-11-01 21:43:16,830 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:43:16,964 [INFO] fl_ids.eval.simulation: Round 15: mean_val_loss=0.0849, comm_bytes=786720
+2026-11-01 21:51:31,609 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:51:31,754 [INFO] fl_ids.eval.simulation: Round 16: mean_val_loss=0.0875, comm_bytes=786720
+2026-11-01 21:52:38,424 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:52:38,561 [INFO] fl_ids.eval.simulation: Round 17: mean_val_loss=0.0855, comm_bytes=786720
+2026-11-01 21:52:38,585 [INFO] fl_ids.fl.client: Client 0 round 18: 0 of 8012 boosting-passed rows flagged; surfacing 0
+2026-11-01 21:52:39,161 [INFO] fl_ids.fl.client: Client 1 round 18: 148 of 13280 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:52:40,176 [INFO] fl_ids.fl.client: Client 2 round 18: 1959 of 70966 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:52:45,701 [INFO] fl_ids.fl.client: Client 3 round 18: 7527 of 68185 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:52:51,919 [INFO] fl_ids.fl.client: Client 5 round 18: 101 of 11039 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:52:53,245 [INFO] fl_ids.fl.client: Client 6 round 18: 31847 of 153594 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:53:04,196 [INFO] fl_ids.fl.client: Client 7 round 18: 257 of 168636 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:53:14,318 [INFO] fl_ids.fl.client: Client 8 round 18: 485 of 16497 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:53:16,253 [INFO] fl_ids.fl.client: Client 9 round 18: 656 of 469623 boosting-passed rows flagged; surfacing 50
+2026-11-01 21:54:17,860 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 101765 rows (now 600 trees)
+2026-11-01 21:54:17,860 [INFO] fl_ids.models.boosting_update: Round 18: boosting v7 (continue) from 400 alerts ({'Fingerprinting': 1, 'Normal': 393, 'Password': 2, 'Port_Scanning': 1, 'Ransomware': 3}); 0 from excluded clients ignored
+2026-11-01 21:54:18,068 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 21:54:18,232 [INFO] fl_ids.eval.simulation: Round 18: mean_val_loss=0.0847, comm_bytes=786720
+2026-11-01 22:03:38,770 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 22:03:38,934 [INFO] fl_ids.eval.simulation: Round 19: mean_val_loss=0.0886, comm_bytes=786720
+2026-11-01 22:04:51,831 [WARNING] fl_ids.fl.client: Client 4: no benign validation samples to evaluate on
+2026-11-01 22:04:51,987 [INFO] fl_ids.eval.simulation: Round 20: mean_val_loss=0.0848, comm_bytes=786720
+2026-11-01 22:04:52,261 [WARNING] fl_ids.eval.common: Clients [4] have no benign validation rows (infinite threshold); 3453 test rows can't be flagged by the autoencoder
+2026-11-01 22:08:18,626 [INFO] __main__: holdout=XSS: boosting_only=0.823 autoencoder_alone=0.680 cascade=0.943 (benign FPR 0.0001 -> 0.0897)
+2026-11-01 22:08:18,657 [INFO] __main__: Saved /home/flids/FL-IDS-clean/results/full/inprocess/s42/shards/zeroday_s42_XSS/zero_day_holdout.csv
+2026-11-01 22:08:19,015 [INFO] __main__: Saved /home/flids/FL-IDS-clean/results/full/inprocess/s42/shards/zeroday_s42_XSS/zero_day_holdout.png
+holdout_class  holdout_rows  boosting_only_detection_rate  autoencoder_alone_detection_rate  cascade_detection_rate  autoencoder_added_detection_rate boosting_top_misattributed_label  boosting_top_misattributed_share  autoencoder_auroc_vs_benign  boosting_only_benign_fpr  cascade_benign_fpr  boosting_only_known_attack_macro_recall  cascade_known_attack_macro_recall  final_val_loss
+          XSS         15172                      0.823425                          0.680003                0.943251                          0.119826            Vulnerability_scanner                          0.809518                     0.950917                  0.000065            0.089712                                 0.972564                           0.996172          0.0848

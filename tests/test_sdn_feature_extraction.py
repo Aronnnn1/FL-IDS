@@ -134,3 +134,26 @@ def test_live_extraction_reproduces_the_dataset_authors_rows():
 
     matched = np.mean([row.tobytes() in authors_rows for row in ours_aligned])
     assert matched > 0.99, f"only {matched:.3f} of live-extracted rows match the authors' rows"
+
+
+def test_damaged_capture_uses_the_packets_before_the_damage_and_other_failures_still_raise(monkeypatch, tmp_path):
+    import subprocess
+
+    from fl_ids.sdn import feature_extraction as fe
+
+    pcap = tmp_path / "x.pcap"
+    pcap.write_bytes(b"x")
+    good = "\"frame.time\",\"ip.src_host\"\n\"t1\",\"10.0.0.1\"\n\"t2\",\"10.0.0.2\"\n"
+
+    def fake(returncode, stdout, stderr):
+        return lambda cmd, **kw: subprocess.CompletedProcess(cmd, returncode, stdout, stderr)
+
+    monkeypatch.setattr(fe.subprocess, "run", fake(2, good, "tshark: The file appears to be damaged or corrupt.\n"))
+    df = fe.extract_raw_fields(pcap, ["frame.time", "ip.src_host"])
+    assert len(df) == 2
+    monkeypatch.setattr(fe.subprocess, "run", fake(2, "", "tshark: The file appears to be damaged or corrupt.\n"))
+    with pytest.raises(subprocess.CalledProcessError):
+        fe.extract_raw_fields(pcap, ["frame.time", "ip.src_host"])
+    monkeypatch.setattr(fe.subprocess, "run", fake(1, good, "tshark: some other failure\n"))
+    with pytest.raises(subprocess.CalledProcessError):
+        fe.extract_raw_fields(pcap, ["frame.time", "ip.src_host"])

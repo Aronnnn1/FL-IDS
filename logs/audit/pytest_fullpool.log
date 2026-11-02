@@ -1,0 +1,18 @@
+........................................................................ [ 29%]
+........................................................................ [ 58%]
+........................................................................ [ 88%]
+...s.........................                                            [100%]
+=============================== warnings summary ===============================
+venv/lib/python3.14/site-packages/typer/__init__.py:24
+  /home/flids/FL-IDS-clean/venv/lib/python3.14/site-packages/typer/__init__.py:24: DeprecationWarning: 'click.utils.get_binary_stream' is deprecated and will be removed in Click 9.0.
+    from click.utils import get_binary_stream as get_binary_stream
+
+venv/lib/python3.14/site-packages/typer/__init__.py:25
+  /home/flids/FL-IDS-clean/venv/lib/python3.14/site-packages/typer/__init__.py:25: DeprecationWarning: 'click.utils.get_text_stream' is deprecated and will be removed in Click 9.0.
+    from click.utils import get_text_stream as get_text_stream
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_sdn_feature_extraction.py:116: real capture + authors' CSV not present
+244 passed, 1 skipped, 2 warnings in 526.94s (0:08:46)
+PYTEST_DONE 0

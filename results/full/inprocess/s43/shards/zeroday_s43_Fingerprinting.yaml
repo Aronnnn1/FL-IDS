@@ -1,0 +1,103 @@
+autoencoder:
+  anomaly_percentile: 97
+  batch_size: 64
+  bottleneck_dim: 8
+  hidden_dims:
+  - 32
+  - 16
+  learning_rate: 0.001
+  local_epochs: 5
+  reconstruction_error_bins: 50
+  reconstruction_error_range:
+  - 0.0
+  - 10.0
+boosting:
+  alert_budget_per_client: 50
+  broadcast_every_n_rounds: 1
+  calibration_eval_fraction: 0.2
+  calibration_fraction: 0.05
+  class_weighting: sqrt
+  label_source: server_held_calibration_set
+  lambda_l2: 1.0
+  learning_rate: 0.05
+  min_sum_hessian_in_leaf: 1.0
+  num_boost_round: 300
+  num_leaves: 31
+  update_every_n_rounds: 3
+  update_num_boost_round: 50
+cascade:
+  anomaly_confidence_clip:
+  - 0.0
+  - 1.0
+  confidence_threshold: 0.7
+classifier_comparison:
+  sample_size: 500000
+  test_fraction: 0.2
+data:
+  capture_repairs:
+    MITM: data/processed/MITM_reextracted.csv
+  dirichlet_alpha: 0.3
+  dnn_csv_path: data/raw/DNN-EdgeIIoT-dataset.csv
+  extended_features: true
+  feature_cache: data/processed/encoded_extended.npz
+  group_by_flow: true
+  min_flows_per_class: 20
+  normalize_per_client: true
+  normalized_clip: 10.0
+  num_clients: 10
+  pcap_dir: data/raw/pcaps
+  test_fraction: 0.15
+  val_benign_fraction: 0.15
+dl_classifier:
+  batch_size: 256
+  dropout: 0.1
+  epochs: 15
+  hidden_dims:
+  - 64
+  - 32
+  learning_rate: 0.001
+evaluation:
+  convergence_tolerance: 0.1
+  output_dir: results/full/inprocess
+  poisoning_fractions:
+  - 0.0
+  - 0.2
+  - 0.3
+  - 0.4
+  - 0.5
+  zero_day_holdout_classes:
+  - Fingerprinting
+  zero_day_max_holdout_rows: 10000000
+fl:
+  clients_per_round: 10
+  local_epochs: 5
+  num_rounds: 20
+  strategy: custom_trust_filtered
+logging:
+  level: INFO
+  log_dir: logs/full
+  log_file: fl_ids.log
+orchestration:
+  artifact_dir: saved_models/phase_a
+  fl_timeout_seconds: 3600
+  live_state_path: /tmp/fl_ids_training_state.json
+  malicious_fraction: 0.0
+  pool_subsample_size: 0
+  run_dir: runs/phase_a
+  server_address: 127.0.0.1:9091
+robustness:
+  attacker_example_count: max_client
+  mad_outlier_threshold: 3.0
+  min_cosine_similarity: 0.0
+  min_trust_score: 0.5
+  norm_clip_multiplier: 2.0
+  trim_fraction: 0.15
+  trust_ema_alpha: 0.3
+sdn:
+  block_confidence_threshold: 0.85
+  bridge_api_host: 127.0.0.1
+  bridge_api_port: 8080
+  controller_host: 127.0.0.1
+  controller_port: 6653
+  rate_limit_confidence_threshold: 0.5
+seed: 43

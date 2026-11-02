@@ -127,6 +127,18 @@ python experiments/accuracy/train_eval.py full --temporal --balance --seed 42   
 python3 tools/build_followups.py                     # tables for the notes, report and results page
 ```
 
+Full pool, split by connection (2026-11-02; `PAPER_NOTES.md` section 8.15, configs in `configs/full/`):
+
+```bash
+python3 tools/make_full_configs.py                       # configs/full/c<clients>_s<seed>.yaml
+bash scripts/reruns/run_full_phase_a.sh 10 42            # real Phase A (1 server + N clients), per-class breakdown, Phase B on Backdoor (about 25 min)
+python -m fl_ids.eval.flow_fpr --config-path configs/full/c10_s42.yaml --artifact-dir saved_models/full/c10_s42 \
+  --run-dir runs/full/c10_s42/phase_a --output-dir results/full/c10_s42/flow_fpr   # false alarms per connection
+python3 tools/run_full_experiments.py --workers 9        # 77 in-process jobs (about 4.4 GB each; several instances can share the work)
+bash scripts/reruns/run_phase_b_all.sh c10_s42           # Phase B on every attack capture
+python3 tools/summarize_full.py && python3 tools/build_full_tables.py   # merge and tabulate
+```
+
 ## Running
 
 ```bash
@@ -284,9 +296,9 @@ for comparison. New results are in `results/extended/`.
 - **Classifier** (LightGBM on all 1.99M rows: 1.43M train, 397k test,
   connections held out of training, 3 seeds): 99.7% accuracy, 0.983–0.985
   macro F1 [96.4%, 0.889].
-- **Data scale:** the federated system trains on ~125k rows (79,430-row
-  server calibration set + 45,474 client training rows from the 60k pool),
-  not the full dataset; see PAPER_NOTES §5.5.
+- **Data scale:** the main federated results (PAPER_NOTES §8.15) train on the whole pool, 1.89M rows split by connection, with a 72-80k-row server
+  calibration set; the earlier runs of this section used a 60k-row pool split by row (kept as the comparison). The standalone classifier trains on 1.43M
+  rows (§5.5).
 - **Real Phase A run** (real Flower server + 10 client processes):
   0.999 attack macro-recall [0.889], 0.035 benign FPR [0.035];
   bootstrap boosting accuracy 0.997 [0.963].

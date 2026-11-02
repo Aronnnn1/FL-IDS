@@ -36,6 +36,13 @@ class DataConfig:
     # .npz cache for the extended encoded matrix (fl_ids.data.pipeline
     # load_and_encode); None rebuilds it on every load (~1.5 min).
     feature_cache: str | None = None
+    # Split by connection instead of by row: packets of one flow share their flow-level features, so a row-level split puts
+    # near-identical siblings on both sides. True keeps every flow whole on one side of the calibration split, the
+    # client partition and each client's train/val/test split (fl_ids.data.pipeline.grouped_*). Needs the feature cache.
+    group_by_flow: bool = False
+    # With group_by_flow, a class with fewer flows than this cannot be split across sides: all of it goes to the server's
+    # calibration set (so the classifier learns it) and none to the clients' pool or test slices.
+    min_flows_per_class: int = 20
 
 
 @dataclass

@@ -1,0 +1,34 @@
+2026-11-02 05:42:10,133 [INFO] fl_ids.data.pipeline: Loaded extended features from cache data/processed/encoded_extended.npz: (1985768, 130)
+{
+  "packet_fpr": 0.024830150160836444,
+  "flow_fpr": 0.0039015327450069672,
+  "benign_test_rows": 213571,
+  "benign_test_flows": 10765,
+  "median_client_packet_fpr": 0.029290248024363648,
+  "share_of_false_alarm_packets_from_top_10_flows": 0.887422213841222
+}
+ client  benign_test_rows  benign_test_flows  packet_fpr  flow_fpr  largest_flow_rows  largest_flow_share  flagged_packets_in_false_alarm_flows
+      0                13                  1    0.076923  0.000000                 13            1.000000                                     0
+      1             17372               1251    0.030279  0.003997                 15            0.000863                                    24
+      2                14                  1    0.071429  0.000000                 14            1.000000                                     0
+      3             51485               2621    0.003962  0.004578               7802            0.151539                                    15
+      4                14                  1    0.000000  0.000000                 14            1.000000                                     0
+      5             22355               1041    0.173429  0.000000               7857            0.351465                                     0
+      6            122106               5834    0.005634  0.004285               9906            0.081126                                    66
+      7               212                 15    0.028302  0.000000                 15            0.070755                                     0
+ client  flow  rows  flagged  false_alarm
+      6 30130  9906 0.015344        False
+      6 30009  8432 0.046252        False
+      6 29274  7901 0.008733        False
+      5 29396  7857 0.493445        False
+      3 75184  7802 0.012817        False
+      6 28049  7611 0.000131        False
+      6 27559  7406 0.000000        False
+      3 27072  7322 0.011609        False
+      3  1573    18 0.000000        False
+      6 15844    17 0.000000        False
+      6 50693    17 0.000000        False
+      6 17903    16 0.000000        False
+      3  6187    16 0.000000        False
+      6 19096    16 0.000000        False
+      6 66143    16 1.000000         True

@@ -1,0 +1,20 @@
+{
+  "boosting_only": {
+    "attack_macro_recall": 0.9701204882061927,
+    "attack_micro_recall": 0.9961871750433275,
+    "benign_fpr": 0.0,
+    "detection_f1": 0.9980899461712103
+  },
+  "autoencoder_only": {
+    "attack_macro_recall": 0.6928497768347461,
+    "attack_micro_recall": 0.6606585788561525,
+    "benign_fpr": 0.044281618349792926,
+    "detection_f1": 0.7520220950877885
+  },
+  "cascade": {
+    "attack_macro_recall": 1.0,
+    "attack_micro_recall": 1.0,
+    "benign_fpr": 0.044281618349792926,
+    "detection_f1": 0.9540343915343915
+  }
+}

@@ -1,0 +1,36 @@
+2026-11-02 05:40:42,027 [INFO] fl_ids.data.pipeline: Loaded extended features from cache data/processed/encoded_extended.npz: (1985768, 130)
+{
+  "packet_fpr": 0.08836414830566877,
+  "flow_fpr": 0.00739594083247334,
+  "benign_test_rows": 203148,
+  "benign_test_flows": 11628,
+  "median_client_packet_fpr": 0.03134144647423777,
+  "share_of_false_alarm_packets_from_top_10_flows": 0.8039106456464821
+}
+ client  benign_test_rows  benign_test_flows  packet_fpr  flow_fpr  largest_flow_rows  largest_flow_share  flagged_packets_in_false_alarm_flows
+      0              2324                169    0.028830  0.000000                 15            0.006454                                     0
+      1             81625               5877    0.031204  0.008338                 16            0.000196                                   104
+      2                14                  1    0.071429  0.000000                 14            1.000000                                     0
+      3              6901                493    0.031155  0.002028                 16            0.002319                                    16
+      4             25988               1322    0.223642  0.007564               7573            0.291404                                  7592
+      5             46323               1509    0.007728  0.004639               9906            0.213846                                   333
+      6             22074                967    0.400063  0.018614               8753            0.396530                                  8785
+      7                28                  2    0.035714  0.000000                 14            0.500000                                     0
+      8              3272                238    0.031479  0.000000                 15            0.004584                                     0
+      9             14599               1050    0.001096  0.000952                 16            0.001096                                    12
+ client  flow  rows  flagged  false_alarm
+      5 30130  9906 0.000808        False
+      6 30496  8753 1.000000         True
+      5 28049  7611 0.000263        False
+      4 28539  7573 0.696818         True
+      5 28294  7562 0.000132        False
+      5 85236   319 1.000000         True
+      1 65064    16 1.000000         True
+      5 38740    16 0.000000        False
+      5 85105    16 0.000000        False
+      9 74592    16 0.250000        False
+      3 72482    16 1.000000         True
+      1 28797    15 0.000000        False
+      1 11885    15 0.000000        False
+      1  9948    15 0.000000        False
+      3  2581    15 0.066667        False

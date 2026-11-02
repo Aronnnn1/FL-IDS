@@ -1,0 +1,300 @@
+[93mWARNING [0m:   DEPRECATED FEATURE: flwr.client.start_client() is deprecated.
+	Instead, use the `flower-supernode` CLI command to start a SuperNode as shown below:
+
+		$ flower-supernode --insecure --superlink='<IP>:<PORT>'
+
+	To view all available options, run:
+
+		$ flower-supernode --help
+
+	Using `start_client()` is deprecated.
+
+            This is a deprecated feature. It will be removed
+            entirely in future versions of Flower.
+        
+2026-11-01 17:47:49,408 [WARNING] flwr: DEPRECATED FEATURE: flwr.client.start_client() is deprecated.
+	Instead, use the `flower-supernode` CLI command to start a SuperNode as shown below:
+
+		$ flower-supernode --insecure --superlink='<IP>:<PORT>'
+
+	To view all available options, run:
+
+		$ flower-supernode --help
+
+	Using `start_client()` is deprecated.
+
+            This is a deprecated feature. It will be removed
+            entirely in future versions of Flower.
+        
+2026-11-01 17:47:49,409 [DEBUG] flwr: Using InMemoryObjectStore
+2026-11-01 17:47:49,416 [DEBUG] flwr: Opened insecure gRPC connection (no certificates were passed)
+2026-11-01 17:47:49,419 [DEBUG] flwr: ChannelConnectivity.IDLE
+2026-11-01 17:47:49,426 [DEBUG] flwr: ChannelConnectivity.CONNECTING
+2026-11-01 17:47:49,427 [DEBUG] flwr: ChannelConnectivity.READY
+[92mINFO [0m:      
+2026-11-01 17:47:51,119 [INFO] flwr: 
+[92mINFO [0m:      Received: train message cf277f03-4266-4198-bcb5-796a4f0ebe0e
+2026-11-01 17:47:51,119 [INFO] flwr: Received: train message cf277f03-4266-4198-bcb5-796a4f0ebe0e
+[92mINFO [0m:      Sent reply
+2026-11-01 17:48:03,520 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:48:59,029 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 338be0fb-1ac5-4d11-a3c9-27cb33f61f13
+2026-11-01 17:48:59,029 [INFO] flwr: Received: evaluate message 338be0fb-1ac5-4d11-a3c9-27cb33f61f13
+2026-11-01 17:48:59,030 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:48:59,031 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:48:59,323 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 519cd0f7-cd8d-432d-ad13-72c214ce612e
+2026-11-01 17:48:59,323 [INFO] flwr: Received: train message 519cd0f7-cd8d-432d-ad13-72c214ce612e
+[92mINFO [0m:      Sent reply
+2026-11-01 17:48:59,340 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:49:13,569 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message b0ee4118-5abb-4c00-92fa-57b70012c083
+2026-11-01 17:49:13,569 [INFO] flwr: Received: evaluate message b0ee4118-5abb-4c00-92fa-57b70012c083
+2026-11-01 17:49:13,570 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:49:13,571 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:49:13,776 [INFO] flwr: 
+[92mINFO [0m:      Received: train message a5023b7a-84a8-44d0-8c26-23a97bea4ef4
+2026-11-01 17:49:13,776 [INFO] flwr: Received: train message a5023b7a-84a8-44d0-8c26-23a97bea4ef4
+[92mINFO [0m:      Sent reply
+2026-11-01 17:49:13,792 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:49:44,635 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message a8e4a592-3a7e-4d17-a39f-e8c73ace3e58
+2026-11-01 17:49:44,635 [INFO] flwr: Received: evaluate message a8e4a592-3a7e-4d17-a39f-e8c73ace3e58
+2026-11-01 17:49:44,636 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:49:44,636 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:49:45,082 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 0aa9c791-cd9d-4ba1-a07a-4d6ef68f5d15
+2026-11-01 17:49:45,082 [INFO] flwr: Received: train message 0aa9c791-cd9d-4ba1-a07a-4d6ef68f5d15
+[92mINFO [0m:      Sent reply
+2026-11-01 17:49:58,125 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:51:02,408 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message b115b36e-ff06-4cf2-bdf9-aea8e9473906
+2026-11-01 17:51:02,408 [INFO] flwr: Received: evaluate message b115b36e-ff06-4cf2-bdf9-aea8e9473906
+2026-11-01 17:51:02,409 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:51:02,410 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:51:02,651 [INFO] flwr: 
+[92mINFO [0m:      Received: train message b2d1db1e-0aaf-448c-9433-1bfe45c2e9f8
+2026-11-01 17:51:02,651 [INFO] flwr: Received: train message b2d1db1e-0aaf-448c-9433-1bfe45c2e9f8
+[92mINFO [0m:      Sent reply
+2026-11-01 17:51:02,666 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:51:16,682 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 42db22d0-2446-4eea-b8d3-2d6c017d1f11
+2026-11-01 17:51:16,682 [INFO] flwr: Received: evaluate message 42db22d0-2446-4eea-b8d3-2d6c017d1f11
+2026-11-01 17:51:16,683 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:51:16,683 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:51:16,979 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 05d87f05-591f-4286-99af-51b862f9bcfe
+2026-11-01 17:51:16,980 [INFO] flwr: Received: train message 05d87f05-591f-4286-99af-51b862f9bcfe
+[92mINFO [0m:      Sent reply
+2026-11-01 17:51:16,993 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:51:51,437 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 83b2741f-14cb-4df9-b8ed-c0e29b890337
+2026-11-01 17:51:51,437 [INFO] flwr: Received: evaluate message 83b2741f-14cb-4df9-b8ed-c0e29b890337
+2026-11-01 17:51:51,438 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:51:51,439 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:51:51,673 [INFO] flwr: 
+[92mINFO [0m:      Received: train message d2e6efb0-62fb-41f7-9706-e47ceefc4999
+2026-11-01 17:51:51,673 [INFO] flwr: Received: train message d2e6efb0-62fb-41f7-9706-e47ceefc4999
+[92mINFO [0m:      Sent reply
+2026-11-01 17:52:05,038 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:53:21,033 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message c61caf6c-257f-4c5d-b33d-3d112480c21f
+2026-11-01 17:53:21,033 [INFO] flwr: Received: evaluate message c61caf6c-257f-4c5d-b33d-3d112480c21f
+2026-11-01 17:53:21,034 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:53:21,035 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:53:21,326 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 05174f34-4b81-41aa-b8ac-d7eee0e1a79e
+2026-11-01 17:53:21,326 [INFO] flwr: Received: train message 05174f34-4b81-41aa-b8ac-d7eee0e1a79e
+[92mINFO [0m:      Sent reply
+2026-11-01 17:53:21,345 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:53:35,580 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message ef6627fd-25b5-431e-980f-4400c06e0002
+2026-11-01 17:53:35,580 [INFO] flwr: Received: evaluate message ef6627fd-25b5-431e-980f-4400c06e0002
+2026-11-01 17:53:35,581 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:53:35,581 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:53:36,003 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 3523e91f-2f0a-4842-8e9d-04f1db13e1fc
+2026-11-01 17:53:36,003 [INFO] flwr: Received: train message 3523e91f-2f0a-4842-8e9d-04f1db13e1fc
+[92mINFO [0m:      Sent reply
+2026-11-01 17:53:36,023 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:54:14,039 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 94ef6eea-f1fb-4c2a-8e89-00974b28e163
+2026-11-01 17:54:14,039 [INFO] flwr: Received: evaluate message 94ef6eea-f1fb-4c2a-8e89-00974b28e163
+2026-11-01 17:54:14,041 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:54:14,041 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:54:14,272 [INFO] flwr: 
+[92mINFO [0m:      Received: train message d95cfd2e-60bc-4e16-908a-af60edebdb44
+2026-11-01 17:54:14,272 [INFO] flwr: Received: train message d95cfd2e-60bc-4e16-908a-af60edebdb44
+[92mINFO [0m:      Sent reply
+2026-11-01 17:54:30,525 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:55:54,006 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 6a856ce1-4c1a-4414-b8d3-d9dfb90a7c5e
+2026-11-01 17:55:54,006 [INFO] flwr: Received: evaluate message 6a856ce1-4c1a-4414-b8d3-d9dfb90a7c5e
+2026-11-01 17:55:54,008 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:55:54,008 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:55:54,430 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 788f78b8-e492-4589-aafa-1ccb448695ed
+2026-11-01 17:55:54,430 [INFO] flwr: Received: train message 788f78b8-e492-4589-aafa-1ccb448695ed
+[92mINFO [0m:      Sent reply
+2026-11-01 17:55:54,447 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:56:09,149 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message eed7f0ae-6f03-4579-8ed1-49feb1200038
+2026-11-01 17:56:09,149 [INFO] flwr: Received: evaluate message eed7f0ae-6f03-4579-8ed1-49feb1200038
+2026-11-01 17:56:09,150 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:56:09,150 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:56:09,472 [INFO] flwr: 
+[92mINFO [0m:      Received: train message af9f532a-69b1-4bb0-9204-afe7c727adb0
+2026-11-01 17:56:09,472 [INFO] flwr: Received: train message af9f532a-69b1-4bb0-9204-afe7c727adb0
+[92mINFO [0m:      Sent reply
+2026-11-01 17:56:09,487 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:56:50,579 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 57b05ef8-cde0-4f67-b7b1-3155f6f786a4
+2026-11-01 17:56:50,579 [INFO] flwr: Received: evaluate message 57b05ef8-cde0-4f67-b7b1-3155f6f786a4
+2026-11-01 17:56:50,580 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:56:50,581 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:56:51,063 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 614959d1-bfdd-467b-a886-e42dfbe93f48
+2026-11-01 17:56:51,064 [INFO] flwr: Received: train message 614959d1-bfdd-467b-a886-e42dfbe93f48
+[92mINFO [0m:      Sent reply
+2026-11-01 17:57:11,830 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:58:42,810 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 45ff546a-7ea8-41d6-b393-11a61c8b4696
+2026-11-01 17:58:42,810 [INFO] flwr: Received: evaluate message 45ff546a-7ea8-41d6-b393-11a61c8b4696
+2026-11-01 17:58:42,811 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:58:42,812 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:58:42,929 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 9a3a7d81-cfbd-4244-b63c-b24803977f0d
+2026-11-01 17:58:42,929 [INFO] flwr: Received: train message 9a3a7d81-cfbd-4244-b63c-b24803977f0d
+[92mINFO [0m:      Sent reply
+2026-11-01 17:58:42,946 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:58:58,185 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 38b22a4c-d471-4b8d-a33e-2f1ed74afafa
+2026-11-01 17:58:58,185 [INFO] flwr: Received: evaluate message 38b22a4c-d471-4b8d-a33e-2f1ed74afafa
+2026-11-01 17:58:58,187 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:58:58,187 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:58:58,649 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 3c8040cb-fd8d-41d7-8436-e427488ddca2
+2026-11-01 17:58:58,649 [INFO] flwr: Received: train message 3c8040cb-fd8d-41d7-8436-e427488ddca2
+[92mINFO [0m:      Sent reply
+2026-11-01 17:58:58,671 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:59:42,603 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message b56f2309-c220-437c-82da-ae1ee6cd2389
+2026-11-01 17:59:42,603 [INFO] flwr: Received: evaluate message b56f2309-c220-437c-82da-ae1ee6cd2389
+2026-11-01 17:59:42,604 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 17:59:42,605 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 17:59:42,740 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 4808b313-ccec-4ccb-a8e5-6c61d9c935dd
+2026-11-01 17:59:42,740 [INFO] flwr: Received: train message 4808b313-ccec-4ccb-a8e5-6c61d9c935dd
+[92mINFO [0m:      Sent reply
+2026-11-01 18:00:05,585 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 18:01:49,090 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message f067a4f8-100b-4b04-844b-b29a6f71e4ee
+2026-11-01 18:01:49,090 [INFO] flwr: Received: evaluate message f067a4f8-100b-4b04-844b-b29a6f71e4ee
+2026-11-01 18:01:49,091 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 18:01:49,092 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 18:01:49,516 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 9da04d4c-ce72-4eaf-8cde-51a83499f40d
+2026-11-01 18:01:49,516 [INFO] flwr: Received: train message 9da04d4c-ce72-4eaf-8cde-51a83499f40d
+[92mINFO [0m:      Sent reply
+2026-11-01 18:01:49,538 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 18:02:04,239 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 6707bf79-dee2-49ab-a514-6ccb18ca72da
+2026-11-01 18:02:04,239 [INFO] flwr: Received: evaluate message 6707bf79-dee2-49ab-a514-6ccb18ca72da
+2026-11-01 18:02:04,241 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 18:02:04,241 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 18:02:04,381 [INFO] flwr: 
+[92mINFO [0m:      Received: train message 6766d5d0-b23b-42e5-a885-fbaf061f8f69
+2026-11-01 18:02:04,381 [INFO] flwr: Received: train message 6766d5d0-b23b-42e5-a885-fbaf061f8f69
+[92mINFO [0m:      Sent reply
+2026-11-01 18:02:04,400 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 18:02:51,841 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 1cb5d7f5-0188-4ec2-a408-d1db2946697f
+2026-11-01 18:02:51,841 [INFO] flwr: Received: evaluate message 1cb5d7f5-0188-4ec2-a408-d1db2946697f
+2026-11-01 18:02:51,843 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 18:02:51,843 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 18:02:52,009 [INFO] flwr: 
+[92mINFO [0m:      Received: train message d8f52f5e-95e8-45e2-bbae-3dc35ca99c0c
+2026-11-01 18:02:52,009 [INFO] flwr: Received: train message d8f52f5e-95e8-45e2-bbae-3dc35ca99c0c
+[92mINFO [0m:      Sent reply
+2026-11-01 18:03:18,969 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 18:05:13,793 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 9be81289-a9bc-4c70-8acd-d3e56b822b42
+2026-11-01 18:05:13,793 [INFO] flwr: Received: evaluate message 9be81289-a9bc-4c70-8acd-d3e56b822b42
+2026-11-01 18:05:13,794 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 18:05:13,795 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 18:05:14,296 [INFO] flwr: 
+[92mINFO [0m:      Received: train message d8c48dae-07b6-4092-9970-bfdc3ecedc5c
+2026-11-01 18:05:14,296 [INFO] flwr: Received: train message d8c48dae-07b6-4092-9970-bfdc3ecedc5c
+[92mINFO [0m:      Sent reply
+2026-11-01 18:05:14,315 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 18:05:29,370 [INFO] flwr: 
+[92mINFO [0m:      Received: evaluate message 1e7ffb64-39ad-4ccd-a5ef-2ece0825ef0b
+2026-11-01 18:05:29,370 [INFO] flwr: Received: evaluate message 1e7ffb64-39ad-4ccd-a5ef-2ece0825ef0b
+2026-11-01 18:05:29,371 [WARNING] __main__: Client 14: no benign validation samples to evaluate on
+[92mINFO [0m:      Sent reply
+2026-11-01 18:05:29,371 [INFO] flwr: Sent reply
+[92mINFO [0m:      
+2026-11-01 18:05:29,446 [INFO] flwr: 
+[92mINFO [0m:      Received: reconnect message b47cc3d0-f947-4841-b465-4c32d215e017
+2026-11-01 18:05:29,446 [INFO] flwr: Received: reconnect message b47cc3d0-f947-4841-b465-4c32d215e017
+2026-11-01 18:05:29,475 [DEBUG] flwr: gRPC channel closed
+[92mINFO [0m:      Disconnect and shut down
+2026-11-01 18:05:29,475 [INFO] flwr: Disconnect and shut down

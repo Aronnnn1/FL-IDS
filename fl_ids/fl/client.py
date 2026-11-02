@@ -19,6 +19,7 @@ Runnable both as a real separate process (this module's `__main__`, using
 
 from __future__ import annotations
 
+import hashlib
 import logging
 
 import numpy as np
@@ -102,6 +103,9 @@ class AutoencoderClient(NumPyClient):
             input_dim, config.autoencoder.hidden_dims, config.autoencoder.bottleneck_dim
         )
         self.last_filtered_fraction: float | None = None
+        # (digest of the broadcast boosting model, parsed model, pass mask): the boosting model only changes on update
+        # rounds, and this client's raw training rows never change, so the filter result is reusable until it does.
+        self._filter_cache: tuple[bytes, BoostingClassifier, np.ndarray] | None = None
 
     def get_parameters(self, config: dict[str, Scalar]) -> NDArrays:
         """Return current local autoencoder weights."""
@@ -126,17 +130,26 @@ class AutoencoderClient(NumPyClient):
         """
         set_weights(self.model, parameters)
 
-        boosting_model = BoostingClassifier.from_bytes(
-            config["boosting_model_bytes"],
-            self.config.boosting,
-            num_classes=int(config["num_classes"]),
-            benign_class=int(config["benign_class"]),
-            seed=self.config.seed,
-            confidence_threshold=self.config.cascade.confidence_threshold,
-        )
+        model_bytes = config["boosting_model_bytes"]
+        digest = hashlib.blake2b(model_bytes, digest_size=16).digest()
+        if self._filter_cache is not None and self._filter_cache[0] == digest:
+            boosting_model, cached_mask = self._filter_cache[1], self._filter_cache[2]
+        else:
+            boosting_model = BoostingClassifier.from_bytes(
+                model_bytes,
+                self.config.boosting,
+                num_classes=int(config["num_classes"]),
+                benign_class=int(config["benign_class"]),
+                seed=self.config.seed,
+                confidence_threshold=self.config.cascade.confidence_threshold,
+            )
+            cached_mask = None
 
         if self.use_boosting_filter:
-            mask = boosting_model.passes_to_autoencoder(self.X_train_raw)
+            if cached_mask is None:
+                cached_mask = boosting_model.passes_to_autoencoder(self.X_train_raw)
+            mask = cached_mask
+            self._filter_cache = (digest, boosting_model, cached_mask)
         else:
             mask = np.ones(len(self.X_train_raw), dtype=bool)
         X_filtered = self.X_train[mask]

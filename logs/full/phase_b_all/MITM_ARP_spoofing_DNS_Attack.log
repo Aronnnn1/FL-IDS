@@ -1,0 +1,12 @@
+2026-11-02 05:21:44,725 [INFO] fl_ids.utils.journey: [phase_b] stage 1/4 started: Load the model bundle (t+0.0s)
+2026-11-02 05:21:44,799 [INFO] fl_ids.utils.journey: [phase_b] stage 1/4 done: Load the model bundle in 0.1s
+2026-11-02 05:21:44,800 [INFO] __main__: Phase A bundle /home/flids/FL-IDS-clean/saved_models/full/c10_s42: 10 clients -> 10 Mininet hosts
+2026-11-02 05:21:44,802 [INFO] fl_ids.utils.journey: [phase_b] stage 2/4 started: Start the SDN bridge and controller (t+0.1s)
+2026-11-02 05:21:47,314 [INFO] __main__: Controller + bridge up at http://127.0.0.1:8080 (OpenFlow port 6653)
+2026-11-02 05:21:47,314 [INFO] fl_ids.utils.journey: [phase_b] stage 2/4 done: Start the SDN bridge and controller in 2.5s
+2026-11-02 05:21:47,315 [INFO] __main__: Running the topology as root: sudo -n /usr/bin/python3 /home/flids/FL-IDS-clean/fl_ids/sdn/topology.py
+2026-11-02 05:21:47,315 [INFO] fl_ids.utils.journey: [phase_b] stage 3/4 started: Network, replay, classify and block (root process) (t+2.6s)
+2026-11-02 05:21:51,317 [INFO] fl_ids.utils.journey: [phase_b] stage 3/4 done: Network, replay, classify and block (root process) in 4.0s
+2026-11-02 05:21:51,349 [INFO] fl_ids.utils.journey: [phase_b] stage 4/4 started: Check the switch's flow table (t+6.6s)
+2026-11-02 05:21:51,350 [INFO] fl_ids.utils.journey: [phase_b] stage 4/4 done: Check the switch's flow table in 0.0s
+2026-11-02 05:21:51,350 [INFO] __main__: Phase B done in 6.6s: h1 (client 0) -> Ransomware (confidence 0.991, boosting stage, 542/1229 packets non-benign) -> block; flow rule: cookie=0x0, duration=0.004s, table=0, n_packets=0, n_bytes=0, priority=100,ip,nw_src=10.0.0.1 actions=drop

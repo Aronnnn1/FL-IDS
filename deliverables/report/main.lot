@@ -1,0 +1,43 @@
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {1.1}{\ignorespaces Project work plan}}{5}{table.1.1}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Mapping of objectives to research gaps}}{9}{table.2.1}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Hardware used for development and evaluation}}{12}{table.3.1}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Software used}}{13}{table.3.2}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Class distribution after cleaning (91 base features)}}{16}{table.4.1}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Training and evaluation rows for each part (130 features, seed 42)}}{19}{table.4.2}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Ambiguity ceiling per feature set (all rows, after de-duplication)}}{24}{table.5.1}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Accuracy and macro F1 as feature groups are added (LightGBM, all rows, 80/20)}}{25}{table.5.2}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Final classifier across seeds}}{26}{table.5.3}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Ablation at 30\% malicious clients, 130 features [91 features] (MR = macro-recall)}}{28}{table.5.4}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Real multi-process Phase A runs (source: \texttt {results/real\_runs/summary.md})}}{32}{table.5.5}%
+\contentsline {table}{\numberline {5.6}{\ignorespaces Phase A stage timing (source: \texttt {results/journey/phase\_a\_journey.json})}}{33}{table.5.6}%
+\contentsline {table}{\numberline {5.7}{\ignorespaces Phase B stage timing (source: \texttt {results/journey/phase\_b\_journey.json})}}{33}{table.5.7}%
+\contentsline {table}{\numberline {5.8}{\ignorespaces Ablation at 30\% sign-flip attackers, seeds 42 / 43 / 44 (source: results/seeds/summary.json)}}{34}{table.5.8}%
+\contentsline {table}{\numberline {5.9}{\ignorespaces Poisoning sweep, seeds 42 / 43 / 44}}{34}{table.5.9}%
+\contentsline {table}{\numberline {5.10}{\ignorespaces Zero-day detection of the unseen class, mean over 14 classes, seeds 42 / 43 / 44}}{35}{table.5.10}%
+\contentsline {table}{\numberline {5.11}{\ignorespaces Where the real-run macro-recall comes from (source: results/real\_runs/<run>/, made by fl\_ids.eval.bundle\_report)}}{35}{table.5.11}%
+\contentsline {table}{\numberline {5.12}{\ignorespaces Real multi-process Phase A with sign-flip attackers (10 clients, 20 rounds, seed 42; source: runs/attack\_runs/)}}{35}{table.5.12}%
+\contentsline {table}{\numberline {5.13}{\ignorespaces Adaptive (stealth) attacker vs. sign-flip, seed 42, 20 rounds (source: results/adaptive/adaptive\_attack.csv)}}{36}{table.5.13}%
+\contentsline {table}{\numberline {5.14}{\ignorespaces Post-training magnitude pruning of the 10-client autoencoder, thresholds recalibrated (source: results/pruning/c10\_s42/pruning.csv)}}{37}{table.5.14}%
+\contentsline {table}{\numberline {5.15}{\ignorespaces Pruning during federated training (server re-prunes each round, linear ramp over the first 10 rounds), seed 42, no attackers (source: results/pruning/pruning\_during\_fl.csv)}}{37}{table.5.15}%
+\contentsline {table}{\numberline {5.16}{\ignorespaces Benign validation loss with and without the per-client z-score clip (source: results/clip/clip\_comparison.csv)}}{37}{table.5.16}%
+\contentsline {table}{\numberline {5.17}{\ignorespaces Per-class time-ordered split vs. connection-grouped split (source: experiments/accuracy/results/full\_temporal\_bal\_s*.json)}}{38}{table.5.17}%
+\contentsline {table}{\numberline {5.18}{\ignorespaces Single-feature AUROC, attack vs. normal (source: results/leak/single\_feature\_auroc.json; after: 300,000-row sample)}}{39}{table.5.18}%
+\contentsline {table}{\numberline {5.19}{\ignorespaces Real multi-process Phase A on the full pool (1.89M rows), split by connection, 20 rounds, no attackers}}{42}{table.5.19}%
+\contentsline {table}{\numberline {5.20}{\ignorespaces The same runs at the earlier scale and now (macro-recall includes only attack types present in the test slices)}}{42}{table.5.20}%
+\contentsline {table}{\numberline {5.21}{\ignorespaces Recall per attack type, 10 clients, seed 42, full pool, by stage (held-out test slices)}}{43}{table.5.21}%
+\contentsline {table}{\numberline {5.22}{\ignorespaces Poisoning sweep, full pool}}{43}{table.5.22}%
+\contentsline {table}{\numberline {5.23}{\ignorespaces Ablation at 30\% sign-flip attackers, full pool, seeds 42 / 43 / 44}}{44}{table.5.23}%
+\contentsline {table}{\numberline {5.24}{\ignorespaces Zero-day (leave one attack class out), full pool: mean over the held-out classes}}{44}{table.5.24}%
+\contentsline {table}{\numberline {5.25}{\ignorespaces Zero-day (leave one attack class out), full pool: mean over the held-out classes: per held-out class}}{44}{table.5.25}%
+\contentsline {table}{\numberline {5.26}{\ignorespaces Stealth attacker vs. sign-flip, full pool}}{45}{table.5.26}%
+\contentsline {table}{\numberline {5.27}{\ignorespaces Pruning during federated training, full pool (no attackers)}}{45}{table.5.27}%
+\contentsline {table}{\numberline {5.28}{\ignorespaces Per-client z-score clip, final-round benign validation loss}}{45}{table.5.28}%
+\contentsline {table}{\numberline {5.29}{\ignorespaces Phase B on every attack capture (10 clients, seed 42, full-pool bundle): class chosen, confidence, deciding stage, packets flagged, action}}{46}{table.5.29}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {1}{\ignorespaces Programme Outcomes Mapping with Project}}{57}{table.Alph0.1}%
+\contentsline {table}{\numberline {2}{\ignorespaces Programme Specific Outcomes Mapping with Project}}{58}{table.Alph0.2}%

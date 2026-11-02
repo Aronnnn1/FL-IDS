@@ -1,0 +1,101 @@
+2026-11-01 22:43:46,228 [INFO] fl_ids.data.pipeline: Loaded extended features from cache data/processed/encoded_extended.npz: (1985768, 130)
+2026-11-01 22:43:47,281 [INFO] fl_ids.models.boosting: Training boosting classifier: 100024 samples, 15 classes, 300 rounds
+2026-11-01 22:44:07,636 [INFO] fl_ids.eval.common: Evaluation setup: 100024 calibration, 1885744 federated pool (subsampled), 283090 test rows across 10 clients
+2026-11-01 22:44:07,639 [INFO] __main__: Poisoning sweep: fraction=0.40 -> malicious clients=[0, 3, 5, 8]
+2026-11-01 22:48:41,153 [INFO] fl_ids.eval.simulation: Round 1: mean_val_loss=0.5727, comm_bytes=786720
+2026-11-01 22:49:47,701 [INFO] fl_ids.eval.simulation: Round 2: mean_val_loss=0.5942, comm_bytes=786720
+2026-11-01 22:49:47,722 [INFO] fl_ids.fl.client: Client 0 round 3: 339 of 11433 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:49:49,131 [INFO] fl_ids.fl.client: Client 1 round 3: 15373 of 399290 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:50:14,903 [INFO] fl_ids.fl.client: Client 2 round 3: 2 of 501 boosting-passed rows flagged; surfacing 2
+2026-11-01 22:50:15,028 [INFO] fl_ids.fl.client: Client 3 round 3: 807 of 48000 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:50:18,372 [INFO] fl_ids.fl.client: Client 4 round 3: 3110 of 122900 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:50:26,618 [INFO] fl_ids.fl.client: Client 5 round 3: 5953 of 209725 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:50:37,651 [INFO] fl_ids.fl.client: Client 6 round 3: 4181 of 99998 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:50:42,995 [INFO] fl_ids.fl.client: Client 7 round 3: 1 of 311 boosting-passed rows flagged; surfacing 1
+2026-11-01 22:50:43,060 [INFO] fl_ids.fl.client: Client 8 round 3: 442 of 22372 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:50:44,348 [INFO] fl_ids.fl.client: Client 9 round 3: 0 of 70849 boosting-passed rows flagged; surfacing 0
+2026-11-01 22:51:06,373 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 100327 rows (now 350 trees)
+2026-11-01 22:51:06,373 [INFO] fl_ids.models.boosting_update: Round 3: boosting v2 (continue) from 303 alerts ({'Normal': 303}); 50 from excluded clients ignored
+2026-11-01 22:51:06,654 [INFO] fl_ids.eval.simulation: Round 3: mean_val_loss=0.6195, comm_bytes=786720
+2026-11-01 22:56:26,169 [INFO] fl_ids.eval.simulation: Round 4: mean_val_loss=0.6574, comm_bytes=786720
+2026-11-01 22:57:29,572 [INFO] fl_ids.eval.simulation: Round 5: mean_val_loss=0.7030, comm_bytes=786720
+2026-11-01 22:57:29,594 [INFO] fl_ids.fl.client: Client 0 round 6: 354 of 11432 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:57:31,033 [INFO] fl_ids.fl.client: Client 1 round 6: 11084 of 399118 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:57:56,509 [INFO] fl_ids.fl.client: Client 2 round 6: 2 of 485 boosting-passed rows flagged; surfacing 2
+2026-11-01 22:57:56,639 [INFO] fl_ids.fl.client: Client 3 round 6: 738 of 47987 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:58:00,210 [INFO] fl_ids.fl.client: Client 4 round 6: 2943 of 122900 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:58:08,950 [INFO] fl_ids.fl.client: Client 5 round 6: 6162 of 209559 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:58:23,560 [INFO] fl_ids.fl.client: Client 6 round 6: 4197 of 99989 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:58:31,760 [INFO] fl_ids.fl.client: Client 7 round 6: 0 of 304 boosting-passed rows flagged; surfacing 0
+2026-11-01 22:58:31,833 [INFO] fl_ids.fl.client: Client 8 round 6: 441 of 22354 boosting-passed rows flagged; surfacing 50
+2026-11-01 22:58:33,382 [INFO] fl_ids.fl.client: Client 9 round 6: 0 of 70833 boosting-passed rows flagged; surfacing 0
+2026-11-01 22:58:59,038 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 100629 rows (now 400 trees)
+2026-11-01 22:58:59,038 [INFO] fl_ids.models.boosting_update: Round 6: boosting v3 (continue) from 302 alerts ({'Normal': 302}); 50 from excluded clients ignored
+2026-11-01 22:58:59,365 [INFO] fl_ids.eval.simulation: Round 6: mean_val_loss=0.7586, comm_bytes=786720
+2026-11-01 23:05:02,274 [INFO] fl_ids.eval.simulation: Round 7: mean_val_loss=0.8843, comm_bytes=786720
+2026-11-01 23:06:12,023 [INFO] fl_ids.eval.simulation: Round 8: mean_val_loss=1.0817, comm_bytes=786720
+2026-11-01 23:06:12,049 [INFO] fl_ids.fl.client: Client 0 round 9: 375 of 11432 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:06:13,606 [INFO] fl_ids.fl.client: Client 1 round 9: 10772 of 399111 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:06:45,743 [INFO] fl_ids.fl.client: Client 2 round 9: 2 of 484 boosting-passed rows flagged; surfacing 2
+2026-11-01 23:06:45,893 [INFO] fl_ids.fl.client: Client 3 round 9: 670 of 47973 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:06:50,861 [INFO] fl_ids.fl.client: Client 4 round 9: 2879 of 122900 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:07:03,416 [INFO] fl_ids.fl.client: Client 5 round 9: 6063 of 209562 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:07:22,676 [INFO] fl_ids.fl.client: Client 6 round 9: 4108 of 99984 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:07:30,765 [INFO] fl_ids.fl.client: Client 7 round 9: 0 of 298 boosting-passed rows flagged; surfacing 0
+2026-11-01 23:07:30,837 [INFO] fl_ids.fl.client: Client 8 round 9: 454 of 22352 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:07:32,561 [INFO] fl_ids.fl.client: Client 9 round 9: 0 of 70827 boosting-passed rows flagged; surfacing 0
+2026-11-01 23:08:00,795 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 100931 rows (now 450 trees)
+2026-11-01 23:08:00,795 [INFO] fl_ids.models.boosting_update: Round 9: boosting v4 (continue) from 302 alerts ({'Normal': 302}); 50 from excluded clients ignored
+2026-11-01 23:08:01,158 [INFO] fl_ids.eval.simulation: Round 9: mean_val_loss=1.2913, comm_bytes=786720
+2026-11-01 23:14:47,574 [INFO] fl_ids.eval.simulation: Round 10: mean_val_loss=2.2944, comm_bytes=786720
+2026-11-01 23:15:52,424 [INFO] fl_ids.eval.simulation: Round 11: mean_val_loss=3.5393, comm_bytes=786720
+2026-11-01 23:15:52,449 [INFO] fl_ids.fl.client: Client 0 round 12: 346 of 11428 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:15:53,984 [INFO] fl_ids.fl.client: Client 1 round 12: 10814 of 399258 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:16:21,977 [INFO] fl_ids.fl.client: Client 2 round 12: 2 of 486 boosting-passed rows flagged; surfacing 2
+2026-11-01 23:16:22,108 [INFO] fl_ids.fl.client: Client 3 round 12: 739 of 47968 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:16:26,642 [INFO] fl_ids.fl.client: Client 4 round 12: 2942 of 122900 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:16:36,247 [INFO] fl_ids.fl.client: Client 5 round 12: 6160 of 209716 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:16:51,526 [INFO] fl_ids.fl.client: Client 6 round 12: 4215 of 99979 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:16:58,773 [INFO] fl_ids.fl.client: Client 7 round 12: 2 of 299 boosting-passed rows flagged; surfacing 2
+2026-11-01 23:16:58,847 [INFO] fl_ids.fl.client: Client 8 round 12: 437 of 22342 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:17:00,534 [INFO] fl_ids.fl.client: Client 9 round 12: 8 of 70817 boosting-passed rows flagged; surfacing 8
+2026-11-01 23:17:34,722 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 101243 rows (now 500 trees)
+2026-11-01 23:17:34,723 [INFO] fl_ids.models.boosting_update: Round 12: boosting v5 (continue) from 312 alerts ({'Normal': 311, 'Uploading': 1}); 50 from excluded clients ignored
+2026-11-01 23:17:35,069 [INFO] fl_ids.eval.simulation: Round 12: mean_val_loss=8.2351, comm_bytes=786720
+2026-11-01 23:25:30,341 [INFO] fl_ids.eval.simulation: Round 13: mean_val_loss=7.8912, comm_bytes=786720
+2026-11-01 23:26:34,251 [INFO] fl_ids.eval.simulation: Round 14: mean_val_loss=24.6070, comm_bytes=786720
+2026-11-01 23:26:34,276 [INFO] fl_ids.fl.client: Client 0 round 15: 326 of 11427 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:26:35,833 [INFO] fl_ids.fl.client: Client 1 round 15: 10130 of 399267 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:27:02,031 [INFO] fl_ids.fl.client: Client 2 round 15: 2 of 295 boosting-passed rows flagged; surfacing 2
+2026-11-01 23:27:02,158 [INFO] fl_ids.fl.client: Client 3 round 15: 745 of 47951 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:27:06,071 [INFO] fl_ids.fl.client: Client 4 round 15: 3095 of 122764 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:27:15,276 [INFO] fl_ids.fl.client: Client 5 round 15: 9205 of 209711 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:27:28,144 [INFO] fl_ids.fl.client: Client 6 round 15: 4466 of 99972 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:27:34,388 [INFO] fl_ids.fl.client: Client 7 round 15: 2 of 295 boosting-passed rows flagged; surfacing 2
+2026-11-01 23:27:34,461 [INFO] fl_ids.fl.client: Client 8 round 15: 451 of 22341 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:27:36,044 [INFO] fl_ids.fl.client: Client 9 round 15: 0 of 70483 boosting-passed rows flagged; surfacing 0
+2026-11-01 23:28:12,429 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 101497 rows (now 550 trees)
+2026-11-01 23:28:12,430 [INFO] fl_ids.models.boosting_update: Round 15: boosting v6 (continue) from 254 alerts ({'Normal': 254}); 100 from excluded clients ignored
+2026-11-01 23:28:12,828 [INFO] fl_ids.eval.simulation: Round 15: mean_val_loss=20.1712, comm_bytes=786720
+2026-11-01 23:36:57,220 [INFO] fl_ids.eval.simulation: Round 16: mean_val_loss=18.2377, comm_bytes=786720
+2026-11-01 23:37:53,528 [INFO] fl_ids.eval.simulation: Round 17: mean_val_loss=0.9768, comm_bytes=786720
+2026-11-01 23:37:53,553 [INFO] fl_ids.fl.client: Client 0 round 18: 395 of 11426 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:37:54,933 [INFO] fl_ids.fl.client: Client 1 round 18: 10463 of 399268 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:38:19,966 [INFO] fl_ids.fl.client: Client 2 round 18: 2 of 231 boosting-passed rows flagged; surfacing 2
+2026-11-01 23:38:20,076 [INFO] fl_ids.fl.client: Client 3 round 18: 732 of 47935 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:38:23,084 [INFO] fl_ids.fl.client: Client 4 round 18: 3068 of 122762 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:38:31,162 [INFO] fl_ids.fl.client: Client 5 round 18: 7039 of 209714 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:38:46,284 [INFO] fl_ids.fl.client: Client 6 round 18: 4292 of 99968 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:38:53,481 [INFO] fl_ids.fl.client: Client 7 round 18: 0 of 298 boosting-passed rows flagged; surfacing 0
+2026-11-01 23:38:53,563 [INFO] fl_ids.fl.client: Client 8 round 18: 403 of 22345 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:38:55,414 [INFO] fl_ids.fl.client: Client 9 round 18: 4013 of 70260 boosting-passed rows flagged; surfacing 50
+2026-11-01 23:39:36,117 [INFO] fl_ids.models.boosting: Continued boosting training: +50 trees on 101849 rows (now 600 trees)
+2026-11-01 23:39:36,118 [INFO] fl_ids.models.boosting_update: Round 18: boosting v7 (continue) from 352 alerts ({'Normal': 351, 'Vulnerability_scanner': 1}); 50 from excluded clients ignored
+2026-11-01 23:39:36,509 [INFO] fl_ids.eval.simulation: Round 18: mean_val_loss=1.6345, comm_bytes=786720
+2026-11-01 23:49:09,458 [INFO] fl_ids.eval.simulation: Round 19: mean_val_loss=1.2813, comm_bytes=786720
+2026-11-01 23:50:16,040 [INFO] fl_ids.eval.simulation: Round 20: mean_val_loss=0.2547, comm_bytes=786720
+2026-11-01 23:51:53,520 [INFO] __main__: fraction=0.40: attack_macro_recall=0.994 benign_fpr=0.0379 autoencoder_alone=0.139 survival=0.637
+2026-11-01 23:51:53,539 [INFO] __main__: Saved /home/flids/FL-IDS-clean/results/full/inprocess/s43/shards/sweep_s43_f40/poisoning_resistance_sweep.csv
+2026-11-01 23:51:53,937 [INFO] __main__: Saved /home/flids/FL-IDS-clean/results/full/inprocess/s43/shards/sweep_s43_f40/poisoning_resistance_sweep.png
+ malicious_fraction  num_malicious_clients  num_total_clients  attack_macro_recall  attack_micro_recall  benign_fpr  detection_f1  zero_day_macro_recall  autoencoder_alone_attack_macro_recall  malicious_client_survival_rate  final_val_loss  rounds_to_convergence  total_communication_bytes
+                0.4                      4                 10             0.994153             0.995622    0.037913      0.951852                    NaN                               0.139282                          0.6375        0.254683                   20.0                   15734400

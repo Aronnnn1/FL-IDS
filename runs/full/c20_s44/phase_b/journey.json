@@ -1,0 +1,124 @@
+{
+  "name": "phase_b",
+  "started_at": "2026-11-01T14:23:42.393647+00:00",
+  "elapsed_s": 9.195,
+  "planned_stages": [
+    "Load the model bundle",
+    "Start the SDN bridge and controller",
+    "Network, replay, classify and block (root process)",
+    "Check the switch's flow table"
+  ],
+  "current_stage": null,
+  "stages": [
+    {
+      "index": 1,
+      "label": "Load the model bundle",
+      "start_s": 0.0,
+      "end_s": 0.066,
+      "duration_s": 0.066,
+      "status": "done",
+      "detail": null
+    },
+    {
+      "index": 2,
+      "label": "Start the SDN bridge and controller",
+      "start_s": 0.068,
+      "end_s": 2.077,
+      "duration_s": 2.009,
+      "status": "done",
+      "detail": null
+    },
+    {
+      "index": 3,
+      "label": "Network, replay, classify and block (root process)",
+      "start_s": 2.078,
+      "end_s": 9.162,
+      "duration_s": 7.084,
+      "status": "done",
+      "detail": null,
+      "substages": [
+        {
+          "index": 1,
+          "label": "Start the Mininet network",
+          "start_s": 0.0,
+          "end_s": 1.001,
+          "duration_s": 1.001,
+          "status": "done",
+          "detail": null
+        },
+        {
+          "index": 2,
+          "label": "Load the model bundle",
+          "start_s": 2.433,
+          "end_s": 2.482,
+          "duration_s": 0.049,
+          "status": "done",
+          "detail": null
+        },
+        {
+          "index": 3,
+          "label": "Register hosts with the bridge",
+          "start_s": 2.482,
+          "end_s": 2.513,
+          "duration_s": 0.031,
+          "status": "done",
+          "detail": null
+        },
+        {
+          "index": 4,
+          "label": "Replay the capture through the switch",
+          "start_s": 2.513,
+          "end_s": 2.771,
+          "duration_s": 0.258,
+          "status": "done",
+          "detail": null
+        },
+        {
+          "index": 5,
+          "label": "Extract features with tshark",
+          "start_s": 2.771,
+          "end_s": 5.005,
+          "duration_s": 2.234,
+          "status": "done",
+          "detail": null
+        },
+        {
+          "index": 6,
+          "label": "Classify with the cascade",
+          "start_s": 5.005,
+          "end_s": 5.727,
+          "duration_s": 0.722,
+          "status": "done",
+          "detail": null
+        },
+        {
+          "index": 7,
+          "label": "Send the verdict, install the drop rule",
+          "start_s": 5.727,
+          "end_s": 5.731,
+          "duration_s": 0.004,
+          "status": "done",
+          "detail": null
+        },
+        {
+          "index": 8,
+          "label": "Read back the switch's flow table",
+          "start_s": 5.731,
+          "end_s": 5.743,
+          "duration_s": 0.012,
+          "status": "done",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "label": "Check the switch's flow table",
+      "start_s": 9.194,
+      "end_s": 9.195,
+      "duration_s": 0.001,
+      "status": "done",
+      "detail": null
+    }
+  ]
+}

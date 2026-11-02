@@ -1,0 +1,70 @@
+{
+  "name": "phase_a",
+  "started_at": "2026-11-01T11:26:35.910144+00:00",
+  "elapsed_s": 189.348,
+  "planned_stages": [
+    "Load, clean and encode the dataset",
+    "Calibration split, bootstrap classifier, client partition",
+    "Federated training",
+    "Calibrate client anomaly thresholds",
+    "Evaluate on the clients' test slices",
+    "Save the model bundle"
+  ],
+  "current_stage": null,
+  "stages": [
+    {
+      "index": 1,
+      "label": "Load, clean and encode the dataset",
+      "start_s": 0.0,
+      "end_s": 1.026,
+      "duration_s": 1.026,
+      "status": "done",
+      "detail": null
+    },
+    {
+      "index": 2,
+      "label": "Calibration split, bootstrap classifier, client partition",
+      "start_s": 1.026,
+      "end_s": 14.132,
+      "duration_s": 13.106,
+      "status": "done",
+      "detail": null
+    },
+    {
+      "index": 3,
+      "label": "Federated training",
+      "start_s": 14.136,
+      "end_s": 184.306,
+      "duration_s": 170.17,
+      "status": "done",
+      "detail": "round 20/20 finished"
+    },
+    {
+      "index": 4,
+      "label": "Calibrate client anomaly thresholds",
+      "start_s": 184.309,
+      "end_s": 184.316,
+      "duration_s": 0.007,
+      "status": "done",
+      "detail": null
+    },
+    {
+      "index": 5,
+      "label": "Evaluate on the clients' test slices",
+      "start_s": 184.316,
+      "end_s": 189.164,
+      "duration_s": 4.848,
+      "status": "done",
+      "detail": null
+    },
+    {
+      "index": 6,
+      "label": "Save the model bundle",
+      "start_s": 189.196,
+      "end_s": 189.347,
+      "duration_s": 0.151,
+      "status": "done",
+      "detail": null
+    }
+  ]
+}

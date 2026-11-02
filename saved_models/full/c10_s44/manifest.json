@@ -1,0 +1,964 @@
+{
+  "class_names": [
+    "Backdoor",
+    "DDoS_HTTP",
+    "DDoS_ICMP",
+    "DDoS_TCP",
+    "DDoS_UDP",
+    "Fingerprinting",
+    "MITM",
+    "Normal",
+    "Password",
+    "Port_Scanning",
+    "Ransomware",
+    "SQL_injection",
+    "Uploading",
+    "Vulnerability_scanner",
+    "XSS"
+  ],
+  "benign_class": 7,
+  "feature_names": [
+    "arp.opcode",
+    "arp.hw.size",
+    "icmp.checksum",
+    "icmp.seq_le",
+    "icmp.unused",
+    "http.content_length",
+    "http.response",
+    "http.tls_port",
+    "tcp.ack",
+    "tcp.ack_raw",
+    "tcp.checksum",
+    "tcp.connection.fin",
+    "tcp.connection.rst",
+    "tcp.connection.syn",
+    "tcp.connection.synack",
+    "tcp.flags",
+    "tcp.flags.ack",
+    "tcp.len",
+    "tcp.seq",
+    "udp.stream",
+    "udp.time_delta",
+    "dns.qry.name",
+    "dns.qry.qu",
+    "dns.qry.type",
+    "dns.retransmission",
+    "dns.retransmit_request",
+    "dns.retransmit_request_in",
+    "mqtt.conflag.cleansess",
+    "mqtt.conflags",
+    "mqtt.hdrflags",
+    "mqtt.len",
+    "mqtt.msg_decoded_as",
+    "mqtt.msgtype",
+    "mqtt.proto_len",
+    "mqtt.topic_len",
+    "mqtt.ver",
+    "mbtcp.len",
+    "mbtcp.trans_id",
+    "mbtcp.unit_id",
+    "svc_port",
+    "c_pl_len",
+    "c_pl_entropy",
+    "c_pl_printable",
+    "c_http_req",
+    "c_http_status",
+    "c_n_headers",
+    "c_n_xheaders",
+    "c_uri_len",
+    "c_uri_nparams",
+    "c_uri_pct",
+    "c_fd_len",
+    "c_special",
+    "c_kw_sql",
+    "c_kw_xss",
+    "c_kw_upload",
+    "c_kw_auth",
+    "c_kw_trav",
+    "c_kw_tool",
+    "f_npkts",
+    "f_pl_sum",
+    "f_pl_max",
+    "f_pl_nonzero",
+    "f_req",
+    "f_status_max",
+    "f_xh_max",
+    "f_syn",
+    "f_fin",
+    "f_rst",
+    "f_ent_max",
+    "f_uri_max",
+    "f_kw_sql",
+    "f_kw_xss",
+    "f_kw_upload",
+    "f_kw_auth",
+    "f_kw_trav",
+    "f_kw_tool",
+    "f_dur",
+    "f_pps",
+    "http.request.method_0",
+    "http.request.method_GET",
+    "http.request.method_OPTIONS",
+    "http.request.method_POST",
+    "http.request.method_PROPFIND",
+    "http.request.method_PUT",
+    "http.request.method_SEARCH",
+    "http.request.method_TRACE",
+    "http.referer_() { _; } >_[$($())] { echo 93e4r0-CVE-2014-6278: true; echo;echo; }",
+    "http.referer_0",
+    "http.referer_127.0.0.1",
+    "http.referer_TESTING_PURPOSES_ONLY",
+    "http.request.version_-a HTTP/1.1",
+    "http.request.version_-al&ABSOLUTE_PATH_STUDIP=http://cirt.net/rfiinc.txt?? HTTP/1.1",
+    "http.request.version_-al&_PHPLIB[libdir]=http://cirt.net/rfiinc.txt?? HTTP/1.1",
+    "http.request.version_/etc/passwd|?data=Download HTTP/1.1",
+    "http.request.version_0",
+    "http.request.version_> HTTP/1.1",
+    "http.request.version_By Dr HTTP/1.1",
+    "http.request.version_HTTP/1.0",
+    "http.request.version_HTTP/1.1",
+    "http.request.version_Src=javascript:alert('Vulnerable')><Img Src=\\\" HTTP/1.1",
+    "http.request.version_name=a><input name=i value=XSS>&lt;script>alert('Vulnerable')</script> HTTP/1.1",
+    "http.request.version_script>alert(1)/script><\\\" HTTP/1.1",
+    "dns.qry.name.len_15",
+    "dns.qry.name.len_16",
+    "dns.qry.name.len_21",
+    "dns.qry.name.len_22",
+    "dns.qry.name.len_0",
+    "dns.qry.name.len_0.debian.pool.ntp.org",
+    "dns.qry.name.len_1.debian.pool.ntp.org",
+    "dns.qry.name.len_2.debian.pool.ntp.org",
+    "dns.qry.name.len_3.debian.pool.ntp.org",
+    "dns.qry.name.len__googlecast._tcp.local",
+    "dns.qry.name.len_null-null.local",
+    "dns.qry.name.len_raspberrypi.local",
+    "mqtt.conack.flags_0",
+    "mqtt.conack.flags_0x00000000",
+    "mqtt.conack.flags_1461073",
+    "mqtt.conack.flags_1461074",
+    "mqtt.conack.flags_1461383",
+    "mqtt.conack.flags_1461384",
+    "mqtt.conack.flags_1461589",
+    "mqtt.conack.flags_1461591",
+    "mqtt.conack.flags_1471198",
+    "mqtt.conack.flags_1471199",
+    "mqtt.conack.flags_1574358",
+    "mqtt.conack.flags_1574359",
+    "mqtt.protoname_0",
+    "mqtt.protoname_MQTT",
+    "mqtt.topic_0",
+    "mqtt.topic_Temperature_and_Humidity"
+  ],
+  "input_dim": 130,
+  "autoencoder": {
+    "hidden_dims": [
+      32,
+      16
+    ],
+    "bottleneck_dim": 8
+  },
+  "cascade": {
+    "confidence_threshold": 0.7,
+    "anomaly_confidence_clip": [
+      0.0,
+      1.0
+    ]
+  },
+  "normalized_clip": 10.0,
+  "client_thresholds": {
+    "0": 0.17463141679763794,
+    "1": 0.1217302531003952,
+    "2": 0.34534865617752075,
+    "3": 1.0295032262802124,
+    "4": 0.20376014709472656,
+    "5": 4.341531276702881,
+    "6": 0.8197822570800781,
+    "7": 0.23131442070007324,
+    "8": Infinity,
+    "9": Infinity
+  },
+  "test_metrics": {
+    "boosting_only": {
+      "attack_macro_recall": 0.9936721907381217,
+      "attack_micro_recall": 0.995400762083027,
+      "benign_fpr": 0.00027625473495933436,
+      "detection_f1": 0.9973008271658687,
+      "per_class_recall": {
+        "Backdoor": 0.9729064039408867,
+        "DDoS_HTTP": 0.9855927552140505,
+        "DDoS_ICMP": 0.999665402632166,
+        "DDoS_TCP": 1.0,
+        "DDoS_UDP": 1.0,
+        "Fingerprinting": 1.0,
+        "Password": 0.987471198156682,
+        "Port_Scanning": 0.9988780852655198,
+        "Ransomware": 0.9897137745974955,
+        "SQL_injection": 0.9986348122866894,
+        "Uploading": 1.0,
+        "Vulnerability_scanner": 0.9904964539007092,
+        "XSS": 0.9943795936013835
+      }
+    },
+    "autoencoder_only": {
+      "attack_macro_recall": 0.21994180296506285,
+      "attack_micro_recall": 0.23268935089243933,
+      "benign_fpr": 0.024553895425877107,
+      "detection_f1": 0.35721396098231784,
+      "per_class_recall": {
+        "Backdoor": 0.0,
+        "DDoS_HTTP": 0.04596597145993414,
+        "DDoS_ICMP": 0.2435868837831809,
+        "DDoS_TCP": 0.1523702031602709,
+        "DDoS_UDP": 0.23451273261508326,
+        "Fingerprinting": 0.13157894736842105,
+        "Password": 0.03297811059907834,
+        "Port_Scanning": 0.01832460732984293,
+        "Ransomware": 0.627906976744186,
+        "SQL_injection": 0.24600682593856654,
+        "Uploading": 0.20191765369430345,
+        "Vulnerability_scanner": 0.691063829787234,
+        "XSS": 0.23303069606571553
+      }
+    },
+    "cascade": {
+      "attack_macro_recall": 0.9939281520594352,
+      "attack_micro_recall": 0.9956280500033424,
+      "benign_fpr": 0.024830150160836444,
+      "detection_f1": 0.9635754305604078,
+      "per_class_recall": {
+        "Backdoor": 0.9729064039408867,
+        "DDoS_HTTP": 0.9855927552140505,
+        "DDoS_ICMP": 0.999665402632166,
+        "DDoS_TCP": 1.0,
+        "DDoS_UDP": 1.0,
+        "Fingerprinting": 1.0,
+        "Password": 0.987471198156682,
+        "Port_Scanning": 0.9988780852655198,
+        "Ransomware": 0.9910554561717353,
+        "SQL_injection": 0.9986348122866894,
+        "Uploading": 1.0,
+        "Vulnerability_scanner": 0.9924822695035461,
+        "XSS": 0.9943795936013835
+      }
+    }
+  },
+  "bootstrap_boosting_metrics": {
+    "accuracy": 0.9980171375964875,
+    "macro_f1": 0.9871090610201689,
+    "weighted_f1": 0.9980476693204068,
+    "false_positive_rate": 4.4632894443204644e-05,
+    "per_class": {
+      "Backdoor": {
+        "f1": 0.9727547931382442,
+        "recall": 0.9469548133595285,
+        "support": 509
+      },
+      "DDoS_HTTP": {
+        "f1": 0.9748237663645518,
+        "recall": 0.9603174603174603,
+        "support": 504
+      },
+      "DDoS_ICMP": {
+        "f1": 1.0,
+        "recall": 1.0,
+        "support": 688
+      },
+      "DDoS_TCP": {
+        "f1": 1.0,
+        "recall": 1.0,
+        "support": 501
+      },
+      "DDoS_UDP": {
+        "f1": 1.0,
+        "recall": 1.0,
+        "support": 1216
+      },
+      "Fingerprinting": {
+        "f1": 1.0,
+        "recall": 1.0,
+        "support": 10
+      },
+      "MITM": {
+        "f1": 0.0,
+        "recall": 0.0,
+        "support": 0
+      },
+      "Normal": {
+        "f1": 0.9999776830547434,
+        "recall": 0.9999553671055568,
+        "support": 22405
+      },
+      "Password": {
+        "f1": 0.9734513274336283,
+        "recall": 0.9880239520958084,
+        "support": 501
+      },
+      "Port_Scanning": {
+        "f1": 1.0,
+        "recall": 1.0,
+        "support": 204
+      },
+      "Ransomware": {
+        "f1": 0.9064748201438849,
+        "recall": 1.0,
+        "support": 126
+      },
+      "SQL_injection": {
+        "f1": 1.0,
+        "recall": 1.0,
+        "support": 523
+      },
+      "Uploading": {
+        "f1": 1.0,
+        "recall": 1.0,
+        "support": 379
+      },
+      "Vulnerability_scanner": {
+        "f1": 0.995159728944821,
+        "recall": 0.9961240310077519,
+        "support": 516
+      },
+      "XSS": {
+        "f1": 0.9968847352024922,
+        "recall": 1.0,
+        "support": 160
+      }
+    }
+  },
+  "training": {
+    "num_rounds": 20,
+    "strategy": "custom_trust_filtered",
+    "num_clients": 10,
+    "malicious_client_ids": [],
+    "final_trust_scores": {
+      "6": 0.6684867345943734,
+      "9": 0.6112690028798766,
+      "7": 0.602010329901009,
+      "5": 0.711122142175223,
+      "2": 0.5635467972445838,
+      "4": 0.5931636796935909,
+      "8": 0.5969174193522918,
+      "0": 0.6130172970571482,
+      "1": 0.7062836356454394,
+      "3": 0.6716269880214683
+    },
+    "final_survivors": [
+      6,
+      9,
+      7,
+      5,
+      2,
+      4,
+      8,
+      0,
+      1,
+      3
+    ],
+    "final_mean_reconstruction_error": 0.33319858090031834,
+    "boosting_updates": [
+      {
+        "round": 3,
+        "version": 2,
+        "alerts_used": 202,
+        "alerts_by_class": {
+          "Backdoor": 2,
+          "Normal": 186,
+          "Ransomware": 1,
+          "SQL_injection": 2,
+          "Uploading": 11
+        },
+        "alerts_from_excluded_clients": 0,
+        "total_alerts_collected": 202,
+        "mode": "continue",
+        "new_classes": [],
+        "metrics": {
+          "accuracy": 0.9980171375964875,
+          "macro_f1": 0.9871090610201689,
+          "weighted_f1": 0.9980476693204068,
+          "false_positive_rate": 4.4632894443204644e-05,
+          "per_class": {
+            "Backdoor": {
+              "f1": 0.9727547931382442,
+              "recall": 0.9469548133595285,
+              "support": 509
+            },
+            "DDoS_HTTP": {
+              "f1": 0.9748237663645518,
+              "recall": 0.9603174603174603,
+              "support": 504
+            },
+            "DDoS_ICMP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 688
+            },
+            "DDoS_TCP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 501
+            },
+            "DDoS_UDP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 1216
+            },
+            "Fingerprinting": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 10
+            },
+            "MITM": {
+              "f1": 0.0,
+              "recall": 0.0,
+              "support": 0
+            },
+            "Normal": {
+              "f1": 0.9999776830547434,
+              "recall": 0.9999553671055568,
+              "support": 22405
+            },
+            "Password": {
+              "f1": 0.9734513274336283,
+              "recall": 0.9880239520958084,
+              "support": 501
+            },
+            "Port_Scanning": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 204
+            },
+            "Ransomware": {
+              "f1": 0.9064748201438849,
+              "recall": 1.0,
+              "support": 126
+            },
+            "SQL_injection": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 523
+            },
+            "Uploading": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 379
+            },
+            "Vulnerability_scanner": {
+              "f1": 0.995159728944821,
+              "recall": 0.9961240310077519,
+              "support": 516
+            },
+            "XSS": {
+              "f1": 0.9968847352024922,
+              "recall": 1.0,
+              "support": 160
+            }
+          }
+        }
+      },
+      {
+        "round": 6,
+        "version": 3,
+        "alerts_used": 162,
+        "alerts_by_class": {
+          "Backdoor": 5,
+          "DDoS_HTTP": 1,
+          "DDoS_UDP": 1,
+          "Normal": 106,
+          "Port_Scanning": 2,
+          "Ransomware": 24,
+          "SQL_injection": 8,
+          "Vulnerability_scanner": 6,
+          "XSS": 9
+        },
+        "alerts_from_excluded_clients": 100,
+        "total_alerts_collected": 364,
+        "mode": "continue",
+        "new_classes": [],
+        "metrics": {
+          "accuracy": 0.997981729339282,
+          "macro_f1": 0.9869664981159479,
+          "weighted_f1": 0.9980116423713705,
+          "false_positive_rate": 4.4632894443204644e-05,
+          "per_class": {
+            "Backdoor": {
+              "f1": 0.9727547931382442,
+              "recall": 0.9469548133595285,
+              "support": 509
+            },
+            "DDoS_HTTP": {
+              "f1": 0.9737903225806451,
+              "recall": 0.9583333333333334,
+              "support": 504
+            },
+            "DDoS_ICMP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 688
+            },
+            "DDoS_TCP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 501
+            },
+            "DDoS_UDP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 1216
+            },
+            "Fingerprinting": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 10
+            },
+            "MITM": {
+              "f1": 0.0,
+              "recall": 0.0,
+              "support": 0
+            },
+            "Normal": {
+              "f1": 0.9999776830547434,
+              "recall": 0.9999553671055568,
+              "support": 22405
+            },
+            "Password": {
+              "f1": 0.9734513274336283,
+              "recall": 0.9880239520958084,
+              "support": 501
+            },
+            "Port_Scanning": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 204
+            },
+            "Ransomware": {
+              "f1": 0.9064748201438849,
+              "recall": 1.0,
+              "support": 126
+            },
+            "SQL_injection": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 523
+            },
+            "Uploading": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 379
+            },
+            "Vulnerability_scanner": {
+              "f1": 0.9941972920696325,
+              "recall": 0.9961240310077519,
+              "support": 516
+            },
+            "XSS": {
+              "f1": 0.9968847352024922,
+              "recall": 1.0,
+              "support": 160
+            }
+          }
+        }
+      },
+      {
+        "round": 9,
+        "version": 4,
+        "alerts_used": 203,
+        "alerts_by_class": {
+          "DDoS_HTTP": 2,
+          "Normal": 187,
+          "Ransomware": 2,
+          "Uploading": 3,
+          "Vulnerability_scanner": 8,
+          "XSS": 1
+        },
+        "alerts_from_excluded_clients": 0,
+        "total_alerts_collected": 567,
+        "mode": "continue",
+        "new_classes": [],
+        "metrics": {
+          "accuracy": 0.9980525458536931,
+          "macro_f1": 0.9872511671491279,
+          "weighted_f1": 0.9980830714336345,
+          "false_positive_rate": 4.4632894443204644e-05,
+          "per_class": {
+            "Backdoor": {
+              "f1": 0.9727547931382442,
+              "recall": 0.9469548133595285,
+              "support": 509
+            },
+            "DDoS_HTTP": {
+              "f1": 0.9758551307847082,
+              "recall": 0.9623015873015873,
+              "support": 504
+            },
+            "DDoS_ICMP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 688
+            },
+            "DDoS_TCP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 501
+            },
+            "DDoS_UDP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 1216
+            },
+            "Fingerprinting": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 10
+            },
+            "MITM": {
+              "f1": 0.0,
+              "recall": 0.0,
+              "support": 0
+            },
+            "Normal": {
+              "f1": 0.9999776830547434,
+              "recall": 0.9999553671055568,
+              "support": 22405
+            },
+            "Password": {
+              "f1": 0.9744094488188977,
+              "recall": 0.9880239520958084,
+              "support": 501
+            },
+            "Port_Scanning": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 204
+            },
+            "Ransomware": {
+              "f1": 0.9064748201438849,
+              "recall": 1.0,
+              "support": 126
+            },
+            "SQL_injection": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 523
+            },
+            "Uploading": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 379
+            },
+            "Vulnerability_scanner": {
+              "f1": 0.995159728944821,
+              "recall": 0.9961240310077519,
+              "support": 516
+            },
+            "XSS": {
+              "f1": 0.9968847352024922,
+              "recall": 1.0,
+              "support": 160
+            }
+          }
+        }
+      },
+      {
+        "round": 12,
+        "version": 5,
+        "alerts_used": 192,
+        "alerts_by_class": {
+          "Normal": 188,
+          "Ransomware": 1,
+          "Vulnerability_scanner": 3
+        },
+        "alerts_from_excluded_clients": 0,
+        "total_alerts_collected": 759,
+        "mode": "continue",
+        "new_classes": [],
+        "metrics": {
+          "accuracy": 0.9980525458536931,
+          "macro_f1": 0.9872511671491279,
+          "weighted_f1": 0.9980830714336345,
+          "false_positive_rate": 4.4632894443204644e-05,
+          "per_class": {
+            "Backdoor": {
+              "f1": 0.9727547931382442,
+              "recall": 0.9469548133595285,
+              "support": 509
+            },
+            "DDoS_HTTP": {
+              "f1": 0.9758551307847082,
+              "recall": 0.9623015873015873,
+              "support": 504
+            },
+            "DDoS_ICMP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 688
+            },
+            "DDoS_TCP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 501
+            },
+            "DDoS_UDP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 1216
+            },
+            "Fingerprinting": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 10
+            },
+            "MITM": {
+              "f1": 0.0,
+              "recall": 0.0,
+              "support": 0
+            },
+            "Normal": {
+              "f1": 0.9999776830547434,
+              "recall": 0.9999553671055568,
+              "support": 22405
+            },
+            "Password": {
+              "f1": 0.9744094488188977,
+              "recall": 0.9880239520958084,
+              "support": 501
+            },
+            "Port_Scanning": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 204
+            },
+            "Ransomware": {
+              "f1": 0.9064748201438849,
+              "recall": 1.0,
+              "support": 126
+            },
+            "SQL_injection": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 523
+            },
+            "Uploading": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 379
+            },
+            "Vulnerability_scanner": {
+              "f1": 0.995159728944821,
+              "recall": 0.9961240310077519,
+              "support": 516
+            },
+            "XSS": {
+              "f1": 0.9968847352024922,
+              "recall": 1.0,
+              "support": 160
+            }
+          }
+        }
+      },
+      {
+        "round": 15,
+        "version": 6,
+        "alerts_used": 192,
+        "alerts_by_class": {
+          "Normal": 186,
+          "SQL_injection": 4,
+          "Uploading": 1,
+          "Vulnerability_scanner": 1
+        },
+        "alerts_from_excluded_clients": 0,
+        "total_alerts_collected": 951,
+        "mode": "continue",
+        "new_classes": [],
+        "metrics": {
+          "accuracy": 0.9980525458536931,
+          "macro_f1": 0.9872511671491279,
+          "weighted_f1": 0.9980830714336345,
+          "false_positive_rate": 4.4632894443204644e-05,
+          "per_class": {
+            "Backdoor": {
+              "f1": 0.9727547931382442,
+              "recall": 0.9469548133595285,
+              "support": 509
+            },
+            "DDoS_HTTP": {
+              "f1": 0.9758551307847082,
+              "recall": 0.9623015873015873,
+              "support": 504
+            },
+            "DDoS_ICMP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 688
+            },
+            "DDoS_TCP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 501
+            },
+            "DDoS_UDP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 1216
+            },
+            "Fingerprinting": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 10
+            },
+            "MITM": {
+              "f1": 0.0,
+              "recall": 0.0,
+              "support": 0
+            },
+            "Normal": {
+              "f1": 0.9999776830547434,
+              "recall": 0.9999553671055568,
+              "support": 22405
+            },
+            "Password": {
+              "f1": 0.9744094488188977,
+              "recall": 0.9880239520958084,
+              "support": 501
+            },
+            "Port_Scanning": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 204
+            },
+            "Ransomware": {
+              "f1": 0.9064748201438849,
+              "recall": 1.0,
+              "support": 126
+            },
+            "SQL_injection": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 523
+            },
+            "Uploading": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 379
+            },
+            "Vulnerability_scanner": {
+              "f1": 0.995159728944821,
+              "recall": 0.9961240310077519,
+              "support": 516
+            },
+            "XSS": {
+              "f1": 0.9968847352024922,
+              "recall": 1.0,
+              "support": 160
+            }
+          }
+        }
+      },
+      {
+        "round": 18,
+        "version": 7,
+        "alerts_used": 197,
+        "alerts_by_class": {
+          "Backdoor": 1,
+          "Normal": 193,
+          "Ransomware": 1,
+          "Vulnerability_scanner": 2
+        },
+        "alerts_from_excluded_clients": 0,
+        "total_alerts_collected": 1148,
+        "mode": "continue",
+        "new_classes": [],
+        "metrics": {
+          "accuracy": 0.997981729339282,
+          "macro_f1": 0.9868870549793372,
+          "weighted_f1": 0.998013300401894,
+          "false_positive_rate": 8.926578888640929e-05,
+          "per_class": {
+            "Backdoor": {
+              "f1": 0.9737903225806451,
+              "recall": 0.9489194499017681,
+              "support": 509
+            },
+            "DDoS_HTTP": {
+              "f1": 0.9737903225806451,
+              "recall": 0.9583333333333334,
+              "support": 504
+            },
+            "DDoS_ICMP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 688
+            },
+            "DDoS_TCP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 501
+            },
+            "DDoS_UDP": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 1216
+            },
+            "Fingerprinting": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 10
+            },
+            "MITM": {
+              "f1": 0.0,
+              "recall": 0.0,
+              "support": 0
+            },
+            "Normal": {
+              "f1": 0.9999553651133726,
+              "recall": 0.9999107342111135,
+              "support": 22405
+            },
+            "Password": {
+              "f1": 0.9724950884086444,
+              "recall": 0.9880239520958084,
+              "support": 501
+            },
+            "Port_Scanning": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 204
+            },
+            "Ransomware": {
+              "f1": 0.9064748201438849,
+              "recall": 1.0,
+              "support": 126
+            },
+            "SQL_injection": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 523
+            },
+            "Uploading": {
+              "f1": 1.0,
+              "recall": 1.0,
+              "support": 379
+            },
+            "Vulnerability_scanner": {
+              "f1": 0.9961240310077519,
+              "recall": 0.9961240310077519,
+              "support": 516
+            },
+            "XSS": {
+              "f1": 0.9937888198757764,
+              "recall": 1.0,
+              "support": 160
+            }
+          }
+        }
+      }
+    ]
+  },
+  "provenance": {
+    "seed": 44,
+    "dataset": "data/raw/DNN-EdgeIIoT-dataset.csv",
+    "created_at": "2026-11-01T13:57:36.477201+00:00",
+    "git_commit": "19409f7694905725ae82e9b2fa22e233c282bcd2-dirty",
+    "run_dir": "runs/full/c10_s44/phase_a"
+  },
+  "seed": 44
+}

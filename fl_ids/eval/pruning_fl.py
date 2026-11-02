@@ -32,6 +32,7 @@ def main() -> None:
     parser.add_argument("--num-rounds", type=int, default=20)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--output-dir", default="results/pruning")
+    parser.add_argument("--sparsities", nargs="*", type=float, default=list(SPARSITIES))
     args = parser.parse_args()
     setup_logging()
     config = load_config(args.config_path)
@@ -40,7 +41,7 @@ def main() -> None:
     )
     setup = build_evaluation_setup_from_arrays(X, y, list(encoder.classes_), benign, config, args.seed)
     rows = []
-    for sparsity in SPARSITIES:
+    for sparsity in args.sparsities:
         trained = train_variant(FULL_PIPELINE, setup, config, args.num_rounds, set(), args.seed, prune_sparsity=sparsity)
         scores = score_on_test_set(trained, setup, config)
         scores.pop("per_class_recall")

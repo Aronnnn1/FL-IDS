@@ -57,6 +57,7 @@ def run_ablation(
     num_rounds: int,
     poisoning_fraction: float,
     seed: int,
+    variant_names: list[str] | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Train and score every ablation variant on the shared test set.
 
@@ -67,6 +68,7 @@ def run_ablation(
         poisoning_fraction: Fraction of clients malicious, held fixed
             across variants so the robustness comparison is meaningful.
         seed: Random seed (model init and malicious-client selection).
+        variant_names: Run only these variants (None = all); lets the variants run as separate parallel jobs.
 
     Returns:
         (table, per_class): one row per variant with `TABLE_COLUMNS`
@@ -79,6 +81,8 @@ def run_ablation(
 
     rows, per_class_rows = [], []
     for variant in ABLATION_VARIANTS:
+        if variant_names and variant.name not in variant_names:
+            continue
         trained = train_variant(variant, setup, config, num_rounds, malicious_ids, seed)
         scores = score_on_test_set(trained, setup, config)
         per_class = scores.pop("per_class_recall")
@@ -144,6 +148,7 @@ if __name__ == "__main__":
     parser.add_argument("--poisoning-fraction", type=float, default=0.3)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--output-dir", default=None)
+    parser.add_argument("--variants", nargs="*", default=None, help="Run only these variants (default: all)")
     parser.add_argument(
         "--skip-zero-day", action="store_true",
         help="Leave zero_day_macro_recall empty (skips one retraining per variant per held-out class)",
@@ -161,7 +166,8 @@ if __name__ == "__main__":
     names = list(label_encoder.classes_)
     eval_setup = build_evaluation_setup_from_arrays(X_all, y_all, names, benign, run_config, args.seed)
     ablation_df, per_class_df = run_ablation(
-        eval_setup, run_config, num_rounds=args.num_rounds, poisoning_fraction=args.poisoning_fraction, seed=args.seed
+        eval_setup, run_config, num_rounds=args.num_rounds, poisoning_fraction=args.poisoning_fraction, seed=args.seed,
+        variant_names=args.variants,
     )
     per_class_df.to_csv(output_dir / "ablation_per_class_recall.csv", index=False)
 

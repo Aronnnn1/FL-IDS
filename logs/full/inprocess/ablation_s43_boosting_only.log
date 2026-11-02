@@ -1,0 +1,8 @@
+2026-11-02 01:23:09,055 [INFO] fl_ids.data.pipeline: Loaded extended features from cache data/processed/encoded_extended.npz: (1985768, 130)
+2026-11-02 01:23:10,108 [INFO] fl_ids.models.boosting: Training boosting classifier: 100024 samples, 15 classes, 300 rounds
+2026-11-02 01:23:30,679 [INFO] fl_ids.eval.common: Evaluation setup: 100024 calibration, 1885744 federated pool (subsampled), 283090 test rows across 10 clients
+2026-11-02 01:23:30,683 [INFO] __main__: Ablation: poisoning_fraction=0.30 -> malicious clients=[4, 5, 9]
+2026-11-02 01:24:13,730 [INFO] __main__: variant=boosting_only: attack_macro_recall=0.989 benign_fpr=0.0001 autoencoder_alone=nan
+2026-11-02 01:24:13,744 [INFO] __main__: Saved /home/flids/FL-IDS-clean/results/full/inprocess/s43/shards/ablation_s43_boosting_only/ablation_table.csv
+      variant  attack_macro_recall  attack_micro_recall  benign_fpr  detection_f1  zero_day_macro_recall  autoencoder_alone_attack_macro_recall  final_val_loss  rounds_to_convergence  total_communication_bytes
+boosting_only             0.989408             0.991681    0.000143      0.995642                    NaN                                    NaN             NaN                    NaN                          0

@@ -126,6 +126,18 @@ def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         A cleaned DataFrame with no NaNs and no duplicate rows, index reset.
     """
+    return clean_dataframe_with_index(df)[0]
+
+
+def clean_dataframe_with_index(df: pd.DataFrame) -> tuple[pd.DataFrame, np.ndarray]:
+    """`clean_dataframe`, also returning the positions (in the input) of the rows it kept.
+
+    Args:
+        df: Raw (post-column-drop) DataFrame, with a default RangeIndex.
+
+    Returns:
+        (cleaned DataFrame with index reset, integer positions of the kept rows in `df`).
+    """
     before = len(df)
     df = df.dropna(axis=0, how="any")
     after_na = len(df)
@@ -138,7 +150,8 @@ def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         before - after_na,
         after_na - after_dup,
     )
-    return df.reset_index(drop=True)
+    kept = df.index.to_numpy()
+    return df.reset_index(drop=True), kept
 
 
 def canonicalize_placeholders(
@@ -244,6 +257,114 @@ def dirichlet_partition(
     return {cid: np.array(idx, dtype=np.int64) for cid, idx in client_indices.items()}
 
 
+def grouped_fraction_mask(
+    y: np.ndarray, groups: np.ndarray, fraction: float, seed: int, min_flows: int, scarce_selected: bool
+) -> np.ndarray:
+    """Pick whole flows, class by class, until about `fraction` of each class's rows are chosen.
+
+    Args:
+        y: Integer class label per row.
+        groups: Flow id per row.
+        fraction: Share of each class's rows to choose (flows are indivisible, so it is approximate).
+        seed: Random seed.
+        min_flows: A class with fewer flows than this is "scarce": it cannot be split sensibly.
+        scarce_selected: Whether scarce classes are chosen entirely (True) or not at all (False).
+
+    Returns:
+        Boolean mask over rows. A flow that would overshoot the target by more than 2x is skipped, unless nothing
+        has been chosen yet for the class (then the smallest-overshoot first flow is taken, so a class is never empty).
+    """
+    rng = np.random.default_rng(seed)
+    chosen = np.zeros(len(y), dtype=bool)
+    for c in np.unique(y):
+        rows = np.where(y == c)[0]
+        flows, inverse = np.unique(groups[rows], return_inverse=True)
+        sizes = np.bincount(inverse)
+        if len(flows) < min_flows:
+            chosen[rows] = scarce_selected
+            continue
+        target = fraction * len(rows)
+        take, total = [], 0
+        for gi in rng.permutation(len(flows)):
+            if total >= target:
+                break
+            if total > 0 and total + sizes[gi] > 2 * target:
+                continue
+            take.append(gi)
+            total += sizes[gi]
+        selected = np.zeros(len(flows), dtype=bool)
+        selected[take] = True
+        chosen[rows[selected[inverse]]] = True
+    return chosen
+
+
+def grouped_dirichlet_partition(
+    y: np.ndarray, groups: np.ndarray, num_clients: int, alpha: float, seed: int
+) -> dict[int, np.ndarray]:
+    """`dirichlet_partition`, but every flow goes to one client whole.
+
+    Per class, a Dirichlet(alpha) draw gives each client a target share of the class's rows; flows (in random order) are
+    handed to the client that is furthest below its target, so shares follow the draw as closely as indivisible flows allow.
+    """
+    rng = np.random.default_rng(seed)
+    client_rows: dict[int, list[np.ndarray]] = {i: [] for i in range(num_clients)}
+    for c in np.unique(y):
+        rows = np.where(y == c)[0]
+        flows, inverse = np.unique(groups[rows], return_inverse=True)
+        sizes = np.bincount(inverse)
+        target = rng.dirichlet(alpha * np.ones(num_clients)) * len(rows)
+        filled = np.zeros(num_clients)
+        owner = np.empty(len(flows), dtype=np.int64)
+        for gi in rng.permutation(len(flows)):
+            k = int(np.argmax(target - filled))
+            owner[gi] = k
+            filled[k] += sizes[gi]
+        row_owner = owner[inverse]
+        for k in range(num_clients):
+            client_rows[k].append(rows[row_owner == k])
+    return {k: (np.concatenate(v) if v else np.empty(0, dtype=np.int64)).astype(np.int64) for k, v in client_rows.items()}
+
+
+def _pick_flows(rows: np.ndarray, groups: np.ndarray, target: float, rng: np.random.Generator) -> np.ndarray:
+    """Boolean mask over `rows`: whole flows (random order) until >= `target` rows, never overshooting by more than 1.5x."""
+    if len(rows) == 0 or target <= 0:
+        return np.zeros(len(rows), dtype=bool)
+    flows, inverse = np.unique(groups[rows], return_inverse=True)
+    sizes = np.bincount(inverse)
+    take, total = [], 0
+    for gi in rng.permutation(len(flows)):
+        if total >= target:
+            break
+        if total + sizes[gi] > 1.5 * target and (total > 0 or sizes[gi] > 3 * target):
+            continue
+        take.append(gi)
+        total += sizes[gi]
+    selected = np.zeros(len(flows), dtype=bool)
+    selected[take] = True
+    return selected[inverse]
+
+
+def _split_client_data_grouped(
+    client_idx: np.ndarray,
+    y: np.ndarray,
+    groups: np.ndarray,
+    benign_class: int,
+    val_benign_fraction: float,
+    test_fraction: float,
+    seed: int,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """`_split_client_data` with whole flows: (train, val_benign, test) index arrays that share no flow."""
+    rng = np.random.default_rng(seed)
+    idx = client_idx.copy()
+    test_mask = _pick_flows(idx, groups, test_fraction * len(idx), rng)
+    test_idx, remaining = idx[test_mask], idx[~test_mask]
+    benign_remaining = remaining[y[remaining] == benign_class]
+    non_benign_remaining = remaining[y[remaining] != benign_class]
+    val_mask = _pick_flows(benign_remaining, groups, val_benign_fraction * len(benign_remaining), rng)
+    val_benign_idx, train_benign_idx = benign_remaining[val_mask], benign_remaining[~val_mask]
+    return np.concatenate([train_benign_idx, non_benign_remaining]), val_benign_idx, test_idx
+
+
 def _split_client_data(
     client_idx: np.ndarray,
     y: np.ndarray,
@@ -311,6 +432,7 @@ def partition_and_normalize_clients(
     benign_class: int,
     config: DataConfig,
     seed: int,
+    groups: np.ndarray | None = None,
 ) -> dict[int, dict[str, np.ndarray]]:
     """Partition (X, y) non-IID across clients, then per-client split and normalize.
 
@@ -344,26 +466,38 @@ def partition_and_normalize_clients(
         config: Data configuration (num_clients, dirichlet_alpha, split
             fractions, normalize_per_client).
         seed: Global random seed, for reproducible partitioning/splitting.
+        groups: Flow id per row. Required when `config.group_by_flow`: flows then stay whole across the partition and
+            each client's train/val/test split. Ignored otherwise.
 
     Returns:
         `{client_id: {"X", "X_raw", "y", "X_val_benign", "y_val_benign",
         "X_test", "X_test_raw", "y_test"}}`, all values `np.ndarray`.
     """
-    client_index_map = dirichlet_partition(y, config.num_clients, config.dirichlet_alpha, seed)
+    if config.group_by_flow:
+        if groups is None or len(groups) != len(y):
+            raise ValueError("data.group_by_flow needs a flow id per row (groups=...)")
+        client_index_map = grouped_dirichlet_partition(y, groups, config.num_clients, config.dirichlet_alpha, seed)
+    else:
+        client_index_map = dirichlet_partition(y, config.num_clients, config.dirichlet_alpha, seed)
 
     client_data: dict[int, dict[str, np.ndarray]] = {}
     for client_id, client_idx in client_index_map.items():
         if len(client_idx) == 0:
             logger.warning("Client %d received zero samples from the Dirichlet split", client_id)
 
-        train_idx, val_benign_idx, test_idx = _split_client_data(
-            client_idx,
-            y,
-            benign_class,
-            config.val_benign_fraction,
-            config.test_fraction,
-            seed=seed + client_id,
-        )
+        if config.group_by_flow:
+            train_idx, val_benign_idx, test_idx = _split_client_data_grouped(
+                client_idx, y, groups, benign_class, config.val_benign_fraction, config.test_fraction, seed=seed + client_id
+            )
+        else:
+            train_idx, val_benign_idx, test_idx = _split_client_data(
+                client_idx,
+                y,
+                benign_class,
+                config.val_benign_fraction,
+                config.test_fraction,
+                seed=seed + client_id,
+            )
         if len(val_benign_idx) == 0:
             logger.warning(
                 "Client %d has zero benign validation samples (heavy Dirichlet skew "
@@ -397,7 +531,7 @@ def partition_and_normalize_clients(
 
 
 # Bump when fl_ids.data.features changes what it computes, so stale caches are rebuilt.
-EXTENDED_FEATURES_VERSION = 1
+EXTENDED_FEATURES_VERSION = 2  # 2: the cache also stores each row's flow id (`flow_id`)
 
 
 def _cache_key(csv_path: str | Path, capture_repairs: dict[str, str] | None) -> str:
@@ -462,11 +596,18 @@ def load_and_encode(
     if extended_features:
         from fl_ids.data.features import derive_features
 
+        from fl_ids.data.features import assign_flows
+
         df = df.reset_index(drop=True)
         derived = derive_features(df)
+        flow_ids = assign_flows(df)  # per packet, before rows are dropped; same call derive_features makes
         df = df.drop(columns=[c for c in DEFAULT_DROP_COLUMNS if c in df.columns])
         df = pd.concat([df, derived], axis=1)
-    df = clean_dataframe(df)
+    else:
+        flow_ids = None
+    df, kept = clean_dataframe_with_index(df)
+    if flow_ids is not None:
+        flow_ids = flow_ids[kept]
     df = one_hot_encode_categoricals(df)
 
     label_encoder = LabelEncoder()
@@ -482,10 +623,88 @@ def load_and_encode(
     if key:
         Path(cache_path).parent.mkdir(parents=True, exist_ok=True)
         np.savez(cache_path, key=np.array(key), X=X, y=y, classes=np.asarray(label_encoder.classes_).astype(str),
-                 feature_names=np.array(feature_names), benign_class=np.array(benign_class))
+                 feature_names=np.array(feature_names), benign_class=np.array(benign_class), flow_id=flow_ids)
         logger.info("Wrote feature cache %s", cache_path)
 
     return X, y, label_encoder, feature_names, benign_class
+
+
+def load_flow_ids(
+    csv_path: str | Path, capture_repairs: dict[str, str] | None, cache_path: str | Path
+) -> np.ndarray:
+    """Flow (connection) id of every row of the matrix `load_and_encode` returns, from its feature cache.
+
+    Packets of one connection share these flow-level features, so splits that must not put siblings on both sides
+    (calibration vs. client test slices) group on this id.
+
+    Raises:
+        FileNotFoundError / ValueError: If the cache is missing, stale or was built without flow ids (call
+            `load_and_encode` with `extended_features=True` and this `cache_path` first).
+    """
+    if not Path(cache_path).exists():
+        raise FileNotFoundError(f"{cache_path}: run load_and_encode with extended_features=True first")
+    cached = np.load(cache_path, allow_pickle=False)
+    if str(cached["key"]) != _cache_key(csv_path, capture_repairs) or "flow_id" not in cached.files:
+        raise ValueError(f"{cache_path} is stale or has no flow ids; rebuild it with load_and_encode")
+    return cached["flow_id"]
+
+
+def server_pool_split(
+    X: np.ndarray,
+    y: np.ndarray,
+    config: "Config",
+    seed: int,
+    pool_cap: int | None,
+    excluded_classes: frozenset[int] = frozenset(),
+    groups: np.ndarray | None = None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray | None, np.ndarray | None]:
+    """The server calibration split and the federated pool, row-level or by flow depending on `config.data.group_by_flow`.
+
+    Returns:
+        (X_calib, y_calib, X_pool, y_pool, groups_calib, groups_pool); the group arrays are None for row-level splits.
+        `groups` (flow id per row) is read from the feature cache when not given. `pool_cap` rows (stratified by class;
+        None or <= 0 = no cap) are kept in the pool. `excluded_classes` are removed
+        from both sides (the zero-day experiment).
+    """
+    from sklearn.model_selection import train_test_split
+
+    frac = config.boosting.calibration_fraction
+    if config.data.group_by_flow:
+        if groups is None:
+            groups = load_flow_ids(config.data.dnn_csv_path, config.data.capture_repairs, config.data.feature_cache)
+        if len(groups) != len(y):
+            raise ValueError("flow ids do not match the feature matrix; rebuild the feature cache")
+        mask = grouped_fraction_mask(y, groups, frac, seed, config.data.min_flows_per_class, scarce_selected=True)
+        X_calib, y_calib, g_calib = X[mask], y[mask], groups[mask]
+        X_pool, y_pool, g_pool = X[~mask], y[~mask], groups[~mask]
+        if pool_cap and pool_cap > 0 and len(y_pool) > pool_cap:
+            keep = grouped_fraction_mask(y_pool, g_pool, pool_cap / len(y_pool), seed, config.data.min_flows_per_class, scarce_selected=False)
+            X_pool, y_pool, g_pool = X_pool[keep], y_pool[keep], g_pool[keep]
+    else:
+        X_calib, X_pool, y_calib, y_pool = train_test_split(X, y, train_size=frac, random_state=seed, stratify=y)
+        g_calib = g_pool = None
+        if pool_cap and pool_cap > 0 and len(X_pool) > pool_cap:
+            X_pool, _, y_pool, _ = train_test_split(X_pool, y_pool, train_size=pool_cap, random_state=seed, stratify=y_pool)
+    if excluded_classes:
+        excluded = np.array(sorted(excluded_classes))
+        ck, pk = ~np.isin(y_calib, excluded), ~np.isin(y_pool, excluded)
+        X_calib, y_calib, X_pool, y_pool = X_calib[ck], y_calib[ck], X_pool[pk], y_pool[pk]
+        if g_calib is not None:
+            g_calib, g_pool = g_calib[ck], g_pool[pk]
+    return X_calib, y_calib, X_pool, y_pool, g_calib, g_pool
+
+
+def calibration_eval_split(
+    X: np.ndarray, y: np.ndarray, groups: np.ndarray | None, config: "Config", seed: int
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Hold back `boosting.calibration_eval_fraction` of the calibration set to score each boosting version (by flow when grouped)."""
+    from sklearn.model_selection import train_test_split
+
+    frac = config.boosting.calibration_eval_fraction
+    if config.data.group_by_flow and groups is not None:
+        mask = grouped_fraction_mask(y, groups, frac, seed, config.data.min_flows_per_class, scarce_selected=False)
+        return X[~mask], X[mask], y[~mask], y[mask]
+    return train_test_split(X, y, test_size=frac, random_state=seed, stratify=y)
 
 
 def build_federated_dataset(

@@ -32,6 +32,8 @@ def main() -> None:
     parser.add_argument("--num-rounds", type=int, default=20)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--output-dir", default="results/adaptive")
+    parser.add_argument("--attacks", nargs="*", default=list(ATTACK_KINDS))
+    parser.add_argument("--fractions", nargs="*", type=float, default=list(FRACTIONS))
     args = parser.parse_args()
 
     setup_logging()
@@ -43,8 +45,8 @@ def main() -> None:
     client_ids = list(setup.client_data)
 
     rows = []
-    for attack in ATTACK_KINDS:
-        for fraction in FRACTIONS:
+    for attack in args.attacks:
+        for fraction in args.fractions:
             malicious = select_malicious_clients(client_ids, fraction, args.seed)
             trained = train_variant(FULL_PIPELINE, setup, config, args.num_rounds, malicious, args.seed, attack=attack)
             scores = score_on_test_set(trained, setup, config)

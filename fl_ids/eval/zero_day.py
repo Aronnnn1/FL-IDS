@@ -183,7 +183,7 @@ def run_zero_day_experiment(
     config: Config,
     num_rounds: int,
     seed: int,
-    pool_subsample_size: int = 60_000,
+    pool_subsample_size: int | None = None,
     checkpoint: RowCheckpoint | None = None,
 ) -> pd.DataFrame:
     """Run the leave-one-attack-class-out experiment over every configured holdout class.
@@ -241,7 +241,7 @@ def zero_day_detection_by_run(
     config: Config,
     num_rounds: int,
     seed: int,
-    pool_subsample_size: int = 60_000,
+    pool_subsample_size: int | None = None,
     checkpoint: RowCheckpoint | None = None,
 ) -> pd.DataFrame:
     """Held-out-attack detection rate for several pipeline variants, one row per (run, holdout class).

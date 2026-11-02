@@ -26,7 +26,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from fl_ids.data.pipeline import load_and_encode, normalize_with_scaler, partition_and_normalize_clients
+from fl_ids.data.pipeline import load_and_encode, normalize_with_scaler, partition_and_normalize_clients, server_pool_split
 from fl_ids.models.autoencoder import Autoencoder, compute_anomaly_threshold, reconstruction_error, set_weights
 from fl_ids.models.boosting import BoostingClassifier
 from fl_ids.utils.config import Config
@@ -90,7 +90,7 @@ def build_evaluation_setup(
     config: Config,
     real_csv_path: str | Path,
     seed: int,
-    pool_subsample_size: int = 60_000,
+    pool_subsample_size: int | None = None,
 ) -> EvaluationSetup:
     """Load the real dataset and build the shared evaluation setup from it.
 
@@ -122,7 +122,7 @@ def build_evaluation_setup_from_arrays(
     benign_class: int,
     config: Config,
     seed: int,
-    pool_subsample_size: int = 60_000,
+    pool_subsample_size: int | None = None,
     excluded_classes: frozenset[int] = frozenset(),
 ) -> EvaluationSetup:
     """Build the shared calibration/federated/test data every sweep point reuses.
@@ -159,25 +159,12 @@ def build_evaluation_setup_from_arrays(
     if benign_class in excluded_classes:
         raise ValueError("The benign class can't be excluded: every stage is calibrated on benign traffic")
 
-    X_calib, X_pool, y_calib, y_pool = train_test_split(
-        X, y, train_size=config.boosting.calibration_fraction, random_state=seed, stratify=y
+    pool_cap = config.orchestration.pool_subsample_size if pool_subsample_size is None else pool_subsample_size
+    X_calib, y_calib, X_pool, y_pool, _groups_calib, groups_pool = server_pool_split(
+        X, y, config, seed, pool_cap, excluded_classes
     )
-
-    if len(X_pool) > pool_subsample_size:
-        X_pool, _, y_pool, _ = train_test_split(
-            X_pool, y_pool, train_size=pool_subsample_size, random_state=seed, stratify=y_pool
-        )
-
     if excluded_classes:
-        excluded = np.array(sorted(excluded_classes))
-        calib_keep = ~np.isin(y_calib, excluded)
-        pool_keep = ~np.isin(y_pool, excluded)
-        X_calib, y_calib = X_calib[calib_keep], y_calib[calib_keep]
-        X_pool, y_pool = X_pool[pool_keep], y_pool[pool_keep]
-        logger.info(
-            "Excluded classes %s from training: removed %d calibration rows, %d federated-pool rows",
-            [class_names[c] for c in excluded], int((~calib_keep).sum()), int((~pool_keep).sum()),
-        )
+        logger.info("Excluded classes %s from training", [class_names[c] for c in sorted(excluded_classes)])
 
     # num_classes stays the full taxonomy even when classes are excluded, so
     # class indices mean the same thing across every setup; LightGBM simply
@@ -191,7 +178,7 @@ def build_evaluation_setup_from_arrays(
     )
     boosting_model.train(X_calib, y_calib)
 
-    client_data = partition_and_normalize_clients(X_pool, y_pool, benign_class, config.data, seed)
+    client_data = partition_and_normalize_clients(X_pool, y_pool, benign_class, config.data, seed, groups=groups_pool)
     # Refit on each client's raw training rows: the exact scaler
     # partition_and_normalize_clients fit and applied (StandardScaler is
     # deterministic), kept for normalizing rows from outside the client.

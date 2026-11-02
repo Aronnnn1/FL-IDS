@@ -103,7 +103,16 @@ def extract_raw_fields(pcap_path: str | Path, fields: list[str] | None = None) -
         for field in (fields or FEATURE_FIELDS):
             cmd += ["-e", field]
         cmd += ["-E", "header=y", "-E", "separator=,", "-E", "quote=d", "-E", "occurrence=f"]
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        if result.returncode != 0:
+            # A capture damaged part-way (the released Vulnerability scanner file has a record claiming a 136 MB packet)
+            # makes tshark stop at that record with a non-zero exit but print every packet before it. Use that prefix and
+            # say so; any other failure, or a failure with nothing readable, is still an error.
+            damaged = any(word in result.stderr for word in ("damaged", "corrupt", "cut short"))
+            if not (damaged and result.stdout.count("\n") > 1):
+                raise subprocess.CalledProcessError(result.returncode, cmd, output=result.stdout, stderr=result.stderr)
+            logger.warning("tshark stopped early on a damaged capture (%s); using the %d packets it could read",
+                           result.stderr.strip().splitlines()[-1] if result.stderr.strip() else "no message", result.stdout.count("\n") - 1)
     finally:
         staged_path.unlink(missing_ok=True)
 
