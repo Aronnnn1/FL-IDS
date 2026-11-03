@@ -1768,7 +1768,8 @@ No new experiment. `deliverables/report/` was reorganised to the mandatory seven
   References, Plagiarism (placeholder until the similarity report exists), appendices A to E. The old Cost Estimation section was dropped (format has none); the zero-cost fact is one bullet under constraints.
 - *Updated*: cover title (SDN-enabled IoT title), abstract and conclusion (full-pool headline numbers instead of the 60k ones), class split of the final 1,985,768 rows (Table in 5.2), hardware (VMware VM, 20 vCPUs, 48 GB), test count.
 - *Tests re-run for the report* (`pytest -q`, 2026-11-03): 244 passed, 1 skipped (a test needing the authors' CSV next to the captures), 462.9 s.
-- *Open*: Work Plan has phases and status but no dates; the owner will supply the real timeline. Plagiarism and AI-content reports still to be attached. Figures 4.1 and 4.3 are drawn in TikZ in the report source.
+- *Work Plan dates* (added 2026-11-03): the owner gave the outline (work started January 2026; literature survey and problem, then novelty, then a comparison of many ML and DL models, then the build, finished 3 November 2026). The month-level periods in Table 1.1 are the owner-approved estimates of that outline, not logged timestamps; only the late-October to 3 November phases are backed by commit and run dates.
+- *Open*: Plagiarism and AI-content reports still to be attached. Figures 4.1 and 4.3 are drawn in TikZ in the report source.
 
 ## 9. Do not cite (superseded numbers, with reason)
 

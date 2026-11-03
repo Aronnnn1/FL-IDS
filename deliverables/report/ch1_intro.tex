@@ -67,29 +67,30 @@ The trained models are saved as a self-describing bundle. In Phase B they classi
 This report also adds flow- and content-level features to the classifier (Chapter~\ref{chap:method}), which raise it from 96.4\% accuracy and 0.887 macro F1 to the levels reported in Chapter~\ref{chap:results}.
 
 \section{Work Plan}
-\begin{table}[H]
-\centering
-\renewcommand{\arraystretch}{1.25}
-\begin{tabular}{|c|p{9.5cm}|c|}
+{\renewcommand{\arraystretch}{1.25}
+\begin{longtable}{|c|p{6.9cm}|>{\raggedright\arraybackslash}p{3cm}|c|}
 \hline
-\textbf{Phase} & \textbf{Work} & \textbf{Status} \\ \hline
-0 & Project scaffolding, configuration, test framework & Done \\ \hline
-1 & Data pipeline: cleaning, encoding, Dirichlet partition, per-client normalisation; label-leak fix and MITM capture repair & Done \\ \hline
-2 & LightGBM bootstrap classifier and incremental update & Done \\ \hline
-3 & Core federated loop with the Flower framework & Done \\ \hline
-4 & Robustness layer: trust filter, trimmed mean, sign-flip attacker & Done \\ \hline
-5 & Training on the real Edge-IIoTset data & Done \\ \hline
-6 & Evaluation: ablation, poisoning sweep, zero-day experiment & Done \\ \hline
-7 & SDN mitigation with Mininet, Open vSwitch and os-ken & Done \\ \hline
-8 & Streamlit dashboard & Done \\ \hline
-9 & End-to-end Phase A $\rightarrow$ Phase B run & Done \\ \hline
-10 & Classifier accuracy improvement (flow and content features) & Done \\ \hline
-11 & Integration of the new features into the federated system and the SDN demo; full re-evaluation & Done \\ \hline
-12 & Follow-up experiments: 20 clients, repeat seeds, adaptive attacker, pruning, time-ordered split & Done \\ \hline
-13 & Whole system re-run on the full dataset, split by connection (10 and 20 clients, three seeds); class split, training time and per-packet decision time & Done \\ \hline
-14 & Results showcase website, project report and presentation & Done \\ \hline
-15 & Paper writing and submission & In progress \\ \hline
-\end{tabular}
+\textbf{Phase} & \textbf{Work} & \textbf{Period} & \textbf{Status} \\ \hline
+\endhead
+1 & Literature survey on intrusion detection, federated learning and SDN; identification of the problem & January -- February 2026 & Done \\ \hline
+2 & Study of the research gaps and selection of the novel contributions & March 2026 & Done \\ \hline
+3 & Comparison of many machine-learning and deep-learning classifiers on Edge-IIoTset; choice of boosting for the first stage & March -- April 2026 & Done \\ \hline
+4 & Project scaffolding, configuration, test framework & April 2026 & Done \\ \hline
+5 & Data pipeline: cleaning, encoding, Dirichlet partition, per-client normalisation; label-leak fix and MITM capture repair & April -- May 2026 & Done \\ \hline
+6 & LightGBM bootstrap classifier and incremental update & May 2026 & Done \\ \hline
+7 & Core federated loop with the Flower framework & May -- June 2026 & Done \\ \hline
+8 & Robustness layer: trust filter, trimmed mean, sign-flip attacker & June 2026 & Done \\ \hline
+9 & Training on the real Edge-IIoTset data & July 2026 & Done \\ \hline
+10 & Evaluation: ablation, poisoning sweep, zero-day experiment & July -- August 2026 & Done \\ \hline
+11 & SDN mitigation with Mininet, Open vSwitch and os-ken & August 2026 & Done \\ \hline
+12 & Streamlit dashboard & August 2026 & Done \\ \hline
+13 & End-to-end Phase A $\rightarrow$ Phase B run & September 2026 & Done \\ \hline
+14 & Classifier accuracy improvement (flow and content features) & September 2026 & Done \\ \hline
+15 & Integration of the new features into the federated system and the SDN demo; full re-evaluation & late September -- early October 2026 & Done \\ \hline
+16 & Follow-up experiments: 20 clients, repeat seeds, adaptive attacker, pruning, time-ordered split & October 2026 & Done \\ \hline
+17 & Whole system re-run on the full dataset, split by connection (10 and 20 clients, three seeds); class split, training time and per-packet decision time & October 2026 & Done \\ \hline
+18 & Results showcase website, project report and presentation & late October -- 3 November 2026 & Done \\ \hline
+19 & Paper writing and submission & November 2026 onwards & In progress \\ \hline
 \caption{Project work plan}
 \label{tab:workplan}
-\end{table}
+\end{longtable}}
