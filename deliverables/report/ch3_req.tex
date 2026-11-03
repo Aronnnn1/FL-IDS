@@ -1,0 +1,141 @@
+\chapter{Requirement Analysis and Specification}\label{chap:req}
+This chapter lists who the system is for, what it must do, the qualities it must have, the hardware, software and data it needs, and the constraints, assumptions and risks that shaped the work.
+
+\section{Stakeholders}
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|>{\raggedright\arraybackslash}p{3.8cm}|>{\raggedright\arraybackslash}p{9.7cm}|}
+\hline
+\textbf{Stakeholder} & \textbf{What they need from FL-IDS} \\ \hline
+Site operators (factory, building or campus owners running IoT/IIoT devices) & Detection of attacks on their own traffic without sending raw packet captures to anyone else; few false alarms; a clear verdict they can act on. \\ \hline
+Security analysts & A label and a confidence for each alert, the stage that raised it (classifier or autoencoder), and a way to confirm alerts so that the classifier can learn from them. \\ \hline
+Network administrators & Mitigation that is expressed as ordinary OpenFlow rules on a software switch, can be read back from the switch, and can be undone. \\ \hline
+Federation coordinator (the server operator) & Protection against clients that send poisoned model updates, and a record of which clients were excluded in which round and why. \\ \hline
+Project team and guide & Reproducible runs, logged numbers, and an honest statement of what the system does not do. \\ \hline
+Examiners and reviewers & A report, presentation and results website in which every figure can be traced to a logged run. \\ \hline
+Researchers who reuse the work & The data-quality findings, the connection-level split, the code, the configuration files and the model bundles. \\ \hline
+\end{tabular}
+\caption{Stakeholders and their needs}
+\end{table}
+
+\section{Functional Requirements}
+\begin{enumerate}
+  \item[FR1] \textbf{Data preparation.} Load the Edge-IIoTset CSV, repair the column-shifted MITM rows from the authors' own capture, canonicalise the categorical placeholder values, remove duplicate rows, one-hot encode the categorical fields, and derive the service-port, content and flow features (130 features in all).
+  \item[FR2] \textbf{Non-IID partitioning.} Hold out a stratified 5\% server calibration set and split the rest across $N=10$ or $N=20$ clients with a Dirichlet($\alpha=0.3$) label-skew partition. Whole connections stay together: each client gets its own training, benign-validation and test slices, normalised with a scaler fitted only on that client's training data.
+  \item[FR3] \textbf{First-stage classification.} Train a LightGBM multi-class classifier on the server's calibration set, broadcast it to clients every round, and update it every 3 rounds with up to 50 analyst-confirmed alerts per surviving client.
+  \item[FR4] \textbf{Second-stage anomaly detection.} On each client, train an autoencoder only on traffic the classifier passes as normal, and set a per-client threshold at the 97th percentile of benign validation reconstruction error, recomputed every round.
+  \item[FR5] \textbf{Federated training.} Run a Flower server and the client processes for 20 rounds; clients send only weight updates and error histograms, never raw traffic.
+  \item[FR6] \textbf{Poisoning defence.} On every round, exclude client updates that are cosine-similarity MAD outliers, that point away from the median update, or that come from clients with EMA trust below 0.5. Clip surviving update norms to $2\times$ the median and aggregate them with a 15\% trimmed mean.
+  \item[FR7] \textbf{Cascade decision.} Label each record as a known attack type, \emph{anomalous} or benign using one shared decision rule for evaluation, dashboard and SDN.
+  \item[FR8] \textbf{Model bundle.} Save the classifier, autoencoder weights, per-client scalers and thresholds, cascade settings, metrics, timing and provenance as a self-describing bundle, and reject inconsistent bundles on load.
+  \item[FR9] \textbf{SDN mitigation.} Replay a capture through Mininet, extract features with tshark, classify, and send the verdict to an os-ken controller, which installs a drop rule (confidence $\geq0.85$) or an OpenFlow meter (confidence $\geq0.5$). Verify the rule from the switch's own flow table.
+  \item[FR10] \textbf{Evaluation.} Produce the ablation table, poisoning-resistance sweep, zero-day leave-one-class-out results, classifier accuracy results, training times and per-packet decision times as CSV/JSON files and figures.
+  \item[FR11] \textbf{Dashboard.} Show live training state (rounds, trust scores, surviving clients, reconstruction error, classifier version) and the live mitigation state in a Streamlit web dashboard.
+\end{enumerate}
+
+\section{Non-Functional Requirements}
+\begin{itemize}
+  \item \textbf{Privacy:} raw traffic must not leave a client during federated training. The only exception is the capped, analyst-confirmed alerts used for the classifier update, which is documented as a trade-off.
+  \item \textbf{Accuracy:} the classifier must reach at least 95\% accuracy and at least 0.95 macro F1 on held-out data, under an evaluation that keeps whole connections out of training.
+  \item \textbf{Robustness:} known-attack recall must stay stable when up to 40\% of clients are malicious.
+  \item \textbf{Reproducibility:} every run is seeded (seed 42 by default, with seeds 43 and 44 as repeats); LightGBM runs deterministically; all tunable values live in configuration files (\texttt{configs/}).
+  \item \textbf{Resource limits:} a full 10-client run on the whole dataset must complete on one virtual machine (Table~\ref{tab:hw}); the per-client footprint was measured at about 0.4--0.8~GB of RAM.
+  \item \textbf{Speed:} the models must decide on a packet fast enough that classification is not the bottleneck of a software switch; the measured figures are in Section~\ref{sec:speed}.
+  \item \textbf{Maintainability:} the code is split into modules by component, with \testcount{} automated tests.
+  \item \textbf{Honesty of reporting:} every number in this report comes from an actual logged run; superseded numbers are not reused.
+\end{itemize}
+
+\section{System Requirements}
+\subsection{Hardware requirements}\label{sec:hw}
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|p{4cm}|p{9.5cm}|}
+\hline
+\textbf{Item} & \textbf{Specification used} \\ \hline
+Host machine & Windows 11 workstation running VMware Workstation (all later runs); an Apple MacBook Pro (M5) with UTM was used for early development and the first 60{,}000-row runs \\ \hline
+Guest operating system & Ubuntu 26.04.1 LTS \\ \hline
+Virtual CPUs & 20 (Intel Xeon, as presented by VMware); 4 in the early UTM virtual machine \\ \hline
+RAM & 48 GB (47 GiB visible to the guest); 7.2 GB, raised to 12 GB, in the early virtual machine \\ \hline
+Disk & 116 GB virtual disk (the raw dataset is 1.2 GB; the processed arrays (4.2 GB), run records (12 GB) and models (0.2 GB) bring the project to about 16 GB) \\ \hline
+Network & Emulated: Mininet hosts and one Open vSwitch switch \\ \hline
+\end{tabular}
+\caption{Hardware used for development and evaluation}
+\label{tab:hw}
+\end{table}
+
+\subsection{Software requirements}
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|p{4.5cm}|p{3cm}|p{6cm}|}
+\hline
+\textbf{Software} & \textbf{Version} & \textbf{Purpose} \\ \hline
+Python & 3.14.4 & Implementation language \\ \hline
+LightGBM & 4.7.0 & First-stage classifier \\ \hline
+PyTorch (CPU) & 2.14.0 & Autoencoder and DL baseline \\ \hline
+Flower (\texttt{flwr}) & 1.38.0 & Federated learning server and clients \\ \hline
+scikit-learn & 1.9.1 & Splits, scaling, metrics \\ \hline
+pandas / NumPy / PyArrow & 3.0.6 / 2.5.3 / 25.0.1 & Data handling \\ \hline
+os-ken & 4.2.2 & OpenFlow 1.3 SDN controller \\ \hline
+Mininet & 2.3.0 & Network emulation \\ \hline
+Open vSwitch & 3.7.1 & Software switch \\ \hline
+TShark (Wireshark) & 4.6.4 & Live feature extraction \\ \hline
+tcpreplay & -- & Replaying attack captures \\ \hline
+Flask & 3.1.3 & Mitigation REST bridge \\ \hline
+Streamlit & 1.64.0 & Dashboard \\ \hline
+pytest & 8.4.2 & Automated tests \\ \hline
+Matplotlib & 3.11.2 & Figures \\ \hline
+\end{tabular}
+\caption{Software used}
+\end{table}
+
+\section{Data Requirements}
+\begin{itemize}
+  \item \textbf{Labelled traffic.} A public packet-level dataset with benign traffic and several attack families, so that results can be repeated by others. Edge-IIoTset~\cite{ferrag2022edge} was chosen (Section~\ref{sec:dataset}).
+  \item \textbf{Raw captures.} The dataset's own \texttt{.pcap} files are needed twice: to repair the column-shifted MITM rows, and to replay real attack traffic in Phase B.
+  \item \textbf{Connection identity.} The evaluation needs to know which packets belong to the same connection, so that a connection never appears on both sides of a train--test split. Identifiers are used only to group packets and are never given to a model as features.
+  \item \textbf{Volume.} 2{,}219{,}201 raw rows, which become 1{,}985{,}768 unique rows (342{,}814 connections) with 130 features after cleaning; about 1.2~GB as CSV and a few gigabytes once the arrays and captures are included.
+  \item \textbf{Class coverage.} Fifteen classes with a very uneven split (Normal 72.3\%, MITM 0.02\%); a rare class needs enough rows to be learned and enough connections to be split (MITM is a single connection, see Section~\ref{sec:limits}).
+  \item \textbf{Privacy.} In deployment the raw traffic would stay on each client; the dataset is split across simulated clients to imitate this.
+  \item \textbf{Isolation.} Because the captures contain real attack traffic, all data, training and results are kept inside one virtual machine, and only text (logs and numbers) is copied out.
+\end{itemize}
+
+\section{Constraints and Limitations}
+\begin{itemize}
+  \item \textbf{One dataset.} All results use Edge-IIoTset, generated on one testbed. Benign traffic in it is only MQTT and VNC, so the service-port feature may over-state how separable web attacks are in a real network.
+  \item \textbf{Emulated, not physical.} The network is Mininet and Open vSwitch inside one virtual machine; there are no physical IoT devices and no hardware switch. Clients are processes on one machine, not separate computers, so communication delays are not measured.
+  \item \textbf{Batch mitigation.} Phase B classifies a whole capture after its features have been extracted; it is not inline per-packet blocking.
+  \item \textbf{Calibration set on the server.} The classifier is trained on labelled data held by the server (5\% of the pool); the classifier itself is not federated.
+  \item \textbf{Time and compute.} The whole project was done on one virtual machine within one academic year. A full-dataset run takes 17 to 31 minutes, which limited the number of repeat seeds to three for the main experiments and to one for the stealth-attacker, pruning and clipping tests.
+  \item \textbf{Cost.} Only free and open-source software and a public dataset were used, so there was no licence cost. A real deployment would need, per site, an edge device able to run the client and an OpenFlow-capable switch or a host running Open vSwitch.
+\end{itemize}
+
+\section{Assumptions}
+\begin{itemize}
+  \item The labels of Edge-IIoTset are correct, apart from the problems reported in Section~\ref{sec:dataquality}.
+  \item Clients hold different mixes of traffic (non-IID, Dirichlet $\alpha=0.3$), and most clients are honest.
+  \item At most about 40\% of clients are malicious; median-based filtering is assumed to fail at 50\% and above.
+  \item The server holds a small, correctly labelled calibration set to start the classifier.
+  \item An analyst can confirm the labels of the few alerts each client surfaces every third round.
+  \item Benign traffic seen by a client during training is representative of its normal traffic later, so the 97th-percentile threshold is meaningful.
+  \item Replaying the dataset's captures is a fair stand-in for live attack traffic in the emulated network.
+\end{itemize}
+
+\section{Risks and Challenges}
+\renewcommand{\arraystretch}{1.25}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{4.3cm}|>{\raggedright\arraybackslash}p{4.4cm}|>{\raggedright\arraybackslash}p{4.8cm}|}
+\hline
+\textbf{Risk} & \textbf{What happened or could happen} & \textbf{How it was handled} \\ \hline
+\endhead
+Label leak in the released dataset & A placeholder spelling separated benign from attack with an AUROC of 1.0, so results looked better than they are & Both spellings mapped to one value; a test fails if any single feature exceeds an AUROC of 0.9 \\ \hline
+Sibling packets in train and test & A random packet split puts packets of one connection on both sides & Split by connection, checked against the row split \\ \hline
+Poisoned client updates & 30\% sign-flip clients drove plain FedAvg's autoencoder loss to about $9\times10^{14}$ & Trust filter, norm clipping and trimmed mean \\ \hline
+Adaptive attacker & A stealth attacker can stay close to the median & Measured and reported; not defended against (Section~\ref{sec:limits}) \\ \hline
+Memory limits & An early 10-process run ran out of memory on a 7~GB virtual machine & Moved to a larger virtual machine; memory per client measured \\ \hline
+Tool version drift & A newer tshark printed booleans differently and silently zeroed one feature on live packets & Live extraction maps both formats back; checked against training rows \\ \hline
+Handling real attack traffic & Malicious captures on a personal computer & Everything runs inside one isolated virtual machine; only text leaves it \\ \hline
+Weak classes at scale & Autoencoder recall and the trust filter were weaker on the whole dataset than on the 60{,}000-row pool & Reported openly; cause not yet established \\ \hline
+\caption{Risks, challenges and how each was handled}
+\end{longtable}

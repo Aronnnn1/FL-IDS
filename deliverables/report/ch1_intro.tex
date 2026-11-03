@@ -1,6 +1,6 @@
 \chapter{Introduction}
 
-\section{Overview}
+\section{Background of the Study}
 Industrial and consumer Internet of Things (IoT/IIoT) deployments connect large numbers of low-power sensors, actuators, edge gateways and controllers. These devices speak lightweight protocols such as MQTT and Modbus/TCP, run with little or no host-based security, and are often installed in places that are physically hard to reach and slow to patch. They are therefore a common target for denial-of-service floods, scanning, injection attacks against web interfaces, malware such as backdoors and ransomware, and man-in-the-middle attacks.
 
 A network intrusion detection system (IDS) watches traffic and labels it as benign or as a particular attack type. A conventional IDS sends all traffic to one central place for training and analysis. In IoT/IIoT settings this is a problem: raw traffic can reveal how a plant or a home operates, traffic volume is high, and different sites see very different mixes of traffic.
@@ -15,7 +15,7 @@ This project, \textbf{FL-IDS}, builds an intrusion detection system for IoT/IIoT
 \end{enumerate}
 The system is evaluated on the public Edge-IIoTset dataset~\cite{ferrag2022edge}, which contains about 2.2 million labelled packets across normal traffic and 14 attack types.
 
-\section{Motivation}
+\section{Research Motivation}
 Three practical problems motivated the work.
 
 \textbf{Privacy and bandwidth.} Packet captures from a factory floor or a smart building contain operational details that owners do not want to share. Federated learning lets each site train on its own data and share only model weights.
@@ -35,7 +35,7 @@ Finally, detection alone does not stop an attack. Linking the detector to an SDN
 \end{enumerate}
 
 \section{Scope}
-The project covers offline federated training and evaluation (``Phase A'') and a live mitigation demonstration on an emulated network (``Phase B''). Training uses 10 simulated clients, run either in one process for the evaluation sweeps or as 10 separate operating-system processes talking to a real Flower server. Mitigation is demonstrated by replaying real attack captures from the dataset through Mininet with \texttt{tcpreplay}.
+The project covers offline federated training and evaluation (``Phase A'') and a live mitigation demonstration on an emulated network (``Phase B''). Training uses 10 or 20 simulated clients, run either in one process for the evaluation sweeps or as separate operating-system processes (one per client) talking to a real Flower server. The main results use the whole Edge-IIoTset dataset (1.99 million unique packets), split by connection. Mitigation is demonstrated by replaying real attack captures from the dataset through Mininet with \texttt{tcpreplay}.
 
 The following are outside the scope: deployment on physical IoT hardware, inline per-packet blocking of a live stream (classification happens once tshark has extracted features from a capture), adaptive attackers other than the sign-flip attacker, and a systematic literature review to establish novelty.
 
@@ -46,7 +46,6 @@ The following are outside the scope: deployment on physical IoT hardware, inline
 
 \textbf{SDG 16: Peace, Justice and Strong Institutions.} The project strengthens cybersecurity and protects sensitive digital data: raw traffic never leaves a site during training, and attacks are detected and blocked.
 
-Together, these promote \textbf{secure and resilient digital ecosystems}.
 
 \section{Existing System}
 Most IDS work on Edge-IIoTset and similar datasets trains a single centralised model, often a deep neural network or a tree ensemble, on the authors' preprocessed CSV file, and reports accuracy on a random split of packets. These systems have the following limitations:
@@ -61,7 +60,7 @@ Most IDS work on Edge-IIoTset and similar datasets trains a single centralised m
 \section{Proposed System}
 FL-IDS uses a two-stage cascade. Every packet first goes to the LightGBM classifier. If it predicts an attack with probability at least 0.7, that label is final. Otherwise the packet goes to the client's autoencoder. If the reconstruction error is above that client's threshold (the 97th percentile of error on its own benign validation data), the packet is labelled \emph{anomalous}; otherwise it is benign.
 
-The autoencoder is trained with federated learning across 10 non-IID clients. On every round the server's trust filter compares each client's weight update with the coordinate-wise median update, excludes outliers, updates that point away from the consensus and clients with low running trust, clips the remaining update norms and combines them with a trimmed mean.
+The autoencoder is trained with federated learning across 10 or 20 non-IID clients. On every round the server's trust filter compares each client's weight update with the coordinate-wise median update, excludes outliers, updates that point away from the consensus and clients with low running trust, clips the remaining update norms and combines them with a trimmed mean.
 
 The trained models are saved as a self-describing bundle. In Phase B they classify replayed attack traffic on a Mininet network, and the verdict is sent to an os-ken OpenFlow~1.3 controller, which installs a drop rule or a rate-limiting meter on the switch.
 
@@ -86,7 +85,10 @@ This report also adds flow- and content-level features to the classifier (Chapte
 9 & End-to-end Phase A $\rightarrow$ Phase B run & Done \\ \hline
 10 & Classifier accuracy improvement (flow and content features) & Done \\ \hline
 11 & Integration of the new features into the federated system and the SDN demo; full re-evaluation & Done \\ \hline
-12 & Paper writing and submission & In progress \\ \hline
+12 & Follow-up experiments: 20 clients, repeat seeds, adaptive attacker, pruning, time-ordered split & Done \\ \hline
+13 & Whole system re-run on the full dataset, split by connection (10 and 20 clients, three seeds); class split, training time and per-packet decision time & Done \\ \hline
+14 & Results showcase website, project report and presentation & Done \\ \hline
+15 & Paper writing and submission & In progress \\ \hline
 \end{tabular}
 \caption{Project work plan}
 \label{tab:workplan}

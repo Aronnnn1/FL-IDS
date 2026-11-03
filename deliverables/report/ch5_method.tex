@@ -1,13 +1,6 @@
 \chapter{Methodology}\label{chap:method}
 FL-IDS runs in two phases. \textbf{Phase A} prepares the data, trains the LightGBM classifier, trains the autoencoder over 20 federated rounds with the trust filter, evaluates everything, and saves a model bundle. \textbf{Phase B} loads that bundle, classifies replayed attack traffic on an emulated network and turns the verdict into an OpenFlow rule. Figure~\ref{fig:hld} shows the overall design.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=\linewidth]{figures/high_level_design.png}
-\caption{High-level design of FL-IDS}
-\label{fig:hld}
-\end{figure}
-
 \section{Tools and Techniques}
 \begin{itemize}
   \item \textbf{LightGBM}~\cite{ke2017lightgbm}: histogram-based gradient-boosted decision trees, used as the first-stage multi-class classifier. Trees work directly on raw feature values, so each client's local normalisation cannot distort the classifier's split thresholds.
@@ -19,7 +12,7 @@ FL-IDS runs in two phases. \textbf{Phase A} prepares the data, trains the LightG
   \item \textbf{Streamlit}: the live dashboard.
 \end{itemize}
 
-\section{Data Set With Explanation}
+\section{Data Set with Explanation}\label{sec:dataset}
 \textbf{Edge-IIoTset}~\cite{ferrag2022edge} was generated on a seven-layer IoT/IIoT testbed (cloud, network functions virtualisation, blockchain, fog, SDN, edge and IoT/IIoT perception layers) with more than ten kinds of sensors, including temperature, humidity, water level, pH, soil moisture, heart rate and flame sensors. They communicate over MQTT and Modbus/TCP. The authors' ML-ready file, \texttt{DNN-EdgeIIoT-dataset.csv}, has 2{,}219{,}201 rows and 63 columns: 61 packet-level fields extracted with tshark, plus \texttt{Attack\_label} and \texttt{Attack\_type}. The 24 per-device and per-attack \texttt{.pcap} captures are also used, for Phase B replay and for repairing corrupted rows.
 
 There are 15 classes: Normal and 14 attacks in five groups. Table~\ref{tab:classes} gives the class sizes after cleaning (current code, before the new features are added).
@@ -61,7 +54,7 @@ Man-in-the-middle & MITM & 406 & 0.02 \\ \hline
 \subsection{Preprocessing}
 Sixteen columns are dropped, following the dataset authors' recipe: identifiers, timestamps, raw payloads and ports, plus \texttt{Attack\_label}, which is fully determined by \texttt{Attack\_type}. Seven nominal columns are one-hot encoded, giving \textbf{91 base features}. Exact duplicate rows are removed (309{,}497 rows), leaving 1{,}909{,}719 rows.
 
-\subsection{New features for the classifier}
+\subsection{New features for the classifier}\label{sec:newfeat}
 Profiling the dropped columns explained why the application-layer attacks were hard to classify. In the SQL\_injection, XSS, Uploading and Password classes, only 5--17\% of packets carry any HTTP content. The rest are content-free TCP handshake and acknowledgement packets to port~80 on the same web server, which look the same whichever attack produced them. Three groups of features were therefore added. IP addresses, absolute time and ephemeral client ports are \emph{never} used as features, because each of them identifies the capture file and hence the label.
 \begin{enumerate}
   \item \textbf{Service port (1 feature):} the server side of a connection, $\min(\text{ports} < 32768)$, or $-1$ if there is none (for example ICMP or ARP).
@@ -70,7 +63,36 @@ Profiling the dropped columns explained why the application-layer attacks were h
 \end{enumerate}
 With all three groups there are 130 features and 1{,}985{,}768 unique rows.
 
-\section{Flow Chart Of Methodology From Start To End}
+\textbf{Class split of the final data.} After the new features are added and duplicates are removed, 1{,}985{,}768 unique rows remain; Table~\ref{tab:classes130} gives the class sizes (the 342{,}814 connections they form are what the splits keep whole). Table~\ref{tab:classes} above was counted on the 91 base features before the last cleaning step and is kept to show what changed.
+\begin{table}[H]
+\centering
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|l|r|r|}
+\hline
+\textbf{Group} & \textbf{Class} & \textbf{Rows} & \textbf{\%} \\ \hline
+-- & Normal & 1{,}436{,}597 & 72.34 \\ \hline
+DoS/DDoS & DDoS\_UDP & 121{,}567 & 6.12 \\ \hline
+DoS/DDoS & DDoS\_ICMP & 68{,}758 & 3.46 \\ \hline
+DoS/DDoS & DDoS\_TCP & 50{,}062 & 2.52 \\ \hline
+DoS/DDoS & DDoS\_HTTP & 49{,}768 & 2.51 \\ \hline
+Injection & SQL\_injection & 50{,}981 & 2.57 \\ \hline
+Injection & Uploading & 37{,}243 & 1.88 \\ \hline
+Injection & XSS & 15{,}172 & 0.76 \\ \hline
+Information gathering & Vulnerability\_scanner & 50{,}044 & 2.52 \\ \hline
+Information gathering & Port\_Scanning & 20{,}213 & 1.02 \\ \hline
+Information gathering & Fingerprinting & 872 & 0.04 \\ \hline
+Malware & Password & 50{,}033 & 2.52 \\ \hline
+Malware & Backdoor & 24{,}167 & 1.22 \\ \hline
+Malware & Ransomware & 9{,}885 & 0.50 \\ \hline
+Man-in-the-middle & MITM & 406 & 0.02 \\ \hline
+\textbf{Total} & & \textbf{1{,}985{,}768} & \textbf{100.00} \\ \hline
+\end{tabular}
+\caption{Class distribution of the final data (130 features)}
+\label{tab:classes130}
+\end{table}
+
+\section{Flowchart of Methodology from Start to End}
 Figure~\ref{fig:flow} shows the complete sequence of steps, from loading the dataset to verifying the mitigation rule.
 \begin{figure}[H]
 \centering
@@ -79,7 +101,7 @@ Figure~\ref{fig:flow} shows the complete sequence of steps, from loading the dat
 \label{fig:flow}
 \end{figure}
 
-\section{Explanation Of Methodology In Details With Equations And Formulae}
+\section{Explanation of Methodology in Detail with Equations and Formulae}
 
 \subsection{How much data each part uses}
 Every packet of the dataset is cleaned and given the new features (2{,}219{,}216 rows, 1{,}985{,}768 unique after de-duplication). How many of them each model trains on differs, and Table~\ref{tab:datascale} lists it. The classifier that meets the accuracy target is trained on most of the data. The federated system was first run on a pool capped at 60{,}000 rows, to keep the roughly 150 evaluation runs practical; the main federated results (Section~\ref{sec:fullpool}) use the whole pool.
@@ -126,7 +148,7 @@ where $\mathbf{v}_t$ are leaf values and $\lambda_2 = 1$. The sample weight $w_n
 \begin{equation}
   w_n = \sqrt{\frac{\max_j N_j}{N_{y_n}}},
 \end{equation}
-so a rare class such as Fingerprinting counts more without being blown up the way full inverse-frequency weights would. In the federated pipeline the classifier uses 300 rounds, learning rate 0.05 and 31 leaves, trained deterministically on one thread so runs are reproducible. The stand-alone accuracy experiments of Section~5.1 used 63 leaves, learning rate 0.1, feature and bagging fractions of 0.8, and early stopping after 50 rounds without improvement on a 10\% validation split.
+so a rare class such as Fingerprinting counts more without being blown up the way full inverse-frequency weights would. In the federated pipeline the classifier uses 300 rounds, learning rate 0.05 and 31 leaves, trained deterministically on one thread so runs are reproducible. The stand-alone accuracy experiments of Section~\ref{sec:clfacc} used 63 leaves, learning rate 0.1, feature and bagging fractions of 0.8, and early stopping after 50 rounds without improvement on a 10\% validation split.
 
 \subsection{Stage 2: autoencoder and threshold}
 Each client trains the autoencoder $g_\theta$ on the rows the current classifier passes (predicted Normal, or an attack with probability below 0.7). It minimises the mean squared reconstruction error

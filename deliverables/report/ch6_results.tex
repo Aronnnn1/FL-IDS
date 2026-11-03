@@ -1,14 +1,16 @@
 \chapter{Results and Discussion}\label{chap:results}
-All numbers below come from logged runs on the hardware in Chapter~3. Unless stated otherwise, the seed is 42.
 
-\textbf{Scale of the federated results.} Sections~\ref{sec:followups} and the federated sections that precede it use a 60{,}000-row federated pool split row by row. Section~\ref{sec:fullpool} repeats the federated system on the whole dataset, split by connection, and gives the headline federated results; the earlier numbers are kept for comparison.
+\section{Presentation of Results}
+All numbers in this chapter come from logged runs on the hardware in Section~\ref{sec:hw}. Unless stated otherwise, the seed is 42. The chapter is ordered from the strongest evidence to the weakest: the stand-alone classifier (Section~\ref{sec:clfacc}), the whole federated system on the whole dataset split by connection (Section~\ref{sec:fullpool}), how long training and a decision take (Section~\ref{sec:speed}), the comparison with a deep-learning classifier, and finally the earlier experiments on a 60{,}000-row pool, which are kept for comparison (Section~\ref{sec:earlier}).
 
-\section{Classifier accuracy}
+\textbf{Scale of the results.} The earlier experiments use a 60{,}000-row federated pool split row by row, to keep roughly 150 evaluation runs practical. The full-dataset experiments repeat the federated system on all 1{,}985{,}768 usable rows, split by connection, and give the headline federated results.
+
+\subsection{Classifier accuracy}\label{sec:clfacc}
 The project requirement was at least 95\% accuracy and at least 0.95 macro F1. The earlier classifier comparison, on a 500{,}000-row class-balanced sample of the base features, gave 0.891 accuracy and 0.887 macro F1. On all 1.9 million rows with the natural class distribution, the same base features give 0.964 accuracy but still only 0.887 macro F1, because the application-layer attacks are confused with each other.
 
 The final classifier is trained on 1{,}429{,}825 packets and tested on 397{,}073 packets from connections it never saw (Table~\ref{tab:datascale}).
 
-\subsection{Ambiguity ceiling}
+\subsubsection{Ambiguity ceiling}
 Before tuning the model, we measured how many rows are impossible to separate with each feature set (Table~\ref{tab:ceiling}). With the 91 base features, 2.31\% of rows share an identical feature vector with a row of a different class, which caps macro recall at 0.969 for \emph{any} per-packet classifier. The new features bring the ambiguous share down to 0.01\%.
 \begin{table}[H]
 \centering
@@ -24,7 +26,7 @@ Base & 91 & 2.31\% & 0.9875 & 0.9692 \\ \hline
 \label{tab:ceiling}
 \end{table}
 
-\subsection{Effect of each feature group}
+\subsubsection{Effect of each feature group}
 Table~\ref{tab:progression} and Figure~\ref{fig:progression} add the feature groups one at a time, on the strict flow-grouped split. The service port mainly fixes Normal versus attack traffic. The content features add little on their own, because only a small share of packets carries content. The flow features give the largest jump, because they pass a connection's content and behaviour on to its content-free packets. Class weighting then stabilises the rare Fingerprinting class.
 \begin{table}[H]
 \centering
@@ -49,7 +51,7 @@ Base (91) & 0.9638 & 0.8868 & 0.9637 & 0.8892 \\ \hline
 \label{fig:progression}
 \end{figure}
 
-\subsection{Robustness across seeds, splits and training size}
+\subsubsection{Robustness across seeds, splits and training size}
 Table~\ref{tab:seeds} repeats the final configuration with three seeds on both splits. Accuracy stays between 0.9970 and 0.9977, and macro F1 between 0.9828 and 0.9868. Without class weights, the flow-grouped macro F1 was less stable (0.9808, 0.9560, 0.9521), because the Fingerprinting score depended on which of its 156 flows landed in test. Weighting removes that sensitivity.
 
 \begin{table}[H]
@@ -69,7 +71,7 @@ Flow-grouped: macro F1 & 0.9828 & 0.9835 & 0.9851 \\ \hline
 
 Two further checks were run. \textbf{(a) Same sampling as before:} on a 500{,}000-row capped sample drawn the same way as in the earlier boosting-versus-DL comparison, and with the same training settings for both feature sets, accuracy rises from 0.8902 to 0.9919 and macro F1 from 0.8827 to 0.9900. \textbf{(b) Calibration-set size:} in FL-IDS the server trains LightGBM on only a 5\% calibration set. Trained on 5\% of the rows and tested on held-out flows, the new features give 0.9968 accuracy and 0.9791 macro F1, against 0.9624 and 0.8807 for the base features. The gain therefore carries over to the classifier as the federated system actually trains it.
 
-\subsection{Per-class results}
+\subsubsection{Per-class results}
 Figure~\ref{fig:perclass} compares per-class F1 before and after. The biggest gains are on exactly the classes that were weak: Uploading (0.76 to 1.00), DDoS\_HTTP (0.76 to 0.97), SQL\_injection (0.80 to 1.00), Password (0.84 to 0.97), XSS (0.85 to 0.98) and Fingerprinting (0.68 to 0.93). Figure~\ref{fig:cm} shows the remaining confusion: Password and DDoS\_HTTP traffic (both HTTP requests to the same server) and Ransomware versus Backdoor (both on port 4321). MITM is a single ARP flow, so it cannot be scored on the flow-grouped split; on the random split its F1 is 0.994.
 \begin{figure}[H]
 \centering
@@ -84,7 +86,7 @@ Figure~\ref{fig:perclass} compares per-class F1 before and after. The biggest ga
 \label{fig:cm}
 \end{figure}
 
-\subsection{Discussion and caveats}
+\subsubsection{Discussion and caveats}
 \begin{itemize}
   \item \textbf{Why a flow-grouped split matters.} A random split of packets puts packets of the same connection in both training and test sets. Reporting the stricter split shows that the improvement does not come from memorising connections.
   \item \textbf{The service port is partly a testbed effect.} In Edge-IIoTset, benign traffic is MQTT (port 1883) and VNC (5900) and never HTTP. In a real network with benign web traffic, the port alone would separate much less.
@@ -92,7 +94,293 @@ Figure~\ref{fig:perclass} compares per-class F1 before and after. The biggest ga
   \item The same features are used by the whole federated pipeline and by Phase B. The following sections report the system-level results with them, next to the original 91-feature results.
 \end{itemize}
 
-\section{Ablation of the federated pipeline}
+\subsection{The whole system on the full dataset, split by connection}\label{sec:fullpool}
+All of the federated results in the earlier sections of this chapter use a 60{,}000-row pool split row by row. This section repeats the federated experiments on all 1{,}985{,}768 usable rows. The server keeps a labelled calibration set (71{,}853 to 79{,}866 rows, about 5\%, depending on the seed) to bootstrap the classifier; the other 1{,}885{,}587 to 1{,}885{,}744 rows are split across 10 or 20 clients, whose test slices hold 283{,}090 to 295{,}566 rows (about 9{,}000 before). Packets of one connection share their flow-level features, so a row-level split puts near-identical siblings on both sides of a test. Here every connection stays whole: in the calibration set, in exactly one client, and in exactly one of that client's training, benign-validation and test slices. MITM is a single connection, so it cannot be split; all of it goes to the server's calibration set (the classifier learns it) and it is scored by the zero-day experiment and the live replay only.
+
+\textbf{A leak check first.} At the old 60{,}000-row scale, splitting by connection did not lower known-attack recall (the classifier alone caught 0.9962 of attack packets, against 0.9968 with the row split), so the earlier federated recall numbers were not inflated by sibling packets.
+
+\textbf{Real runs.} Table~\ref{tab:full_real_full} lists six real multi-process runs (one server and 10 or 20 client processes, 20 rounds, three seeds). Known attacks are caught as before: micro recall 0.9956 to 0.9989 and classifier-alone micro recall 0.9954 to 0.9981 (0.9939 to 0.9980 in the earlier runs; Table~\ref{tab:full_pool_compare}). False alarms need two numbers. Counted per packet, 2.5\% to 16.3\% of normal test packets are flagged (earlier 2.8\% to 4.0\%), but counted per connection the rate is 0.34\% to 1.04\%, and the median client flags 2.9\% to 3.2\% of its packets in all six runs. The packet figure is dominated by a few very long normal connections (7{,}000 to 11{,}800 packets each): in five of the six runs, 80\% to 94\% of the false-alarm packets come from the ten largest connections. The false-alarm rate should therefore be quoted both ways.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|}
+\hline
+\textbf{Run} & \textbf{Phase A s} & \textbf{Attack macro-recall} & \textbf{Attack micro recall} & \textbf{Classifier-only micro recall} & \textbf{Packet-level false alarms} & \textbf{Connection-level false alarms} & \textbf{Test rows} & \textbf{Clients with no benign validation rows} \\ \hline
+10 clients, seed 42 & 1844 & 0.9958 & 0.9974 & 0.9970 & 0.1275 & 0.0034 & 288,416 & 1 \\ \hline
+10 clients, seed 43 & 1397 & 0.9947 & 0.9978 & 0.9971 & 0.0884 & 0.0074 & 283,090 & 0 \\ \hline
+10 clients, seed 44 & 1754 & 0.9939 & 0.9956 & 0.9954 & 0.0248 & 0.0039 & 288,366 & 2 \\ \hline
+20 clients, seed 42 & 1260 & 0.9981 & 0.9989 & 0.9981 & 0.0588 & 0.0104 & 283,427 & 3 \\ \hline
+20 clients, seed 43 & 1063 & 0.9970 & 0.9980 & 0.9974 & 0.1628 & 0.0076 & 292,222 & 2 \\ \hline
+20 clients, seed 44 & 1225 & 0.9972 & 0.9978 & 0.9972 & 0.1089 & 0.0081 & 295,566 & 0 \\ \hline
+\end{tabular}
+\caption{Real multi-process Phase A on the full pool (1.89M rows), split by connection, 20 rounds, no attackers}
+\label{tab:full_real_full}
+\end{table}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Setting} & \textbf{Attack macro-recall} & \textbf{Attack micro recall} & \textbf{Classifier-only micro recall} & \textbf{Benign FPR (packets)} \\ \hline
+10 clients, seed 42: 60k pool, split by row & 0.9990 & 0.9992 & 0.9968 & 0.0340 \\ \hline
+10 clients, seed 42: full pool, split by connection & 0.9958 & 0.9974 & 0.9970 & 0.1275 \\ \hline
+10 clients, seed 42: 60k pool, split by connection & 1.0000 & 1.0000 & 0.9962 & 0.0443 \\ \hline
+10 clients, seed 43: 60k pool, split by row & 0.9985 & 0.9992 & 0.9976 & 0.0311 \\ \hline
+10 clients, seed 43: full pool, split by connection & 0.9947 & 0.9978 & 0.9971 & 0.0884 \\ \hline
+10 clients, seed 44: 60k pool, split by row & 0.9962 & 0.9960 & 0.9939 & 0.0284 \\ \hline
+10 clients, seed 44: full pool, split by connection & 0.9939 & 0.9956 & 0.9954 & 0.0248 \\ \hline
+20 clients, seed 42: 60k pool, split by row & 0.9784 & 0.9964 & 0.9952 & 0.0362 \\ \hline
+20 clients, seed 42: full pool, split by connection & 0.9981 & 0.9989 & 0.9981 & 0.0588 \\ \hline
+20 clients, seed 43: 60k pool, split by row & 0.9993 & 0.9992 & 0.9980 & 0.0284 \\ \hline
+20 clients, seed 43: full pool, split by connection & 0.9970 & 0.9980 & 0.9974 & 0.1628 \\ \hline
+20 clients, seed 44: 60k pool, split by row & 0.9991 & 0.9988 & 0.9968 & 0.0396 \\ \hline
+20 clients, seed 44: full pool, split by connection & 0.9972 & 0.9978 & 0.9972 & 0.1089 \\ \hline
+\end{tabular}
+\caption{The same runs at the earlier scale and now (macro-recall includes only attack types present in the test slices)}
+\label{tab:full_pool_compare}
+\end{table}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{figures/full_pool_runs.png}
+\caption{Earlier (60k pool, split by row) and full-pool (split by connection) results for the six runs}
+\label{fig:fullpoolruns}
+\end{figure}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Class} & \textbf{Test rows} & \textbf{Classifier alone} & \textbf{Autoencoder alone} & \textbf{Cascade} \\ \hline
+Backdoor & 2263 & 0.9885 & 0.0367 & 0.9929 \\ \hline
+DDoS\_HTTP & 6915 & 0.9899 & 0.4807 & 0.9899 \\ \hline
+DDoS\_ICMP & 9520 & 1.0000 & 0.3171 & 1.0000 \\ \hline
+DDoS\_TCP & 6717 & 1.0000 & 0.9394 & 1.0000 \\ \hline
+DDoS\_UDP & 17755 & 0.9999 & 0.3063 & 1.0000 \\ \hline
+Fingerprinting & 129 & 0.9845 & 0.0698 & 0.9922 \\ \hline
+Password & 7795 & 0.9913 & 0.2517 & 0.9914 \\ \hline
+Port\_Scanning & 2929 & 1.0000 & 0.6842 & 1.0000 \\ \hline
+Ransomware & 691 & 0.9841 & 0.4877 & 0.9870 \\ \hline
+SQL\_injection & 7228 & 0.9990 & 0.8944 & 0.9996 \\ \hline
+Uploading & 5567 & 0.9998 & 0.5493 & 0.9998 \\ \hline
+Vulnerability\_scanner & 7216 & 0.9946 & 0.5006 & 0.9961 \\ \hline
+XSS & 2274 & 0.9960 & 0.4714 & 0.9969 \\ \hline
+\end{tabular}
+\caption{Recall per attack type, 10 clients, seed 42, full pool, by stage (held-out test slices)}
+\label{tab:full_per_class}
+\end{table}
+\textbf{Poisoning and ablation.} Known-attack recall stays between 0.985 and 0.997 at every attacker fraction up to 50\% (Table~\ref{tab:full_sweep}). The trust filter lets more attackers through than at 60{,}000 rows: attacker survival at 30\% is 0.50, 0.55 and 0.62 (earlier 0.12, 0.12 and 0.27), and at 50\% it is 0.64, 1.00 and 0.99; why is not established. Robust aggregation still protects the autoencoder: with 30\% attackers its recall alone is 0.490, 0.373 and 0.245 for the full pipeline, against 0.013, 0.002 and 0.092 for plain FedAvg (Table~\ref{tab:full_ablation}). The ranges are wide and three seeds support no confidence intervals. The ablation's full-pipeline row is the sweep's 30\% point.
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Attackers} & \textbf{Attack macro-recall} & \textbf{Autoencoder-alone recall} & \textbf{Attacker survival} \\ \hline
+0\% & 0.996 / 0.996 / 0.994 & 0.457 / 0.492 / 0.221 & n/a / n/a / n/a \\ \hline
+20\% & 0.995 / 0.996 / 0.994 & 0.466 / 0.483 / 0.258 & 0.30 / 0.40 / 0.23 \\ \hline
+30\% & 0.995 / 0.997 / 0.995 & 0.490 / 0.373 / 0.245 & 0.50 / 0.55 / 0.62 \\ \hline
+40\% & 0.994 / 0.994 / 0.992 & 0.297 / 0.139 / 0.074 & 0.60 / 0.64 / 0.61 \\ \hline
+50\% & 0.995 / 0.990 / 0.985 & 0.249 / 0.000 / 0.000 & 0.64 / 1.00 / 0.99 \\ \hline
+\end{tabular}
+\caption{Poisoning sweep, full pool}
+\label{tab:full_sweep}
+\end{table}
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Variant} & \textbf{Attack macro-recall} & \textbf{Autoencoder-alone recall} & \textbf{Benign FPR} \\ \hline
+full\_pipeline & 0.995 / 0.997 / 0.995 & 0.490 / 0.373 / 0.245 & 0.1112 / 0.0653 / 0.0075 \\ \hline
+autoencoder\_only & 0.105 / 0.073 / 0.051 & 0.105 / 0.073 / 0.051 & 0.0473 / 0.0411 / 0.0445 \\ \hline
+boosting\_only & 0.990 / 0.989 / 0.982 & n/a / n/a / n/a & 0.0001 / 0.0001 / 0.0003 \\ \hline
+plain\_fedavg & 0.992 / 0.994 / 0.990 & 0.013 / 0.002 / 0.092 & 0.0947 / 0.0301 / 0.0301 \\ \hline
+trimmed\_mean\_only & 0.995 / 0.995 / 0.993 & 0.205 / 0.000 / 0.025 & 0.1070 / 0.0261 / 0.0299 \\ \hline
+\end{tabular}
+\caption{Ablation at 30\% sign-flip attackers, full pool, seeds 42 / 43 / 44}
+\label{tab:full_ablation}
+\end{table}
+\textbf{Zero-day detection.} The cascade detects 0.910, 0.944 and 0.895 of an unseen attack type on average (earlier 0.943, 0.952 and 0.952); every row of each held-out class is scored (Tables~\ref{tab:full_zeroday_mean} and~\ref{tab:full_zeroday_class}, Figure~\ref{fig:fullzd}). Uploading is the weakest (0.527 to 0.665), followed by MITM (0.751 to 1.000) and, depending on the seed, Backdoor and Vulnerability\_scanner.
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Stage} & \textbf{Mean detection rate} \\ \hline
+Classifier alone & 0.735 / 0.757 / 0.723 (classes: 14, 14, 14) \\ \hline
+Autoencoder alone & 0.681 / 0.728 / 0.590 (classes: 14, 14, 14) \\ \hline
+Cascade & 0.910 / 0.944 / 0.895 (classes: 14, 14, 14) \\ \hline
+\end{tabular}
+\caption{Zero-day (leave one attack class out), full pool: mean over the held-out classes}
+\label{tab:full_zeroday_mean}
+\end{table}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Held-out class} & \textbf{Rows scored} & \textbf{Cascade detection} & \textbf{Classifier alone} & \textbf{Autoencoder alone} \\ \hline
+Backdoor & 24167 & 0.743 / 0.998 / 0.998 & 0.486 / 0.996 / 0.997 & 0.493 / 0.550 / 0.810 \\ \hline
+DDoS\_HTTP & 49768 & 0.879 / 0.932 / 0.885 & 0.695 / 0.764 / 0.719 & 0.572 / 0.698 / 0.560 \\ \hline
+DDoS\_ICMP & 68758 & 1.000 / 1.000 / 1.000 & 1.000 / 1.000 / 0.999 & 0.786 / 0.802 / 0.800 \\ \hline
+DDoS\_TCP & 50062 & 0.933 / 0.953 / 0.921 & 0.865 / 0.921 / 0.879 & 0.640 / 0.686 / 0.615 \\ \hline
+DDoS\_UDP & 121567 & 0.905 / 0.803 / 0.866 & 0.416 / 0.021 / 0.334 & 0.849 / 0.799 / 0.799 \\ \hline
+Fingerprinting & 872 & 0.998 / 0.998 / 0.997 & 0.995 / 0.994 / 0.994 & 0.826 / 0.747 / 0.492 \\ \hline
+MITM & 406 & 0.803 / 1.000 / 0.751 & 0.148 / 0.200 / 0.005 & 0.764 / 1.000 / 0.751 \\ \hline
+Password & 50033 & 0.932 / 0.935 / 0.880 & 0.872 / 0.865 / 0.813 & 0.505 / 0.407 / 0.307 \\ \hline
+Port\_Scanning & 20213 & 0.999 / 0.993 / 0.992 & 0.998 / 0.988 / 0.989 & 0.570 / 0.745 / 0.409 \\ \hline
+Ransomware & 9885 & 0.990 / 0.994 / 0.988 & 0.984 / 0.990 / 0.982 & 0.621 / 0.753 / 0.374 \\ \hline
+SQL\_injection & 50981 & 0.961 / 0.970 / 0.999 & 0.828 / 0.713 / 0.999 & 0.764 / 0.871 / 0.787 \\ \hline
+Uploading & 37243 & 0.665 / 0.652 / 0.527 & 0.204 / 0.266 / 0.304 & 0.581 / 0.512 / 0.295 \\ \hline
+Vulnerability\_scanner & 50044 & 0.992 / 0.993 / 0.859 & 0.980 / 0.894 / 0.335 & 0.880 / 0.976 / 0.772 \\ \hline
+XSS & 15172 & 0.943 / 0.991 / 0.867 & 0.823 / 0.986 / 0.767 & 0.680 / 0.650 / 0.483 \\ \hline
+\end{tabular}
+\caption{Zero-day (leave one attack class out), full pool: mean over the held-out classes: per held-out class}
+\label{tab:full_zeroday_class}
+\end{table}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{figures/full_zero_day.png}
+\caption{Zero-day detection by the cascade at full scale (one dot per seed) and the earlier 60k-pool mean}
+\label{fig:fullzd}
+\end{figure}
+\textbf{Stealth attacker, pruning and clipping (seed 42 only).} The stealth attacker survives in 0.60, 0.73 and 0.80 of client-rounds against 0.30, 0.50 and 0.60 for sign-flip, with no clear extra harm to the autoencoder and known-attack recall of at least 0.9949 (Table~\ref{tab:full_stealth}). Pruning during training costs more at full scale than at 60{,}000 rows: autoencoder-alone recall falls from 0.457 to 0.350 at 70\% sparsity, and to 0.098 when pruned after training (Table~\ref{tab:full_pruning}). Without the per-client clip the final benign validation loss is 0.242 against 0.129 with it, much less than the factor of about 1{,}500 at the smaller scale (Table~\ref{tab:full_clip}).
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Attackers} & \textbf{Sign-flip survival} & \textbf{Stealth survival} & \textbf{Sign-flip AE-alone recall} & \textbf{Stealth AE-alone recall} & \textbf{Stealth known-attack recall} \\ \hline
+20\% & 0.30 / 0.40 / 0.23 & 0.60 / n/a / n/a & 0.466 / 0.483 / 0.258 & 0.454 / n/a / n/a & 0.9956 / n/a / n/a \\ \hline
+30\% & 0.50 / 0.55 / 0.62 & 0.73 / n/a / n/a & 0.490 / 0.373 / 0.245 & 0.427 / n/a / n/a & 0.9961 / n/a / n/a \\ \hline
+40\% & 0.60 / 0.64 / 0.61 & 0.80 / n/a / n/a & 0.297 / 0.139 / 0.074 & 0.334 / n/a / n/a & 0.9949 / n/a / n/a \\ \hline
+\end{tabular}
+\caption{Stealth attacker vs. sign-flip, full pool}
+\label{tab:full_stealth}
+\end{table}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Sparsity} & \textbf{Non-zero weights} & \textbf{Autoencoder-alone recall} & \textbf{Cascade macro-recall} & \textbf{Benign FPR} \\ \hline
+0\% & 9600 & 0.457 / 0.492 / 0.221 & 0.996 / 0.996 / 0.994 & 0.1182 / 0.0414 / 0.0352 \\ \hline
+50\% & 4800 & 0.439 / n/a / n/a & 0.995 / n/a / n/a & 0.1400 / n/a / n/a \\ \hline
+70\% & 2880 & 0.350 / n/a / n/a & 0.993 / n/a / n/a & 0.1201 / n/a / n/a \\ \hline
+80\% & 1920 & 0.338 / n/a / n/a & 0.993 / n/a / n/a & 0.1451 / n/a / n/a \\ \hline
+90\% & 960 & 0.198 / n/a / n/a & 0.993 / n/a / n/a & 0.1151 / n/a / n/a \\ \hline
+\end{tabular}
+\caption{Pruning during federated training, full pool (no attackers)}
+\label{tab:full_pruning}
+\end{table}
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Normalisation} & \textbf{seed 42} & \textbf{seed 43} & \textbf{seed 44} \\ \hline
+clip 10 & 0.1292 & 0.05736 & 0.2644 \\ \hline
+no clip & 0.242 & n/a & n/a \\ \hline
+\end{tabular}
+\caption{Per-client z-score clip, final-round benign validation loss}
+\label{tab:full_clip}
+\end{table}
+\textbf{Live replay of every capture.} All 14 attack captures were replayed through Mininet with the full-pool bundle (Table~\ref{tab:full_phase_b_all}). Every one ends in a block decision with the drop rule read back from the switch; 12 of 14 are classified as the right attack type, while the MITM capture is called Ransomware and the OS-fingerprinting capture DDoS\_ICMP. The replays are of the dataset's own captures, so they demonstrate the pipeline and are not a held-out test. The released Vulnerability-scanner capture is damaged part-way, so its readable first 265{,}827 packets were used.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Capture} & \textbf{Classified as} & \textbf{Confidence} & \textbf{Stage} & \textbf{Packets flagged} & \textbf{Action} & \textbf{Wall time} \\ \hline
+Backdoor attack & Backdoor & 0.997 & boosting & 24,543 / 24,914 & block & 12 s \\ \hline
+DDoS HTTP Flood Attacks & DDoS\_HTTP & 0.966 & boosting & 119,748 / 229,142 & block & 29 s \\ \hline
+DDoS ICMP Flood Attacks & DDoS\_ICMP & 1.000 & boosting & 2,914,156 / 2,914,356 & block & 232 s \\ \hline
+DDoS TCP SYN Flood Attacks & DDoS\_TCP & 0.999 & boosting & 2,020,023 / 2,020,152 & block & 211 s \\ \hline
+DDoS UDP Flood Attacks & DDoS\_UDP & 0.999 & boosting & 2,899,758 / 3,215,732 & block & 268 s \\ \hline
+MITM ARP spoofing DNS Attack & Ransomware & 0.991 & boosting & 542 / 1,229 & block & 8 s \\ \hline
+OS Fingerprinting attack & DDoS\_ICMP & 0.980 & boosting & 1,134 / 1,176 & block & 9 s \\ \hline
+Password attacks & Password & 0.957 & boosting & 919,469 / 1,053,893 & block & 130 s \\ \hline
+Port Scanning attack & Port\_Scanning & 0.999 & boosting & 22,495 / 23,329 & block & 12 s \\ \hline
+Ransomware attack & Ransomware & 0.994 & boosting & 10,620 / 11,030 & block & 11 s \\ \hline
+SQL injection attack & SQL\_injection & 1.000 & boosting & 51,097 / 51,228 & block & 17 s \\ \hline
+Uploading attack & Uploading & 0.999 & boosting & 37,592 / 37,644 & block & 15 s \\ \hline
+XSS attacks & XSS & 0.999 & boosting & 15,677 / 16,215 & block & 12 s \\ \hline
+Vulnerability scanner attack & Vulnerability\_scanner & 0.996 & boosting & 262,922 / 265,827 & block & 60 s \\ \hline
+\end{tabular}
+\caption{Phase B on every attack capture (10 clients, seed 42, full-pool bundle): class chosen, confidence, deciding stage, packets flagged, action}
+\label{tab:full_phase_b_all}
+\end{table}
+\subsection{Training time and time to decide on a packet}\label{sec:speed}
+\textbf{Training time.} Table~\ref{tab:traintime} gives the time of each of the six full-dataset runs (one server and 10 or 20 client processes, 20 rounds), taken from the stage timer saved with each bundle. Federated training takes 82\% to 90\% of the total. Everything else (loading, the calibration split and bootstrap classifier, threshold calibration, evaluation on 283{,}090 to 295{,}566 test rows, saving) takes 175 to 211 s, of which evaluation is 156 to 191 s. For comparison, the stand-alone classifier on all rows trains in 24.2 s (it stopped at tree 54, with 1{,}429{,}825 rows for training and 158{,}870 for early stopping). Some of these runs shared the virtual machine with other jobs, so the times are upper bounds.
+\begin{table}[H]
+\centering
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Run} & \textbf{Total (s)} & \textbf{Federated training, 20 rounds (s)} & \textbf{All other stages (s)} \\ \hline
+10 clients, seed 42 & 1843.6 & 1632.8 & 210.8 \\ \hline
+10 clients, seed 43 & 1397.2 & 1220.9 & 176.3 \\ \hline
+10 clients, seed 44 & 1753.6 & 1578.8 & 174.8 \\ \hline
+20 clients, seed 42 & 1260.3 & 1072.6 & 187.7 \\ \hline
+20 clients, seed 43 & 1063.4 & 871.5 & 191.9 \\ \hline
+20 clients, seed 44 & 1225.0 & 1033.7 & 191.3 \\ \hline
+\end{tabular}
+\caption{Time taken by each full-dataset run (\texttt{journey.json} of each bundle)}
+\label{tab:traintime}
+\end{table}
+The 20-client runs were faster than the 10-client runs; each client holds about half as many rows, but this was not tested separately, so the cause is not claimed.
+
+\textbf{Time to decide on one packet.} The latency benchmark (\texttt{tools/latency\_benchmark.py}) loads the saved 10-client, seed-42 bundle and times the models on held-out test packets, on one CPU thread of the virtual machine: 3{,}000 packets timed one call at a time, then one batch of 200{,}000. Table~\ref{tab:latency} gives the result.
+\begin{table}[H]
+\centering
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Mode} & \textbf{Median (ms)} & \textbf{95th (ms)} & \textbf{99th (ms)} & \textbf{Batch ($\mu$s per packet)} & \textbf{Batch (packets/s)} \\ \hline
+Classifier alone & 0.372 & 0.440 & 0.497 & 264.2 & 3{,}784 \\ \hline
+Autoencoder alone & 0.060 & 0.094 & 0.660 & 5.5 & 181{,}382 \\ \hline
+Cascade (both) & 0.642 & 0.706 & 0.819 & 265.9 & 3{,}760 \\ \hline
+\end{tabular}
+\caption{Time for the models to decide on a packet (model time only, one thread)}
+\label{tab:latency}
+\end{table}
+The classifier dominates the cost. This is the time for the models only: it leaves out reading a capture, TShark feature extraction and the switch. Phase B is not inline, so there is no per-packet blocking latency to report. Averaged over a whole replay (wall time divided by packets, from Table~\ref{tab:full_phase_b_all}), the live path took 83~$\mu$s a packet for the DDoS UDP capture, 80~$\mu$s for DDoS ICMP and 104~$\mu$s for DDoS TCP. These numbers come from one bundle, one thread and one machine, and no confidence interval is claimed.
+
+\subsection{Boosting vs.\ a deep-learning classifier}
+On the same 500{,}000-row sample, LightGBM (base features) reached 0.887 macro F1 and a dense MLP of comparable effort (8{,}271 parameters, 15 epochs) reached 0.622. The gap was largest on the application-layer attacks (XSS 0.761 vs.\ 0.072 recall; SQL\_injection 0.767 vs.\ 0.183). This supports the boosting-first design. It is a comparison against a modest baseline, not a claim that deep learning cannot work here.
+
+\subsection{Earlier results on the 60{,}000-row pool}\label{sec:earlier}
+The experiments in this subsection were run first, on a 60{,}000-row federated pool split row by row, with the 91 or 130 features available at the time. They are kept for comparison with the full-dataset results above; where both exist, the full-dataset result is the one to quote. Numbers in square brackets are the values before the service-port, content and flow features were added.
+
+\subsubsection{Ablation of the federated pipeline}
 Figure~\ref{fig:ablation} and Table~\ref{tab:ablation} compare five variants with 30\% sign-flip attackers (clients 0, 6 and 9), 20 rounds, with the 130-feature pipeline; the original 91-feature results are given in brackets. Known-attack detection is now close to perfect for every variant that includes the classifier (0.996--1.000 macro-recall), so the backstop's value is on \emph{zero-day} attacks: 0.930 macro-recall for the full pipeline against 0.795 for boosting alone. Without the trust filter (plain FedAvg, trimmed mean only) the autoencoder is poisoned again: its stand-alone recall drops to about 0, its validation loss diverges, and zero-day recall falls back to boosting's level (0.795 and 0.799).
 \begin{table}[H]
 \centering
@@ -117,7 +405,7 @@ Boosting only & 0.996 [0.875] & 0.000 & 0.998 & 0.795 [0.518] & n/a \\ \hline
 \end{figure}
 One trade-off is worth stating. On known attacks, boosting alone now has a higher detection F1 than the full cascade (0.998 vs.\ 0.961). The autoencoder's threshold is set to flag about 3\% of benign traffic, and that cost now outweighs the little it adds when the classifier already catches 99.6\% of known attacks. Final validation losses: full pipeline 0.028; plain FedAvg $5.0\times10^{20}$ and trimmed mean $1.3\times10^{4}$ (diverged). Communication: 15.7\,MB over 20 rounds (the autoencoder now has 9{,}834 parameters, up from 7{,}299).
 
-\section{Poisoning resistance}
+\subsubsection{Poisoning resistance}
 Figure~\ref{fig:poison} sweeps the share of sign-flip attackers from 0 to 50\%. Attack macro-recall stays between 0.997 and 1.000 at every fraction [0.878--0.887], and zero-day macro-recall between 0.901 and 0.943 up to 40\% [0.724--0.736]. Attackers got past the filter in 10\%, 12\% and 36\% of attacker-rounds at 20\%, 30\% and 40\% [28\%, 32\%, 24\%]: lower at the first two fractions but higher at 40\%, although the autoencoder still held there (stand-alone recall 0.691). At 50\% the coordinate-wise median reference becomes the attackers' direction again: every attacker update passes, the autoencoder collapses, and zero-day detection falls back to the classifier (0.803). This is the known limit of median-based defences~\cite{yin2018trimmed}. A repeat with seeds 43 and 44 at 20\% and 30\% gave 0.996--0.999 attack macro-recall for every seed, while stand-alone autoencoder recall varied by seed (0.56--0.74), as it did with the original features.
 \begin{figure}[H]
 \centering
@@ -126,7 +414,7 @@ Figure~\ref{fig:poison} sweeps the share of sign-flip attackers from 0 to 50\%. 
 \label{fig:poison}
 \end{figure}
 
-\section{Zero-day detection}
+\subsubsection{Zero-day detection}
 Each of the 14 attack classes was removed in turn from all training data (including scaler statistics) and then scored as unseen traffic (Figures~\ref{fig:zeroday} and~\ref{fig:zerodaycmp}). The cascade's average detection rose from 0.736 to \textbf{0.943}; boosting alone from 0.533 to 0.801 and the autoencoder alone from 0.493 to 0.757. The autoencoder separates unseen attacks from benign traffic far better than before (AUROC 0.968--1.000 for every class, against 0.59--0.70 for the HTTP-family attacks with the original features). The largest gains are on the attacks that were hardest before: Password 0.44$\rightarrow$0.97, Ransomware 0.54$\rightarrow$1.00, SQL\_injection 0.61$\rightarrow$1.00, XSS 0.52$\rightarrow$0.99 and DDoS\_HTTP 0.36$\rightarrow$0.88.
 
 Two classes got worse and are reported rather than hidden. MITM fell from 0.89 to 0.69: its single ARP connection gets ordinary-looking connection features, so the autoencoder finds it less unusual. Unseen Uploading traffic now looks normal to the classifier (boosting-only 0.49$\rightarrow$0.08); the autoencoder catches most of it, so the cascade still improves (0.52$\rightarrow$0.72). The benign false-positive rate stays about 3\%, as set by the 97th-percentile threshold.
@@ -143,12 +431,12 @@ Two classes got worse and are reported rather than hidden. MITM fell from 0.89 t
 \label{fig:zerodaycmp}
 \end{figure}
 
-\section{Real multi-process run and SDN mitigation}
+\subsubsection{Real multi-process run and SDN mitigation}
 \textbf{Phase A, real run.} A real Flower server and 10 separate client processes completed 20 rounds in about 4 minutes. The bootstrap classifier reached 0.997 accuracy on the calibration hold-out [0.963]. The final cascade gave \textbf{0.999} attack macro-recall [0.889] and a 0.035 benign false-positive rate [0.035] on the clients' test slices. A separate full-pipeline run scored per class gave 0.976 accuracy and 0.971 macro F1 for the cascade [0.944 / 0.931], and an autoencoder AUROC of 0.982 [0.805].
 
 \textbf{Phase B.} Live extraction now derives the same 130 features from the capture with the same code as training: for \texttt{Backdoor\_attack.pcap}, 99.8\% of the live rows are identical to that capture's training rows. Replayed through Mininet with the new bundle, the capture was classified as \textbf{Backdoor with 0.997 confidence} by the boosting stage, 24{,}669 of its 24{,}914 packets were flagged [23{,}895], the bridge chose \emph{block}, and the rule \texttt{priority=100,ip,nw\_src=10.0.0.1 actions=drop} was confirmed in the switch's flow table. Because classification happens once features have been extracted from the whole capture, 23{,}161 replayed packets had already been forwarded when the rule appeared. The mitigation is therefore capture-level, not inline per-packet blocking.
 
-\section{Scaling to 20 clients, repeat seeds and run timing}
+\subsubsection{Scaling to 20 clients, repeat seeds and run timing}
 \textbf{Real 20-process runs.} The project was re-hosted on a virtual machine with 24~GB of memory, which can hold one Flower server and 20 client processes (an earlier attempt on a 7.4~GB machine could not). Phase A was run with 10 and with 20 real client processes at seeds 42, 43 and 44 (20 rounds, no attackers). The seed changes the data split, the Dirichlet partition and the initialisation. Table~\ref{tab:realruns} lists every run. Over the three seeds the cascade's attack macro-recall averages 0.998 with 10 clients and 0.992 with 20 clients, and the benign false-positive rate stays between 2.8\% and 4.0\%. At seed 42, the 20-client run dips to 0.978; this run was not analysed per class, so its cause is not established. With only three seeds, no confidence intervals are claimed.
 
 \begin{table}[H]
@@ -208,7 +496,7 @@ Check the switch's flow table & 0.00 \\ \hline
 \label{tab:timeb}
 \end{table}
 
-\section{Follow-up experiments: more seeds, an adaptive attacker, pruning and a time-ordered split}\label{sec:followups}
+\subsubsection{Follow-up experiments: more seeds, an adaptive attacker, pruning and a time-ordered split}\label{sec:followups}
 These experiments were run after the main results, in the virtual machine, and every table is generated from the experiments' own result files.
 
 \textbf{More seeds.} The ablation, the poisoning sweep and the zero-day experiment were repeated at seeds 43 and 44 (Tables~\ref{tab:fu_seed_ablation}--\ref{tab:fu_seed_zeroday}). The conclusions hold in all three seeds: the full pipeline's attack macro-recall stays between 0.995 and 1.000 up to 50\% attackers; plain FedAvg and the trimmed mean alone leave the autoencoder at recall 0.000--0.026 with 30\% attackers; the trust filter fails at 50\% (attacker survival 0.97--1.00); and the cascade's mean zero-day detection is 0.943, 0.952 and 0.952. Other numbers move with the seed: the autoencoder's recall at 30\% attackers ranges from 0.565 to 0.712, attacker survival at 20\% from 0.03 to 0.23, and MITM zero-day detection from 0.695 to 0.963. The per-class zero-day columns inside the ablation and sweep tables were not repeated at seeds 43 and 44 (about 85 extra trainings per seed). Three seeds are too few for confidence intervals.
@@ -452,247 +740,41 @@ f\_syn & 0.7108 & 130-feature matrix, after \\ \hline
 \label{fig:pbtimeline}
 \end{figure}
 
-\section{The whole system on the full dataset, split by connection}\label{sec:fullpool}
-All of the federated results in the earlier sections of this chapter use a 60{,}000-row pool split row by row. This section repeats the federated experiments on all 1{,}985{,}768 usable rows. The server keeps a labelled calibration set (71{,}853 to 79{,}866 rows, about 5\%, depending on the seed) to bootstrap the classifier; the other 1{,}885{,}587 to 1{,}885{,}744 rows are split across 10 or 20 clients, whose test slices hold 283{,}090 to 295{,}566 rows (about 9{,}000 before). Packets of one connection share their flow-level features, so a row-level split puts near-identical siblings on both sides of a test. Here every connection stays whole: in the calibration set, in exactly one client, and in exactly one of that client's training, benign-validation and test slices. MITM is a single connection, so it cannot be split; all of it goes to the server's calibration set (the classifier learns it) and it is scored by the zero-day experiment and the live replay only.
 
-\textbf{A leak check first.} At the old 60{,}000-row scale, splitting by connection did not lower known-attack recall (the classifier alone caught 0.9962 of attack packets, against 0.9968 with the row split), so the earlier federated recall numbers were not inflated by sibling packets.
+\section{Limitations of the Study}\label{sec:limits}
+\begin{enumerate}
+  \item \textbf{One dataset, one testbed.} Every number comes from Edge-IIoTset. Its benign traffic is only MQTT and VNC, so the service-port feature is partly a testbed effect: in a network with benign web traffic the port alone would separate far less.
+  \item \textbf{Mitigation is not inline.} Phase B classifies a capture after TShark has extracted features from all of it; for a replayed file nearly the whole capture had already passed through the default forwarding entry before the drop rule appeared. No per-packet blocking latency is measured or claimed, and the latency benchmark covers model time only (Section~\ref{sec:speed}).
+  \item \textbf{Flow features describe whole flow records} (up to 120~s), so the classifier labels flow records rather than deciding on a first packet.
+  \item \textbf{The trust filter is weaker at full scale.} Attacker survival at 30\% malicious clients is 0.50 to 0.62 on the whole dataset (0.12 to 0.27 on the 60{,}000-row pool); the cause is not established. The filter breaks down at 50\%, as median-based references do, and a white-box stealth attacker is mostly missed (survival 0.60 to 0.80 at full scale, 0.72 to 0.90 earlier). Only two attack models were tested.
+  \item \textbf{The autoencoder backstop is weaker at full scale}: autoencoder-alone recall is 0.22 to 0.49 on the whole dataset. Clients that hold no benign validation rows (up to three of 20) get an infinite threshold, so their autoencoder never flags anything.
+  \item \textbf{False alarms.} The 97th-percentile threshold gives about 3\% benign false alarms by construction. On the whole dataset 2.5\% to 16.3\% of normal packets are flagged, but only 0.34\% to 1.04\% of normal connections, because a few long normal connections dominate the packet count.
+  \item \textbf{Small classes.} MITM is a single connection (406 rows) and cannot be split, so it is scored only by the zero-day experiment and the live replay; Fingerprinting has 872 rows. Per-class figures for these rest on very few test rows.
+  \item \textbf{Zero-day detection depends on the class.} Uploading is the weakest held-out class (0.527 to 0.665), then MITM (0.751 to 1.000) and, depending on the seed, Backdoor and Vulnerability\_scanner.
+  \item \textbf{Live replay.} The captures are the dataset's own, the released Vulnerability-scanner capture is damaged (its readable prefix was used), and two of the 14 captures are classified as the wrong attack type (both are still blocked).
+  \item \textbf{Seeds.} The main experiments use three seeds, but the stealth-attacker, pruning and clipping tests at full scale use one, and no confidence intervals are given. Seed-to-seed variation is real (for example autoencoder-alone recall of 0.221 to 0.492 at 0 attackers).
+  \item \textbf{Privacy relaxation.} The incremental classifier update sends at most 50 analyst-confirmed alert rows per surviving client to the server. The calibration set is also held centrally, so the classifier is not federated.
+  \item \textbf{Pruning} reduces the model but clients still send dense updates, so no communication saving is demonstrated.
+  \item \textbf{Emulation.} Clients are processes on one machine and the network is Mininet inside one virtual machine; there are no physical devices, hardware switch or network delays. Timings come from one machine and are upper bounds where other jobs shared it.
+  \item \textbf{Comparability.} The dataset corrections (placeholder fix, MITM repair, connection split) mean the numbers cannot be compared directly with papers that train on the released CSV with a random split; the claim that those results are inflated is a reasoned expectation, not something this report measured on their pipelines.
+  \item \textbf{Novelty} rests on targeted searches only, not a systematic literature review.
+  \item \textbf{Deep-learning comparison.} The comparison of LightGBM with a neural classifier used a 500{,}000-row class-capped sample and a modest network, so only its relative result is meaningful.
+\end{enumerate}
 
-\textbf{Real runs.} Table~\ref{tab:full_real_full} lists six real multi-process runs (one server and 10 or 20 client processes, 20 rounds, three seeds). Known attacks are caught as before: micro recall 0.9956 to 0.9989 and classifier-alone micro recall 0.9954 to 0.9981 (0.9939 to 0.9980 in the earlier runs; Table~\ref{tab:full_pool_compare}). False alarms need two numbers. Counted per packet, 2.5\% to 16.3\% of normal test packets are flagged (earlier 2.8\% to 4.0\%), but counted per connection the rate is 0.34\% to 1.04\%, and the median client flags 2.9\% to 3.2\% of its packets in all six runs. The packet figure is dominated by a few very long normal connections (7{,}000 to 11{,}800 packets each): in five of the six runs, 80\% to 94\% of the false-alarm packets come from the ten largest connections. The false-alarm rate should therefore be quoted both ways.
-
-\begin{table}[H]
-\centering
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{|l|c|c|c|c|c|c|c|c|}
-\hline
-\textbf{Run} & \textbf{Phase A s} & \textbf{Attack macro-recall} & \textbf{Attack micro recall} & \textbf{Classifier-only micro recall} & \textbf{Packet-level false alarms} & \textbf{Connection-level false alarms} & \textbf{Test rows} & \textbf{Clients with no benign validation rows} \\ \hline
-10 clients, seed 42 & 1844 & 0.9958 & 0.9974 & 0.9970 & 0.1275 & 0.0034 & 288,416 & 1 \\ \hline
-10 clients, seed 43 & 1397 & 0.9947 & 0.9978 & 0.9971 & 0.0884 & 0.0074 & 283,090 & 0 \\ \hline
-10 clients, seed 44 & 1754 & 0.9939 & 0.9956 & 0.9954 & 0.0248 & 0.0039 & 288,366 & 2 \\ \hline
-20 clients, seed 42 & 1260 & 0.9981 & 0.9989 & 0.9981 & 0.0588 & 0.0104 & 283,427 & 3 \\ \hline
-20 clients, seed 43 & 1063 & 0.9970 & 0.9980 & 0.9974 & 0.1628 & 0.0076 & 292,222 & 2 \\ \hline
-20 clients, seed 44 & 1225 & 0.9972 & 0.9978 & 0.9972 & 0.1089 & 0.0081 & 295,566 & 0 \\ \hline
-\end{tabular}
-\caption{Real multi-process Phase A on the full pool (1.89M rows), split by connection, 20 rounds, no attackers}
-\label{tab:full_real_full}
-\end{table}
-\begin{table}[H]
-\centering
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-\textbf{Setting} & \textbf{Attack macro-recall} & \textbf{Attack micro recall} & \textbf{Classifier-only micro recall} & \textbf{Benign FPR (packets)} \\ \hline
-10 clients, seed 42: 60k pool, split by row & 0.9990 & 0.9992 & 0.9968 & 0.0340 \\ \hline
-10 clients, seed 42: full pool, split by connection & 0.9958 & 0.9974 & 0.9970 & 0.1275 \\ \hline
-10 clients, seed 42: 60k pool, split by connection & 1.0000 & 1.0000 & 0.9962 & 0.0443 \\ \hline
-10 clients, seed 43: 60k pool, split by row & 0.9985 & 0.9992 & 0.9976 & 0.0311 \\ \hline
-10 clients, seed 43: full pool, split by connection & 0.9947 & 0.9978 & 0.9971 & 0.0884 \\ \hline
-10 clients, seed 44: 60k pool, split by row & 0.9962 & 0.9960 & 0.9939 & 0.0284 \\ \hline
-10 clients, seed 44: full pool, split by connection & 0.9939 & 0.9956 & 0.9954 & 0.0248 \\ \hline
-20 clients, seed 42: 60k pool, split by row & 0.9784 & 0.9964 & 0.9952 & 0.0362 \\ \hline
-20 clients, seed 42: full pool, split by connection & 0.9981 & 0.9989 & 0.9981 & 0.0588 \\ \hline
-20 clients, seed 43: 60k pool, split by row & 0.9993 & 0.9992 & 0.9980 & 0.0284 \\ \hline
-20 clients, seed 43: full pool, split by connection & 0.9970 & 0.9980 & 0.9974 & 0.1628 \\ \hline
-20 clients, seed 44: 60k pool, split by row & 0.9991 & 0.9988 & 0.9968 & 0.0396 \\ \hline
-20 clients, seed 44: full pool, split by connection & 0.9972 & 0.9978 & 0.9972 & 0.1089 \\ \hline
-\end{tabular}
-\caption{The same runs at the earlier scale and now (macro-recall includes only attack types present in the test slices)}
-\label{tab:full_pool_compare}
-\end{table}
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.95\linewidth]{figures/full_pool_runs.png}
-\caption{Earlier (60k pool, split by row) and full-pool (split by connection) results for the six runs}
-\label{fig:fullpoolruns}
-\end{figure}
-\begin{table}[H]
-\centering
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-\textbf{Class} & \textbf{Test rows} & \textbf{Classifier alone} & \textbf{Autoencoder alone} & \textbf{Cascade} \\ \hline
-Backdoor & 2263 & 0.9885 & 0.0367 & 0.9929 \\ \hline
-DDoS\_HTTP & 6915 & 0.9899 & 0.4807 & 0.9899 \\ \hline
-DDoS\_ICMP & 9520 & 1.0000 & 0.3171 & 1.0000 \\ \hline
-DDoS\_TCP & 6717 & 1.0000 & 0.9394 & 1.0000 \\ \hline
-DDoS\_UDP & 17755 & 0.9999 & 0.3063 & 1.0000 \\ \hline
-Fingerprinting & 129 & 0.9845 & 0.0698 & 0.9922 \\ \hline
-Password & 7795 & 0.9913 & 0.2517 & 0.9914 \\ \hline
-Port\_Scanning & 2929 & 1.0000 & 0.6842 & 1.0000 \\ \hline
-Ransomware & 691 & 0.9841 & 0.4877 & 0.9870 \\ \hline
-SQL\_injection & 7228 & 0.9990 & 0.8944 & 0.9996 \\ \hline
-Uploading & 5567 & 0.9998 & 0.5493 & 0.9998 \\ \hline
-Vulnerability\_scanner & 7216 & 0.9946 & 0.5006 & 0.9961 \\ \hline
-XSS & 2274 & 0.9960 & 0.4714 & 0.9969 \\ \hline
-\end{tabular}
-\caption{Recall per attack type, 10 clients, seed 42, full pool, by stage (held-out test slices)}
-\label{tab:full_per_class}
-\end{table}
-\textbf{Poisoning and ablation.} Known-attack recall stays between 0.985 and 0.997 at every attacker fraction up to 50\% (Table~\ref{tab:full_sweep}). The trust filter lets more attackers through than at 60{,}000 rows: attacker survival at 30\% is 0.50, 0.55 and 0.62 (earlier 0.12, 0.12 and 0.27), and at 50\% it is 0.64, 1.00 and 0.99; why is not established. Robust aggregation still protects the autoencoder: with 30\% attackers its recall alone is 0.490, 0.373 and 0.245 for the full pipeline, against 0.013, 0.002 and 0.092 for plain FedAvg (Table~\ref{tab:full_ablation}). The ranges are wide and three seeds support no confidence intervals. The ablation's full-pipeline row is the sweep's 30\% point.
-
+\section{Conclusion}
+The results answer the four objectives as follows.
 \begin{table}[H]
 \centering
 \small
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{|l|c|c|c|}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|>{\raggedright\arraybackslash}p{3.7cm}|>{\raggedright\arraybackslash}p{9.8cm}|}
 \hline
-\textbf{Attackers} & \textbf{Attack macro-recall} & \textbf{Autoencoder-alone recall} & \textbf{Attacker survival} \\ \hline
-0\% & 0.996 / 0.996 / 0.994 & 0.457 / 0.492 / 0.221 & n/a / n/a / n/a \\ \hline
-20\% & 0.995 / 0.996 / 0.994 & 0.466 / 0.483 / 0.258 & 0.30 / 0.40 / 0.23 \\ \hline
-30\% & 0.995 / 0.997 / 0.995 & 0.490 / 0.373 / 0.245 & 0.50 / 0.55 / 0.62 \\ \hline
-40\% & 0.994 / 0.994 / 0.992 & 0.297 / 0.139 / 0.074 & 0.60 / 0.64 / 0.61 \\ \hline
-50\% & 0.995 / 0.990 / 0.985 & 0.249 / 0.000 / 0.000 & 0.64 / 1.00 / 0.99 \\ \hline
+\textbf{Objective} & \textbf{What the measurements show} \\ \hline
+1. Malicious-client detection and filtering & Known-attack recall stays at 0.985 to 0.997 up to 50\% sign-flip clients on the whole dataset. At 30\% the filtered autoencoder keeps 0.245 to 0.490 recall alone, where plain FedAvg falls to 0.002 to 0.092. The filter lets more attackers through than at 60{,}000 rows and misses a stealth attacker. \\ \hline
+2. Efficient, privacy-aware FL & Clients send only weights (9{,}834 parameters, about 39~kB) and error histograms; a 10-client run on 1.89 million rows takes 23 to 31 minutes and a 20-client run 18 to 21 minutes. Raw traffic stays on the client apart from the capped confirmed alerts. \\ \hline
+3. Model optimisation (pruning) & Pruning during training costs autoencoder-alone recall (0.457 dense, 0.350 at 70\% sparsity, 0.198 at 90\%) while cascade macro-recall stays at 0.993 or above; no communication saving is shown because updates are still dense. \\ \hline
+4. Semi-supervised, anomaly-based detection & On attack classes held out of all training, the cascade detects 0.895 to 0.944 on average, against 0.723 to 0.757 for the classifier alone and 0.590 to 0.728 for the autoencoder alone. \\ \hline
 \end{tabular}
-\caption{Poisoning sweep, full pool}
-\label{tab:full_sweep}
+\caption{Objectives and the evidence for each (whole dataset, three seeds unless stated)}
 \end{table}
-\begin{table}[H]
-\centering
-\small
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Variant} & \textbf{Attack macro-recall} & \textbf{Autoencoder-alone recall} & \textbf{Benign FPR} \\ \hline
-full\_pipeline & 0.995 / 0.997 / 0.995 & 0.490 / 0.373 / 0.245 & 0.1112 / 0.0653 / 0.0075 \\ \hline
-autoencoder\_only & 0.105 / 0.073 / 0.051 & 0.105 / 0.073 / 0.051 & 0.0473 / 0.0411 / 0.0445 \\ \hline
-boosting\_only & 0.990 / 0.989 / 0.982 & n/a / n/a / n/a & 0.0001 / 0.0001 / 0.0003 \\ \hline
-plain\_fedavg & 0.992 / 0.994 / 0.990 & 0.013 / 0.002 / 0.092 & 0.0947 / 0.0301 / 0.0301 \\ \hline
-trimmed\_mean\_only & 0.995 / 0.995 / 0.993 & 0.205 / 0.000 / 0.025 & 0.1070 / 0.0261 / 0.0299 \\ \hline
-\end{tabular}
-\caption{Ablation at 30\% sign-flip attackers, full pool, seeds 42 / 43 / 44}
-\label{tab:full_ablation}
-\end{table}
-\textbf{Zero-day detection.} The cascade detects 0.910, 0.944 and 0.895 of an unseen attack type on average (earlier 0.943, 0.952 and 0.952); every row of each held-out class is scored (Tables~\ref{tab:full_zeroday_mean} and~\ref{tab:full_zeroday_class}, Figure~\ref{fig:fullzd}). Uploading is the weakest (0.527 to 0.665), followed by MITM (0.751 to 1.000) and, depending on the seed, Backdoor and Vulnerability\_scanner.
-
-\begin{table}[H]
-\centering
-\small
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{|l|c|}
-\hline
-\textbf{Stage} & \textbf{Mean detection rate} \\ \hline
-Classifier alone & 0.735 / 0.757 / 0.723 (classes: 14, 14, 14) \\ \hline
-Autoencoder alone & 0.681 / 0.728 / 0.590 (classes: 14, 14, 14) \\ \hline
-Cascade & 0.910 / 0.944 / 0.895 (classes: 14, 14, 14) \\ \hline
-\end{tabular}
-\caption{Zero-day (leave one attack class out), full pool: mean over the held-out classes}
-\label{tab:full_zeroday_mean}
-\end{table}
-\begin{table}[H]
-\centering
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-\textbf{Held-out class} & \textbf{Rows scored} & \textbf{Cascade detection} & \textbf{Classifier alone} & \textbf{Autoencoder alone} \\ \hline
-Backdoor & 24167 & 0.743 / 0.998 / 0.998 & 0.486 / 0.996 / 0.997 & 0.493 / 0.550 / 0.810 \\ \hline
-DDoS\_HTTP & 49768 & 0.879 / 0.932 / 0.885 & 0.695 / 0.764 / 0.719 & 0.572 / 0.698 / 0.560 \\ \hline
-DDoS\_ICMP & 68758 & 1.000 / 1.000 / 1.000 & 1.000 / 1.000 / 0.999 & 0.786 / 0.802 / 0.800 \\ \hline
-DDoS\_TCP & 50062 & 0.933 / 0.953 / 0.921 & 0.865 / 0.921 / 0.879 & 0.640 / 0.686 / 0.615 \\ \hline
-DDoS\_UDP & 121567 & 0.905 / 0.803 / 0.866 & 0.416 / 0.021 / 0.334 & 0.849 / 0.799 / 0.799 \\ \hline
-Fingerprinting & 872 & 0.998 / 0.998 / 0.997 & 0.995 / 0.994 / 0.994 & 0.826 / 0.747 / 0.492 \\ \hline
-MITM & 406 & 0.803 / 1.000 / 0.751 & 0.148 / 0.200 / 0.005 & 0.764 / 1.000 / 0.751 \\ \hline
-Password & 50033 & 0.932 / 0.935 / 0.880 & 0.872 / 0.865 / 0.813 & 0.505 / 0.407 / 0.307 \\ \hline
-Port\_Scanning & 20213 & 0.999 / 0.993 / 0.992 & 0.998 / 0.988 / 0.989 & 0.570 / 0.745 / 0.409 \\ \hline
-Ransomware & 9885 & 0.990 / 0.994 / 0.988 & 0.984 / 0.990 / 0.982 & 0.621 / 0.753 / 0.374 \\ \hline
-SQL\_injection & 50981 & 0.961 / 0.970 / 0.999 & 0.828 / 0.713 / 0.999 & 0.764 / 0.871 / 0.787 \\ \hline
-Uploading & 37243 & 0.665 / 0.652 / 0.527 & 0.204 / 0.266 / 0.304 & 0.581 / 0.512 / 0.295 \\ \hline
-Vulnerability\_scanner & 50044 & 0.992 / 0.993 / 0.859 & 0.980 / 0.894 / 0.335 & 0.880 / 0.976 / 0.772 \\ \hline
-XSS & 15172 & 0.943 / 0.991 / 0.867 & 0.823 / 0.986 / 0.767 & 0.680 / 0.650 / 0.483 \\ \hline
-\end{tabular}
-\caption{Zero-day (leave one attack class out), full pool: mean over the held-out classes: per held-out class}
-\label{tab:full_zeroday_class}
-\end{table}
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.9\linewidth]{figures/full_zero_day.png}
-\caption{Zero-day detection by the cascade at full scale (one dot per seed) and the earlier 60k-pool mean}
-\label{fig:fullzd}
-\end{figure}
-\textbf{Stealth attacker, pruning and clipping (seed 42 only).} The stealth attacker survives in 0.60, 0.73 and 0.80 of client-rounds against 0.30, 0.50 and 0.60 for sign-flip, with no clear extra harm to the autoencoder and known-attack recall of at least 0.9949 (Table~\ref{tab:full_stealth}). Pruning during training costs more at full scale than at 60{,}000 rows: autoencoder-alone recall falls from 0.457 to 0.350 at 70\% sparsity, and to 0.098 when pruned after training (Table~\ref{tab:full_pruning}). Without the per-client clip the final benign validation loss is 0.242 against 0.129 with it, much less than the factor of about 1{,}500 at the smaller scale (Table~\ref{tab:full_clip}).
-
-\begin{table}[H]
-\centering
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{|l|c|c|c|c|c|}
-\hline
-\textbf{Attackers} & \textbf{Sign-flip survival} & \textbf{Stealth survival} & \textbf{Sign-flip AE-alone recall} & \textbf{Stealth AE-alone recall} & \textbf{Stealth known-attack recall} \\ \hline
-20\% & 0.30 / 0.40 / 0.23 & 0.60 / n/a / n/a & 0.466 / 0.483 / 0.258 & 0.454 / n/a / n/a & 0.9956 / n/a / n/a \\ \hline
-30\% & 0.50 / 0.55 / 0.62 & 0.73 / n/a / n/a & 0.490 / 0.373 / 0.245 & 0.427 / n/a / n/a & 0.9961 / n/a / n/a \\ \hline
-40\% & 0.60 / 0.64 / 0.61 & 0.80 / n/a / n/a & 0.297 / 0.139 / 0.074 & 0.334 / n/a / n/a & 0.9949 / n/a / n/a \\ \hline
-\end{tabular}
-\caption{Stealth attacker vs. sign-flip, full pool}
-\label{tab:full_stealth}
-\end{table}
-\begin{table}[H]
-\centering
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-\textbf{Sparsity} & \textbf{Non-zero weights} & \textbf{Autoencoder-alone recall} & \textbf{Cascade macro-recall} & \textbf{Benign FPR} \\ \hline
-0\% & 9600 & 0.457 / 0.492 / 0.221 & 0.996 / 0.996 / 0.994 & 0.1182 / 0.0414 / 0.0352 \\ \hline
-50\% & 4800 & 0.439 / n/a / n/a & 0.995 / n/a / n/a & 0.1400 / n/a / n/a \\ \hline
-70\% & 2880 & 0.350 / n/a / n/a & 0.993 / n/a / n/a & 0.1201 / n/a / n/a \\ \hline
-80\% & 1920 & 0.338 / n/a / n/a & 0.993 / n/a / n/a & 0.1451 / n/a / n/a \\ \hline
-90\% & 960 & 0.198 / n/a / n/a & 0.993 / n/a / n/a & 0.1151 / n/a / n/a \\ \hline
-\end{tabular}
-\caption{Pruning during federated training, full pool (no attackers)}
-\label{tab:full_pruning}
-\end{table}
-\begin{table}[H]
-\centering
-\small
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Normalisation} & \textbf{seed 42} & \textbf{seed 43} & \textbf{seed 44} \\ \hline
-clip 10 & 0.1292 & 0.05736 & 0.2644 \\ \hline
-no clip & 0.242 & n/a & n/a \\ \hline
-\end{tabular}
-\caption{Per-client z-score clip, final-round benign validation loss}
-\label{tab:full_clip}
-\end{table}
-\textbf{Live replay of every capture.} All 14 attack captures were replayed through Mininet with the full-pool bundle (Table~\ref{tab:full_phase_b_all}). Every one ends in a block decision with the drop rule read back from the switch; 12 of 14 are classified as the right attack type, while the MITM capture is called Ransomware and the OS-fingerprinting capture DDoS\_ICMP. The replays are of the dataset's own captures, so they demonstrate the pipeline and are not a held-out test. The released Vulnerability-scanner capture is damaged part-way, so its readable first 265{,}827 packets were used.
-
-\begin{table}[H]
-\centering
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{|l|c|c|c|c|c|c|}
-\hline
-\textbf{Capture} & \textbf{Classified as} & \textbf{Confidence} & \textbf{Stage} & \textbf{Packets flagged} & \textbf{Action} & \textbf{Wall time} \\ \hline
-Backdoor attack & Backdoor & 0.997 & boosting & 24,543 / 24,914 & block & 12 s \\ \hline
-DDoS HTTP Flood Attacks & DDoS\_HTTP & 0.966 & boosting & 119,748 / 229,142 & block & 29 s \\ \hline
-DDoS ICMP Flood Attacks & DDoS\_ICMP & 1.000 & boosting & 2,914,156 / 2,914,356 & block & 232 s \\ \hline
-DDoS TCP SYN Flood Attacks & DDoS\_TCP & 0.999 & boosting & 2,020,023 / 2,020,152 & block & 211 s \\ \hline
-DDoS UDP Flood Attacks & DDoS\_UDP & 0.999 & boosting & 2,899,758 / 3,215,732 & block & 268 s \\ \hline
-MITM ARP spoofing DNS Attack & Ransomware & 0.991 & boosting & 542 / 1,229 & block & 8 s \\ \hline
-OS Fingerprinting attack & DDoS\_ICMP & 0.980 & boosting & 1,134 / 1,176 & block & 9 s \\ \hline
-Password attacks & Password & 0.957 & boosting & 919,469 / 1,053,893 & block & 130 s \\ \hline
-Port Scanning attack & Port\_Scanning & 0.999 & boosting & 22,495 / 23,329 & block & 12 s \\ \hline
-Ransomware attack & Ransomware & 0.994 & boosting & 10,620 / 11,030 & block & 11 s \\ \hline
-SQL injection attack & SQL\_injection & 1.000 & boosting & 51,097 / 51,228 & block & 17 s \\ \hline
-Uploading attack & Uploading & 0.999 & boosting & 37,592 / 37,644 & block & 15 s \\ \hline
-XSS attacks & XSS & 0.999 & boosting & 15,677 / 16,215 & block & 12 s \\ \hline
-Vulnerability scanner attack & Vulnerability\_scanner & 0.996 & boosting & 262,922 / 265,827 & block & 60 s \\ \hline
-\end{tabular}
-\caption{Phase B on every attack capture (10 clients, seed 42, full-pool bundle): class chosen, confidence, deciding stage, packets flagged, action}
-\label{tab:full_phase_b_all}
-\end{table}
-\section{Boosting vs.\ a deep-learning classifier}
-On the same 500{,}000-row sample, LightGBM (base features) reached 0.887 macro F1 and a dense MLP of comparable effort (8{,}271 parameters, 15 epochs) reached 0.622. The gap was largest on the application-layer attacks (XSS 0.761 vs.\ 0.072 recall; SQL\_injection 0.767 vs.\ 0.183). This supports the boosting-first design. It is a comparison against a modest baseline, not a claim that deep learning cannot work here.
+Beyond the objectives, the stand-alone classifier reaches 99.72\% accuracy and 0.983 macro F1 on 397{,}073 test packets from connections it never saw, all 14 attack captures are blocked by a drop rule read back from the switch, and the models decide on a packet in a median 0.642~ms.

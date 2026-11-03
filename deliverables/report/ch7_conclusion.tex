@@ -1,0 +1,25 @@
+\chapter{Conclusion}\label{chap:conclusion}
+
+\section*{Conclusion}
+The five parts of FL-IDS work together on real IoT/IIoT traffic: a boosting classifier, a federated autoencoder backstop, a cosine-similarity trust filter, Flower-based federated learning, and SDN mitigation. Each part has a measured contribution, and the measurements were repeated on the whole Edge-IIoTset dataset, split by connection, rather than on a subsample split by row. All planned phases are complete.
+
+\begin{itemize}
+  \item \textbf{Accuracy target met.} With service-port, payload-content and flow features and square-root class weights, the LightGBM classifier reaches \textbf{99.7\% accuracy and 0.983--0.985 macro F1} when trained on 1.43 million packets and tested on 397 thousand packets from connections that never appear in training. That is up from 96.4\% and 0.889 with the original features. It holds across three seeds, and when the classifier is trained on only the 5\% server calibration set (99.7\% / 0.979).
+  \item \textbf{The whole federated system works at full scale.} In six real multi-process runs (10 and 20 clients, three seeds, 1.89 million training rows) the cascade reaches 0.994--0.998 attack macro-recall. The trust-filtered autoencoder stays usable with up to 50\% sign-flip clients for known attacks, while plain FedAvg's autoencoder collapses.
+  \item \textbf{The backstop pays off on unseen attacks.} When each attack class is held out of training in turn, the cascade detects 0.895--0.944 of the unseen class on average, against 0.723--0.757 for the classifier alone.
+  \item \textbf{Detection drives enforcement.} All 14 attack captures replayed through Mininet end in a block decision and a drop rule read back from the switch; 12 of 14 are classified as the right attack type.
+  \item \textbf{The models are fast; the pipeline is not inline.} A packet is decided in a median 0.642~ms (one thread), and a whole full-dataset training run takes 18 to 31 minutes. Mitigation is nonetheless capture-level, not per-packet.
+  \item \textbf{Data quality.} The released Edge-IIoTset CSV contains a placeholder label leak (one feature with an AUROC of 1.0), first reported by Galal~\cite{galal2026provenance}, and column-shifted MITM rows, which we found and repaired. Results trained directly on it with a random split are likely inflated.
+\end{itemize}
+The limitations that qualify these results are listed in Section~\ref{sec:limits}.
+
+\section*{Future Work}
+\begin{enumerate}
+  \item Make mitigation streaming: classify flows incrementally (for example after the first $n$ packets) so a rule can be installed while an attack is still running, and measure the end-to-end blocking latency.
+  \item Defend against the white-box stealth attacker (Section~\ref{sec:followups}), which the filter mostly misses, for example with a small trusted root dataset as in FLTrust~\cite{cao2021fltrust}; measure zero-day detection under it; and test other adaptive strategies and attackers above 50\%.
+  \item Find out why the trust filter excludes fewer attackers and the autoencoder is weaker at full scale, and repeat the stealth-attacker, pruning and clipping experiments at full scale over more seeds, with confidence intervals.
+  \item Validate on a second dataset that contains benign web traffic, to measure how much the service-port feature depends on the testbed.
+  \item Reduce the per-round communication as well: clients still send dense updates, so sparse updates and zero-day detection of pruned models remain to be tested.
+  \item Federate the classifier itself (for example with histogram-based federated boosting) so the calibration set no longer needs to be held centrally.
+  \item Deploy on physical edge hardware and a hardware OpenFlow switch, and measure real network delays.
+\end{enumerate}

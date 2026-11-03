@@ -1761,6 +1761,15 @@ Shown on the showcase site (https://aronnnn1.github.io/FL-IDS-showcase/). All nu
   per-packet blocking latency to report. Averaged over a whole replay (wall time divided by packets, from the section 8.15 Phase B table): DDoS UDP 83 microseconds a
   packet, DDoS ICMP 80, DDoS TCP 104. The latency benchmark is one bundle, one thread, one machine; no confidence interval is claimed.
 
+### 8.17 Report restructured to the department format (2026-11-03)
+No new experiment. `deliverables/report/` was reorganised to the mandatory seven-chapter contents list and brought up to the latest results.
+- *Structure now*: 1 Introduction, 2 Literature Survey, 3 Requirement Analysis and Specification (new: stakeholders, data requirements, constraints, assumptions, risks), 4 Designs (new: deployment view, modules, detailed design, data design),
+  5 Methodology (was chapter 4), 6 Results and Discussion (full-pool results first, 60k-pool results kept as a comparison subsection; new training-time and latency subsection; limitations; conclusion), 7 Conclusion and future work,
+  References, Plagiarism (placeholder until the similarity report exists), appendices A to E. The old Cost Estimation section was dropped (format has none); the zero-cost fact is one bullet under constraints.
+- *Updated*: cover title (SDN-enabled IoT title), abstract and conclusion (full-pool headline numbers instead of the 60k ones), class split of the final 1,985,768 rows (Table in 5.2), hardware (VMware VM, 20 vCPUs, 48 GB), test count.
+- *Tests re-run for the report* (`pytest -q`, 2026-11-03): 244 passed, 1 skipped (a test needing the authors' CSV next to the captures), 462.9 s.
+- *Open*: Work Plan has phases and status but no dates; the owner will supply the real timeline. Plagiarism and AI-content reports still to be attached. Figures 4.1 and 4.3 are drawn in TikZ in the report source.
+
 ## 9. Do not cite (superseded numbers, with reason)
 
 - Every real-data number from before `c1cc656` (label leak): Phase 5

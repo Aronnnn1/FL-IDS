@@ -28,7 +28,7 @@ FedAvg is fragile when some clients are malicious. Yin \emph{et al.}~\cite{yin20
 
 \textbf{Sharafaldin \emph{et al.}, CIC-IDS2017, 2018}~\cite{sharafaldin2018cicids}. This work introduced the CIC-IDS2017 dataset, whose features are computed per flow by CICFlowMeter (packet counts, rates, durations, payload statistics). Flow features of this kind are standard in network IDS. FL-IDS adopts the same idea, including CICFlowMeter's 120-second active timeout for splitting long sessions into flow records.
 
-\section{Research Gap Identification}
+\section{Research Gaps}
 From the survey, the following gaps were identified.
 \begin{enumerate}
   \item \textbf{No single system combines all five parts.} Federated anomaly detection, cosine-based robust aggregation, a boosting-first cascade and FL with SDN enforcement each exist in some paper, as pairs or triples. A handful of targeted searches found no system combining all five. (This is not a systematic review, so novelty is stated cautiously.)
@@ -39,7 +39,7 @@ From the survey, the following gaps were identified.
   \item \textbf{Detection rarely drives verified enforcement.} Many papers stop at a classification score. Few show a detection producing a flow rule that is then read back from the switch.
 \end{enumerate}
 
-\section{Mapping of your Objective with Research Gap Identification}
+\section{Mapping of Project Objectives with Research Gaps}
 \begin{table}[H]
 \centering
 \renewcommand{\arraystretch}{1.3}
@@ -50,7 +50,7 @@ From the survey, the following gaps were identified.
 2. Zero-day detection rarely measured & Objective 4: autoencoder-based anomaly detection, measured by holding out each of the 14 attack classes \\ \hline
 3. Robust aggregation under non-IID data & Objective 1: cosine/MAD/EMA-trust filtering of client updates, tested from 0\% to 50\% malicious clients \\ \hline
 4. Inflated results on the released CSV & Supporting work for all objectives: placeholder-leak fix, MITM capture repair and a flow-grouped evaluation split \\ \hline
-5. Weak application-layer detection & Supporting work: service-port, content and flow features for the classifier (Section 4.2.3) \\ \hline
+5. Weak application-layer detection & Supporting work: service-port, content and flow features for the classifier (Section~\ref{sec:newfeat}) \\ \hline
 6. Detection not linked to enforcement & Objective 2 (practical FL design): Phase B turns a verdict into an OpenFlow rule verified in the switch's flow table \\ \hline
 \end{tabular}
 \caption{Mapping of objectives to research gaps}
