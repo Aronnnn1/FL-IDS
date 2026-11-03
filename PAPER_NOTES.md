@@ -1743,6 +1743,24 @@ captures, so they demonstrate the pipeline; they are not a held-out test. The re
 at full scale; MITM cannot be split by connection and is scored only by zero-day and Phase B; the pipeline's classifier still starts from the 5% server set (the
 full 1.43M-row classifier is a separate experiment, §8.10); stealth / pruning / clip are single-seed at full scale; the full-scale seeds are 42-44 only.
 
+### 8.16 Class split, training time and time to decide on a packet (2026-11-03)
+Shown on the showcase site (https://aronnnn1.github.io/FL-IDS-showcase/). All numbers below come from files in this repository.
+- *Class split of the 1,985,768 usable rows* (counted from `data/processed/encoded_extended.npz`): Normal 1,436,597 (72.3%); Backdoor 24,167;
+  DDoS_HTTP 49,768; DDoS_ICMP 68,758; DDoS_TCP 50,062; DDoS_UDP 121,567; Fingerprinting 872; MITM 406; Password 50,033; Port_Scanning 20,213;
+  Ransomware 9,885; SQL_injection 50,981; Uploading 37,243; Vulnerability_scanner 50,044; XSS 15,172. The standalone classifier on all rows
+  (connection-grouped split, seed 42; `experiments/accuracy/results/full_grouped_bal_s42.json`) used 1,429,825 rows to train, 158,870 for early
+  stopping and 397,073 to test, trained in 24.2 s (stopped at tree 54), accuracy 0.9972, macro F1 0.9828.
+- *Training time of the six real runs* (`saved_models/full/<run>/journey.json`, seconds): total 1,843.6 / 1,397.2 / 1,753.6 (10 clients, seeds 42/43/44) and
+  1,260.3 / 1,063.4 / 1,225.0 (20 clients). Federated training (20 rounds) is 1,632.8 / 1,220.9 / 1,578.8 and 1,072.6 / 871.5 / 1,033.7 of that; calibration split
+  plus bootstrap classifier plus client partition takes 16.2 to 16.7 s; evaluation 156 to 191 s. Some runs overlapped other jobs on the VM, so these are upper bounds.
+- *Time to decide on one packet* (`tools/latency_benchmark.py`, `results/latency/c10_s42.json`; saved 10-client seed-42 bundle, one CPU thread of the VM's
+  Intel Xeon, 3,000 held-out test packets timed one call each, then one batch of 200,000): classifier alone median 0.372 ms (95th 0.440, 99th 0.497); autoencoder
+  alone 0.060 ms (0.094, 0.660); both stages 0.642 ms (0.706, 0.819). Batch: classifier 264.2 microseconds per packet (3,784 packets/s), autoencoder 5.5 microseconds
+  (181,382/s), both 265.9 microseconds (3,760/s). **Model time only**: it excludes reading a capture, tshark feature extraction and the switch.
+- *What this does not show.* Phase B is not inline (see section 8.7 and section 10): it classifies a whole capture after extracting its features, so there is no
+  per-packet blocking latency to report. Averaged over a whole replay (wall time divided by packets, from the section 8.15 Phase B table): DDoS UDP 83 microseconds a
+  packet, DDoS ICMP 80, DDoS TCP 104. The latency benchmark is one bundle, one thread, one machine; no confidence interval is claimed.
+
 ## 9. Do not cite (superseded numbers, with reason)
 
 - Every real-data number from before `c1cc656` (label leak): Phase 5

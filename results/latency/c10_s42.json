@@ -1,0 +1,50 @@
+{
+  "rows_available": 288416,
+  "cpu": "Intel(R) Xeon(R) 636",
+  "threads": "1 (OMP_NUM_THREADS=1)",
+  "bundle": "saved_models/full/c10_s42",
+  "modes": {
+    "boosting_only": {
+      "single_packet_ms": {
+        "median": 0.3715345010277815,
+        "p95": 0.43965049335383805,
+        "p99": 0.4974106489680707,
+        "n": 3000
+      },
+      "batch": {
+        "packets": 200000,
+        "seconds": 52.84989205299644,
+        "us_per_packet": 264.2494602649822,
+        "packets_per_second": 3784.3029045252433
+      }
+    },
+    "autoencoder_only": {
+      "single_packet_ms": {
+        "median": 0.059674493968486786,
+        "p95": 0.09427229597349646,
+        "p99": 0.6597898289328399,
+        "n": 3000
+      },
+      "batch": {
+        "packets": 200000,
+        "seconds": 1.1026480309956241,
+        "us_per_packet": 5.513240154978121,
+        "packets_per_second": 181381.54186827157
+      }
+    },
+    "cascade": {
+      "single_packet_ms": {
+        "median": 0.6424655002774671,
+        "p95": 0.7056370966893155,
+        "p99": 0.8191091642947853,
+        "n": 3000
+      },
+      "batch": {
+        "packets": 200000,
+        "seconds": 53.18546290100494,
+        "us_per_packet": 265.9273145050247,
+        "packets_per_second": 3760.426046723775
+      }
+    }
+  }
+}
