@@ -1,7 +1,7 @@
 """Root-side half of the live arena: builds the Mininet network and replays real captures on command.
 
-Topology: one core switch (s1) and five client switches (s2..s6). Client k (1..5) has three hosts
-c<k>h1..c<k>h3 (10.0.<k>.1..3/16) on switch s<k+1>. All switches use the project's OpenFlow controller.
+Topology: one core switch (s1) and eight client switches (s2..s9). Client k (1..8) has five hosts
+c<k>h1..c<k>h5 (10.0.<k>.1..3/16) on switch s<k+1>. All switches use the project's OpenFlow controller.
 
 Control API (127.0.0.1 only, JSON):  GET /topology  GET /counters  POST /replay  POST /stop  POST /shutdown
 Run (as root):  sudo /usr/bin/python3 fl_ids/arena/netagent.py
@@ -23,7 +23,7 @@ from mininet.log import setLogLevel
 from mininet.net import Mininet
 from mininet.node import OVSSwitch, RemoteController
 
-CLIENTS, HOSTS_PER_CLIENT = 5, 3
+CLIENTS, HOSTS_PER_CLIENT = 8, 5   # the largest network the UI can grow to; unused hosts simply stay idle
 PORT = 8099
 PCAP_ALLOWED_DIR = ROOT / "arena_assets" / "slices"
 
@@ -59,10 +59,15 @@ def topology() -> dict:
 
 
 def tx_counters() -> dict:
+    """Packets each host has sent, read from the switch-side end of its veth pair (root namespace, no shell-outs)."""
     out = {}
     for h in net.hosts:
-        v = h.cmd(f"cat /sys/class/net/{h.defaultIntf().name}/statistics/tx_packets").strip()
-        out[h.name] = int(v) if v.isdigit() else 0
+        link = h.defaultIntf().link
+        sw_intf = link.intf2 if link.intf1.node is h else link.intf1
+        try:
+            out[h.name] = int(Path(f"/sys/class/net/{sw_intf.name}/statistics/rx_packets").read_text())
+        except (OSError, ValueError):
+            out[h.name] = 0
     return out
 
 

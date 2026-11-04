@@ -18,9 +18,9 @@
     <button id="btn-boot" class="btn primary">Start network</button>
     <select id="preset" class="btn" title="Fill the hosts with a ready-made scenario">
       <option value="">Scenario…</option>
-      <option value="mixed">Mixed network (10 attacks, 5 normal)</option>
-      <option value="all14">All 14 attack types + 1 normal</option>
-      <option value="normal">All 15 hosts normal (false-alarm check)</option>
+      <option value="mixed">Mixed network (attackers and normal hosts)</option>
+      <option value="all14">All 14 attack types (rest normal)</option>
+      <option value="normal">All hosts normal (false-alarm check)</option>
     </select>
     <button id="btn-launch" class="btn go" disabled>Launch all</button>
     <button id="btn-reset" class="btn" disabled>Reset</button>
@@ -31,6 +31,11 @@
 <main>
   <section class="map-wrap">
     <div id="narr" class="narr">Start the network, give each host a role (click a host), then launch.</div>
+    <div class="toolbar">
+      <span class="tgroup"><button id="btn-addnet" class="btn sm">+ Network</button><button id="btn-rmnet" class="btn sm">− Network</button></span>
+      <span class="tgroup" id="speedbar"><b>Speed</b><button data-s="0.25">0.25×</button><button data-s="0.5">0.5×</button><button data-s="1" class="active">1×</button><button data-s="2">2×</button><button data-s="4">4×</button></span>
+      <span id="speedinfo" class="sub"></span>
+    </div>
     <svg id="map" viewBox="0 0 1180 610" preserveAspectRatio="xMidYMid meet"></svg>
     <div class="legend">
       <span><i class="dot idle"></i>Idle</span>

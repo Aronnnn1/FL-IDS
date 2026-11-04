@@ -43,7 +43,10 @@ PPS = 1000
 BUNDLE = ROOT / "saved_models" / "full" / "c10_s42"
 # Arena client k (1..5) uses these clients of the 10-client bundle: those with well-calibrated anomaly thresholds
 # on their own held-out normal traffic (see arena_assets/window_benchmark.json); clients 6 and 9 flag 17-26% of it.
-BUNDLE_CLIENTS = {1: 1, 2: 2, 3: 3, 4: 7, 5: 8}
+BUNDLE_CLIENTS = {1: 1, 2: 2, 3: 3, 4: 7, 5: 8, 6: 5, 7: 9, 8: 0}
+# Clients 4 (no normal rows) and 6 (flags about 26% of its own normal traffic) are not used. Client 9 flags about 18% and
+# client 0 has only 224 held-out normal rows: networks 7 and 8 carry a warning in the UI.
+MAX_NETS, MAX_HOSTS = 8, 5
 CLASSES = ["Backdoor", "DDoS_HTTP", "DDoS_ICMP", "DDoS_TCP", "DDoS_UDP", "Fingerprinting", "MITM", "Password",
            "Port_Scanning", "Ransomware", "SQL_injection", "Uploading", "Vulnerability_scanner", "XSS"]
 
@@ -54,7 +57,7 @@ EVENTS: list[dict] = []
 T0 = time.time()
 HOSTS: list[dict] = [
     {"id": f"c{k}h{j}", "client": k, "bundle_client": BUNDLE_CLIENTS[k], "ip": f"10.0.{k}.{j}"}
-    for k in range(1, 6) for j in range(1, 4)
+    for k in range(1, MAX_NETS + 1) for j in range(1, MAX_HOSTS + 1)
 ]
 HOST = {h["id"]: h for h in HOSTS}
 ROLES: dict[str, str] = {h["id"]: "idle" for h in HOSTS}
@@ -63,6 +66,8 @@ TX: dict[str, int] = {}
 SENDING: dict[str, bool] = {}
 SWITCH_DROPS: dict[str, dict] = {}
 BOOT = {"state": "off", "message": "Network not started"}
+TOPO: dict[int, int] = {k: 3 for k in range(1, 6)}   # active networks -> active hosts
+SPEED = 1.0
 CTX: dict = {}
 RUN_LAUNCHED = 0
 procs: dict[str, subprocess.Popen] = {}
@@ -108,13 +113,13 @@ def boot_worker() -> None:
         else:
             raise RuntimeError("bridge did not start (see /tmp/arena_bridge.log)")
 
-        BOOT["message"] = "Building the network: 6 switches, 15 hosts"
+        BOOT["message"] = "Building the network: 9 switches, 40 hosts"
         log_a = open("/tmp/arena_agent.log", "w")
         procs["agent"] = subprocess.Popen(
             ["sudo", "-n", "/usr/bin/python3", str(ROOT / "fl_ids" / "arena" / "netagent.py")], cwd=ROOT,
             stdout=log_a, stderr=subprocess.STDOUT)
         topo = None
-        for _ in range(120):
+        for _ in range(240):
             try:
                 topo = requests.get(AGENT + "/topology", timeout=1).json()
                 dps = requests.get(BRIDGE + "/health", timeout=1).json()["connected_datapaths"]
@@ -186,24 +191,27 @@ def run_host(hid: str) -> None:
     h, role = HOST[hid], ROLES[hid]
     art, truth = CTX["art"], role
     t_launch = time.time()
-    emit("launch", host=hid, role=role, client=h["client"])
+    speed = SPEED
+    pps = max(50, int(PPS * speed))
+    slack = 30 / min(1.0, speed)
+    emit("launch", host=hid, role=role, client=h["client"], speed=speed, pps=pps)
     try:
         if role == "normal":
             rows = CTX["benign"][h["client"]]
             n = min(WINDOW_PACKETS, len(rows))
             for step in range(1, 7):
-                time.sleep(0.5)
+                time.sleep(0.5 / speed)
                 emit("progress", host=hid, packets=int(n * step / 6), total=n, source="dataset")
             X = rows[CTX["rng"].choice(len(rows), size=n, replace=False)]
             source, extract_ms = "dataset", 0.0
         else:
             n = CTX["window"][role]
             base = TX.get(hid, 0)
-            r = agent("POST", "/replay", host=hid, pcap=str(SLICES / f"{role}.pcap"), pps=PPS)
+            r = agent("POST", "/replay", host=hid, pcap=str(SLICES / f"{role}.pcap"), pps=pps)
             if "error" in r:
                 raise RuntimeError(r["error"])
             last = 0.0
-            while TX.get(hid, 0) - base < n and time.time() - t_launch < 30:
+            while TX.get(hid, 0) - base < n and time.time() - t_launch < slack:
                 if time.time() - last > 0.4:
                     last = time.time()
                     emit("progress", host=hid, packets=max(0, TX.get(hid, 0) - base), total=n, source="wire")
@@ -235,7 +243,7 @@ def run_host(hid: str) -> None:
         else:
             emit("mitigation", host=hid, action="allow", applied=True, bridge_ms=0, time_to_action_s=round(time.time() - t_launch, 2))
         if role != "normal":
-            while SENDING.get(hid) and time.time() - t_launch < 60:
+            while SENDING.get(hid) and time.time() - t_launch < slack + 60:
                 time.sleep(0.3)
             time.sleep(1.3)
         emit("host_done", host=hid)
@@ -265,6 +273,8 @@ def save_recording() -> None:
     n_norm = sum(r == "normal" for r in roles_)
     name = time.strftime("run-%Y%m%d-%H%M%S") + f"-{len(roles_) - n_norm}attack-{n_norm}normal.json"
     base = evs[0]["t"]
+    evs = [{"i": -1, "t": base, "type": "topology", "nets": {str(k): v for k, v in sorted(TOPO.items())}},
+           {"i": -1, "t": base, "type": "speed", "value": SPEED}] + evs
     (RECORDINGS / name).write_text(json.dumps(
         {"name": name, "roles": {e["host"]: e["role"] for e in evs if e["type"] == "launch"},
          "events": [{**e, "t": round(e["t"] - base, 3)} for e in evs]}))
@@ -285,7 +295,9 @@ def static_files(p):
 def config():
     return jsonify({"hosts": [{k: h[k] for k in ("id", "client", "ip")} for h in HOSTS], "classes": CLASSES,
                     "window": WINDOW_PACKETS, "pps": PPS, "share_threshold": SHARE_THRESHOLD,
-                    "roles": ROLES, "boot": BOOT})
+                    "roles": ROLES, "boot": BOOT, "max_nets": MAX_NETS, "max_hosts": MAX_HOSTS,
+                    "topo": {str(k): v for k, v in TOPO.items()}, "speed": SPEED,
+                    "bundle_clients": {str(k): v for k, v in BUNDLE_CLIENTS.items()}})
 
 
 @app.post("/api/boot")
@@ -312,12 +324,48 @@ def set_role():
     return jsonify({"ok": True})
 
 
+def topo_event() -> None:
+    emit("topology", nets={str(k): v for k, v in sorted(TOPO.items())})
+
+
+@app.post("/api/topology")
+def topology_change():
+    b = request.get_json(force=True)
+    act, net = b.get("action"), int(b.get("net", 0))
+    if BUSY:
+        return jsonify({"error": "wait until the running hosts finish"}), 400
+    if act == "add_host" and net in TOPO and TOPO[net] < MAX_HOSTS:
+        TOPO[net] += 1
+    elif act == "remove_host" and net in TOPO and TOPO[net] > 1:
+        ROLES[f"c{net}h{TOPO[net]}"] = "idle"
+        TOPO[net] -= 1
+    elif act == "add_net" and len(TOPO) < MAX_NETS:
+        TOPO[max(TOPO) + 1] = 3
+    elif act == "remove_net" and len(TOPO) > 1 and net == max(TOPO):
+        for j in range(1, MAX_HOSTS + 1):
+            ROLES[f"c{net}h{j}"] = "idle"
+        del TOPO[net]
+    else:
+        return jsonify({"error": "not possible"}), 400
+    topo_event()
+    return jsonify({"topo": TOPO})
+
+
+@app.post("/api/speed")
+def set_speed():
+    global SPEED
+    SPEED = min(8.0, max(0.1, float(request.get_json(force=True)["speed"])))
+    emit("speed", value=SPEED)
+    return jsonify({"speed": SPEED})
+
+
 @app.post("/api/launch")
 def launch():
     if BOOT["state"] != "ready":
         return jsonify({"error": "network not ready"}), 400
     ids = request.get_json(force=True).get("hosts", "all")
-    ids = [h["id"] for h in HOSTS] if ids == "all" else ids
+    active = {f"c{k}h{j}" for k, n in TOPO.items() for j in range(1, n + 1)}
+    ids = [h["id"] for h in HOSTS if h["id"] in active] if ids == "all" else [i for i in ids if i in active]
     started = []
     for hid in ids:
         if ROLES.get(hid, "idle") == "idle":
@@ -349,6 +397,8 @@ def reset():
     for hid in ROLES:
         ROLES[hid] = "idle"
     emit("reset")
+    topo_event()
+    emit("speed", value=SPEED)
     return jsonify({"ok": True})
 
 
