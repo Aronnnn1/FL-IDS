@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FL-IDS Live Arena</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">FL</div>
+    <div><h1>FL-IDS Live Arena</h1><p>Federated intrusion detection with SDN mitigation, running live</p></div>
+  </div>
+  <div class="actions">
+    <span id="mode" class="pill live">LIVE</span>
+    <span id="boot" class="pill">Network off</span>
+    <button id="btn-boot" class="btn primary">Start network</button>
+    <select id="preset" class="btn" title="Fill the hosts with a ready-made scenario">
+      <option value="">Scenario…</option>
+      <option value="mixed">Mixed network (10 attacks, 5 normal)</option>
+      <option value="all14">All 14 attack types + 1 normal</option>
+      <option value="normal">All 15 hosts normal (false-alarm check)</option>
+    </select>
+    <button id="btn-launch" class="btn go" disabled>Launch all</button>
+    <button id="btn-reset" class="btn" disabled>Reset</button>
+    <select id="rec" class="btn" title="Replay a saved run"><option value="">Replay a saved run…</option></select>
+  </div>
+</header>
+
+<main>
+  <section class="map-wrap">
+    <div id="narr" class="narr">Start the network, give each host a role (click a host), then launch.</div>
+    <svg id="map" viewBox="0 0 1180 610" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="legend">
+      <span><i class="dot idle"></i>Idle</span>
+      <span><i class="dot send"></i>Sending / being scored</span>
+      <span><i class="dot ana"></i>Analysing window</span>
+      <span><i class="dot ok"></i>Judged normal</span>
+      <span><i class="dot bad"></i>Attack, blocked</span>
+      <span><i class="dot miss"></i>Missed / false alarm</span>
+      <span class="note">Attack hosts send real captured packets through the switches. Normal hosts are scored on real held-out normal rows from the dataset.</span>
+    </div>
+  </section>
+
+  <aside>
+    <div class="tabs">
+      <button data-tab="host" class="active">Host</button>
+      <button data-tab="results">Results</button>
+      <button data-tab="feed">Live feed</button>
+      <button data-tab="switch">Switch rules</button>
+      <button data-tab="bench">Benchmark</button>
+    </div>
+    <div id="tab-host" class="tabpane active"></div>
+    <div id="tab-results" class="tabpane"></div>
+    <div id="tab-feed" class="tabpane"></div>
+    <div id="tab-switch" class="tabpane"></div>
+    <div id="tab-bench" class="tabpane"></div>
+  </aside>
+</main>
+<script src="/static/app.js"></script>
+</body>
+</html>
