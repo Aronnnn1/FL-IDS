@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FL-IDS Live Arena</title>
-<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/style.css?v=4">
 </head>
 <body>
 <header>
@@ -22,8 +22,8 @@
       <option value="all14">All 14 attack types (rest normal)</option>
       <option value="normal">All hosts normal (false-alarm check)</option>
     </select>
-    <button id="btn-launch" class="btn go" disabled>Launch all</button>
-    <button id="btn-reset" class="btn" disabled>Reset</button>
+    <button id="btn-launch" class="btn go" disabled>▶ Play</button>
+    <button id="btn-reset" class="btn" disabled>+ New run</button>
     <select id="rec" class="btn" title="Replay a saved run"><option value="">Replay a saved run…</option></select>
   </div>
 </header>
@@ -44,7 +44,7 @@
       <span><i class="dot ok"></i>Judged normal</span>
       <span><i class="dot bad"></i>Attack, blocked</span>
       <span><i class="dot miss"></i>Missed / false alarm</span>
-      <span class="note">Attack hosts send real captured packets through the switches. Normal hosts are scored on real held-out normal rows from the dataset.</span>
+      <span class="note" id="build" style="color:#9aa8bd"></span><span class="note">Attack hosts send real captured packets through the switches. Normal hosts are scored on real held-out normal rows from the dataset.</span>
     </div>
   </section>
 
@@ -63,6 +63,6 @@
     <div id="tab-bench" class="tabpane"></div>
   </aside>
 </main>
-<script src="/static/app.js"></script>
+<script src="/static/app.js?v=4"></script>
 </body>
 </html>

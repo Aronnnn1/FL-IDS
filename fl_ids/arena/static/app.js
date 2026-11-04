@@ -11,13 +11,17 @@ const $ = (s) => document.querySelector(s);
 const fmt = (n) => Number(n).toLocaleString("en-US");
 const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
 const DEFAULT_TOPO = { 1: 3, 2: 3, 3: 3, 4: 3, 5: 3 };
+// The sample network every run starts from. "+ New run" always returns to exactly this.
+const BASE_ROLES = { c1h1: "SQL_injection", c1h2: "normal", c1h3: "normal", c2h1: "DDoS_UDP", c2h2: "normal", c2h3: "Password", c3h1: "Backdoor", c3h2: "normal", c3h3: "XSS",
+  c4h1: "normal", c4h2: "Ransomware", c4h3: "Port_Scanning", c5h1: "normal", c5h2: "Uploading", c5h3: "DDoS_HTTP" };
+const BUILD = "build 4 Nov, v4";
 const NET_NOTE = { 9: "model flags about 22% of its own normal traffic (near the 25% rule)", 0: "calibrated on only 224 normal rows" };
 
 let CFG = null, V = null, S = freshState(), mode = "live", nextEv = 0, selected = null, replayTimer = null, benchmark = null, simT0 = 0, simTimers = [];
 let hostPos = {}, routes = {}, layoutInfo = null;
 const dots = [];
 
-function freshState(topo) { return { hosts: {}, feed: [], narr: "", topo: { ...(topo || DEFAULT_TOPO) }, speed: 1 }; }
+function freshState(topo) { return { hosts: {}, feed: [], narr: "", topo: { ...(topo || DEFAULT_TOPO) }, speed: 1, finished: false, running: false }; }
 function H(id) { return S.hosts[id] || (S.hosts[id] = { id, role: "idle", phase: "idle", packets: 0, total: 0, source: null, verdict: null, mit: null, dropped: 0, ttb: null }); }
 const nets = () => Object.keys(S.topo).map(Number).sort((a, b) => a - b);
 const activeIds = () => nets().flatMap((k) => Array.from({ length: S.topo[k] }, (_, j) => `c${k}h${j + 1}`));
@@ -29,11 +33,11 @@ function apply(ev) {
   const feed = (html) => S.feed.unshift(`<div><span class="t">${stamp}s</span>${html}</div>`);
   switch (ev.type) {
     case "boot": S.narr = "Network is up: controller, core switch and every client network are ready."; break;
-    case "reset": S = freshState(S.topo); S.narr = "Reset. All rules cleared. Give the hosts new roles."; break;
+    case "reset": S = freshState(DEFAULT_TOPO); S.narr = "New run: back to the sample network. Change roles or the topology, then press Play."; break;
     case "topology": S.topo = Object.fromEntries(Object.entries(ev.nets).map(([k, v]) => [Number(k), v])); break;
     case "speed": S.speed = ev.value; break;
     case "role": { const h = H(ev.host); Object.assign(h, { role: ev.role, phase: ev.role === "idle" ? "idle" : "armed", verdict: null, mit: null, packets: 0, dropped: 0, ttb: null }); break; }
-    case "launch": { S.narr = `${ev.host} launched as ${ev.role === "normal" ? "a normal device" : LONG(ev.role)}. Window of ${fmt(CFG.window)} packets is being collected.`; const h = H(ev.host);
+    case "launch": { S.finished = false; S.running = true; S.narr = `${ev.host} launched as ${ev.role === "normal" ? "a normal device" : LONG(ev.role)}. Window of ${fmt(CFG.window)} packets is being collected.`; const h = H(ev.host);
       Object.assign(h, { role: ev.role, phase: "sending", packets: 0, total: 0, verdict: null, mit: null, dropped: 0, ttb: null });
       feed(ev.role === "normal" ? `<b>${ev.host}</b> starts as a <b>normal</b> device (scored on real normal rows from the dataset).`
         : `<b>${ev.host}</b> starts a real <b>${LONG(ev.role)}</b> attack: replaying captured packets through its switch.`); break; }
@@ -52,7 +56,7 @@ function apply(ev) {
       break; }
     case "dropped": { H(ev.host).dropped = ev.packets; break; }
     case "host_done": { const h = H(ev.host); if (h.phase !== "idle") h.phase = "done"; break; }
-    case "run_done": feed("<b>Run finished.</b> See the Results tab for the scoreboard."); S.narr = "Run finished. Results are in the Results tab."; break;
+    case "run_done": S.running = false; S.finished = true; feed("<b>Run finished.</b> See the Results tab for the scoreboard."); S.narr = "Run finished. Open the Results tab, or click + New run to start again from the sample network."; break;
     case "error": feed(`<span class="tag bad">error</span> ${ev.host || ""} ${ev.message}`); break;
   }
 }
@@ -199,7 +203,7 @@ function render(force) {
   }
   $("#narr").textContent = S.narr || defaultNarr();
 }
-const defaultNarr = () => (STATIC ? "Simulator: give hosts roles (click a host or use Scenario), then Launch. Verdicts are the real cascade outputs; packets are not sent on this page." : "Start the network, give each host a role (click a host), then launch.");
+const defaultNarr = () => (STATIC ? "This is the sample network. Click a host to see its role, change roles, add or remove hosts and networks, then press Play. Verdicts are the real cascade outputs; packets are not sent on this page." : "Start the network first. Then click a host to see or change its role, and press Play.");
 
 // packet animation (illustrative: dots only show that traffic flows; counts elsewhere are real)
 function along(pts, t) {
@@ -241,12 +245,12 @@ function activateTab(name) {
 document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => { activateTab(b.dataset.tab); refreshTabs(true); }));
 const lastHtml = {};
 function setHTML(id, html) { const e = $("#" + id); if (lastHtml[id] === html) return false; lastHtml[id] = html; e.innerHTML = html; return true; }
-function canEdit() { return mode === "live" && !busyIds().length && (STATIC || (CFG && CFG.boot === "ready")); }
+function canEdit() { return mode === "live" && !S.running && !busyIds().length && !S.finished && (STATIC || (CFG && CFG.boot === "ready")); }
 
 function renderHostTab() {
   if (!selected || !activeIds().includes(selected)) {
     selected = null;
-    setHTML("tab-host", `<h3>Pick a host</h3><p class="sub">Click any host on the map. Choose what it should do, then launch it. The <b>Scenario…</b> menu fills the whole network. Use <b>+ host</b> / <b>− host</b> inside a client network, and <b>+ Network</b> above the map, to change the topology.</p>
+    setHTML("tab-host", `<h3>Pick a host</h3><p class="sub">Click any host on the map to see what it is: an attacker (and which attack) or a normal device. Before you press <b>Play</b> you can change roles, use the <b>Scenario…</b> menu, and use <b>+ host</b> / <b>− host</b> inside a client network and <b>+ Network</b> / <b>− Network</b> above the map to change the topology. <b>+ New run</b> always returns to the sample network.</p>
     <div class="help"><b>How to read the map.</b> Each client network has its own switch and hosts. An attacker host replays a slice of the <i>real captured attack</i> through the switches. After its first ${fmt(CFG.window)} packets the cascade (LightGBM classifier, then the client's autoencoder) judges the host and the controller installs a drop rule on the host's switch. ${STATIC ? "On this page the packets are not sent; each verdict is the real cascade output, computed in the project VM for that client's model and capture." : "Packets from a blocked host then show up as dropped counts on the real switch."}</div>`);
     return;
   }
@@ -254,7 +258,7 @@ function renderHostTab() {
   const roles = ["normal", ...CFG.classes], net = Number(selected.slice(1, selected.indexOf("h"))), host = CFG.hosts.find((x) => x.id === selected);
   const note = NET_NOTE[CFG.bundle_clients ? CFG.bundle_clients[net] : -1];
   let html = `<h3>${selected} <span class="sub">(client ${net}, ${host.ip})</span></h3>${note ? `<p class="sub" style="color:#b45309">⚠ This network's model ${note}.</p>` : ""}
-  <p class="sub">What should this host do?${ed ? "" : " (Roles can be changed when no host is running.)"}</p><div class="chips">` +
+  <p class="sub">${h.role === "idle" ? "This host does nothing." : h.role === "normal" ? "This host is a normal device." : "This host is an attacker: " + LONG(h.role) + "."} ${ed ? "Change its role:" : S.finished ? "This run is finished. Click + New run to change roles." : "Roles can be changed when no host is running."}</p><div class="chips">` +
     roles.map((r) => `<button class="chip ${r === "normal" ? "normal" : ""} ${h.role === r ? "sel" : ""}" data-role="${r}" ${ed ? "" : "disabled"}>${r === "normal" ? "Normal device" : LONG(r)}</button>`).join("") +
     `</div><div class="btnrow"><button class="btn go" id="btn-launch-one" ${ed && h.role !== "idle" ? "" : "disabled"}>Launch this host</button><button class="btn" id="btn-clear-one" ${ed ? "" : "disabled"}>Set idle</button></div>`;
   if (v) {
@@ -358,7 +362,7 @@ function localEmit(ev) { apply({ t: now(), ...ev }); render(); refreshTabs(); }
 async function setRole(host, role) { if (STATIC) { localEmit({ type: "role", host, role }); return; } await api("/api/role", { host, role }); await poll(); }
 async function launch(hosts) { if (STATIC) { simLaunch(hosts); return; } await api("/api/launch", { hosts }); await poll(); }
 async function topoChange(action, net) {
-  if (busyIds().length) return;
+  if (S.running || busyIds().length) return;
   if (STATIC) {
     const t = { ...S.topo };
     if (action === "add_host" && t[net] < CFG.max_hosts) t[net]++;
@@ -386,10 +390,21 @@ $("#preset").addEventListener("change", async (e) => {
 });
 $("#btn-boot").addEventListener("click", async () => { await api("/api/boot", {}); });
 $("#btn-launch").addEventListener("click", () => launch("all"));
-$("#btn-reset").addEventListener("click", async () => {
-  if (STATIC) { simTimers.forEach(clearTimeout); simTimers = []; localEmit({ type: "reset" }); selected = null; refreshTabs(true); return; }
-  await api("/api/reset", {}); selected = null; await poll(); refreshTabs(true);
-});
+async function newRun() {
+  if (S.running || busyIds().length) return;
+  simTimers.forEach(clearTimeout); simTimers = []; selected = null;
+  if (STATIC) {
+    localEmit({ type: "reset" });
+    localEmit({ type: "topology", nets: { ...DEFAULT_TOPO } });
+    for (const [h, r] of Object.entries(BASE_ROLES)) apply({ t: now(), type: "role", host: h, role: r });
+    S.narr = "New run: back to the sample network. Change roles or the topology, then press Play.";
+    render(true); refreshTabs(true); return;
+  }
+  await api("/api/reset", {});
+  for (const [h, r] of Object.entries(BASE_ROLES)) await api("/api/role", { host: h, role: r });
+  nextEv = 0; S = freshState(); mapSig = ""; await poll(); render(true); refreshTabs(true);
+}
+$("#btn-reset").addEventListener("click", newRun);
 $("#btn-addnet").addEventListener("click", () => topoChange("add_net", 0));
 $("#btn-rmnet").addEventListener("click", () => topoChange("remove_net", 0));
 document.querySelectorAll("#speedbar button").forEach((b) => b.addEventListener("click", () => setSpeed(Number(b.dataset.s))));
@@ -438,7 +453,9 @@ async function poll() {
   if (STATIC || mode !== "live") return;
   try {
     const d = await api(`/api/events?since=${nextEv}`);
+    const wasReady = CFG.boot === "ready";
     CFG.boot = d.boot.state;
+    if (d.boot.state === "ready" && !wasReady && !poll.baselined) { poll.baselined = true; await newRun(); return; }
     d.events.forEach(apply); nextEv = d.next;
     updateChrome(d.boot);
   } catch (e) { /* server restarting */ }
@@ -450,18 +467,20 @@ function updateChrome(boot) {
   p.className = "pill " + (boot.state === "ready" ? "ready" : boot.state === "error" ? "err" : boot.state === "off" ? "" : "busy");
   const ready = boot.state === "ready" && mode === "live";
   $("#btn-boot").disabled = boot.state !== "off" && boot.state !== "error";
-  $("#btn-launch").disabled = !ready || busyIds().length > 0 || !activeIds().some((id) => S.hosts[id] && S.hosts[id].phase === "armed");
-  $("#btn-reset").disabled = !ready;
-  ["#btn-addnet", "#btn-rmnet"].forEach((q) => ($(q).disabled = !ready || busyIds().length > 0));
+  $("#btn-launch").disabled = !canEdit() || !activeIds().some((id) => S.hosts[id] && S.hosts[id].phase === "armed");
+  $("#btn-reset").disabled = !ready || S.running || busyIds().length > 0;
+  ["#btn-addnet", "#btn-rmnet"].forEach((q) => ($(q).disabled = !canEdit()));
+  $("#preset").disabled = !canEdit();
   document.querySelectorAll("#speedbar button").forEach((b) => (b.disabled = !ready));
 }
 function updateStaticChrome() {
   if (mode !== "live") return;
-  const idle = !busyIds().length;
-  $("#btn-launch").disabled = !idle || !activeIds().some((id) => S.hosts[id] && S.hosts[id].phase === "armed");
-  $("#btn-reset").disabled = false;
-  $("#btn-addnet").disabled = !idle || nets().length >= CFG.max_nets;
-  $("#btn-rmnet").disabled = !idle || nets().length <= 1;
+  const ed = canEdit();
+  $("#btn-launch").disabled = !ed || !activeIds().some((id) => S.hosts[id] && S.hosts[id].phase === "armed");
+  $("#btn-reset").disabled = S.running || busyIds().length > 0;
+  $("#btn-addnet").disabled = !ed || nets().length >= CFG.max_nets;
+  $("#btn-rmnet").disabled = !ed || nets().length <= 1;
+  $("#preset").disabled = !ed;
   document.querySelectorAll("#speedbar button").forEach((b) => (b.disabled = false));
 }
 
@@ -487,7 +506,7 @@ function showBackButton() {
   const b = document.createElement("button"); b.id = "btn-back"; b.className = "btn primary"; b.textContent = STATIC ? "Back to simulator" : "Back to live";
   b.onclick = () => {
     clearInterval(replayTimer); mode = "live"; b.remove();
-    S = freshState(Object.fromEntries(Object.entries(CFG.topo || DEFAULT_TOPO).map(([k, v]) => [Number(k), v]))); S.speed = CFG.speed || 1; nextEv = 0; mapSig = "";
+    S = freshState(); for (const [h, r] of Object.entries(BASE_ROLES)) apply({ t: 0, type: "role", host: h, role: r }); S.narr = ""; nextEv = 0; mapSig = "";
     $("#mode").textContent = STATIC ? "SIMULATOR" : "LIVE"; $("#mode").className = "pill live";
     render(true); refreshTabs(true); updateSpeedUI(); if (STATIC) updateStaticChrome(); else poll();
   };
@@ -509,6 +528,8 @@ async function loadRecordings() {
   S = freshState(Object.fromEntries(Object.entries(CFG.topo || DEFAULT_TOPO).map(([k, v]) => [Number(k), v]))); S.speed = CFG.speed || 1;
   try { benchmark = await api("/api/benchmark"); } catch (e) { benchmark = null; }
   if (STATIC) { try { V = await (await fetch("verdicts.json")).json(); } catch (e) { V = null; } simT0 = performance.now(); }
+  S = freshState(); for (const [h, r] of Object.entries(BASE_ROLES)) apply({ t: 0, type: "role", host: h, role: r });
+  $("#build").textContent = BUILD;
   render(true); refreshTabs(true); await loadRecordings(); updateSpeedUI();
   if (STATIC) {
     ["#btn-boot", "#boot"].forEach((q) => ($(q).style.display = "none"));

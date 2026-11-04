@@ -396,6 +396,8 @@ def reset():
     BUSY.clear()
     for hid in ROLES:
         ROLES[hid] = "idle"
+    TOPO.clear()
+    TOPO.update({k: 3 for k in range(1, 6)})
     emit("reset")
     topo_event()
     emit("speed", value=SPEED)
