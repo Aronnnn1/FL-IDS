@@ -189,7 +189,7 @@ document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("cli
 
 function renderHostTab() {
   const box = $("#tab-host");
-  if (!selected) { box.innerHTML = `<h3>Pick a host</h3><p class="sub">Click any of the 15 hosts on the map. Choose what it should do, then launch it. You can also use <b>Scenario…</b> at the top to fill the whole network.</p>
+  if (!selected) { box.innerHTML = `<h3>Pick a host</h3><p class="sub">Click any of the 15 hosts on the map. ${STATIC ? "Its verdict from the recorded run appears here." : "Choose what it should do, then launch it. You can also use <b>Scenario…</b> at the top to fill the whole network."}</p>
     <div class="help"><b>How to read the map.</b> Each client network has its own switch and three hosts. An attacker host replays a slice of the <i>real captured attack</i> through the switches. After its first ${fmt(CFG.window)} packets the cascade (LightGBM classifier, then the client's autoencoder) judges the host and the controller installs a drop rule on the host's switch. Packets from a blocked host then show up as dropped counts on the real switch.</div>`; return; }
   const h = H(selected), busy = ["sending", "analysing"].includes(h.phase), v = h.verdict, m = h.mit;
   const canEdit = mode === "live" && !busy && CFG.boot === "ready";
@@ -243,7 +243,7 @@ function renderResults() {
 function renderFeed() { $("#tab-feed").innerHTML = `<h3>What is happening, step by step</h3><div class="feed">${S.feed.join("") || '<p class="sub">Nothing yet.</p>'}</div>`; }
 
 function renderSwitch() {
-  const rows = Object.entries(switchRules).map(([id, r]) => `<tr><td><b>${id}</b></td><td>switch s${(CFG.hosts.find((x) => x.id === id).client) + 1}</td><td><code>ipv4_src=${r.ip} → ${r.actions}</code></td><td>${fmt(r.packets)}</td></tr>`).join("");
+  const rows = Object.values(S.hosts).filter((h) => h.mit && h.mit.action === "block").map((h) => `<tr><td><b>${h.id}</b></td><td>switch s${Number(h.id[1]) + 1}</td><td><code>ipv4_src=${CFG.hosts.find((x) => x.id === h.id).ip} → drop</code></td><td>${fmt(h.dropped || 0)}</td></tr>`).join("");
   $("#tab-switch").innerHTML = `<h3>Rules the controller has installed</h3>
   <p class="sub">Read live from the Open vSwitch flow tables over OpenFlow, not from what the bridge believes it sent.</p>
   <table><tr><th>Host</th><th>Where</th><th>Rule</th><th>Packets hit</th></tr>${rows || '<tr><td colspan="4" class="sub">No mitigation rules yet.</td></tr>'}</table>
@@ -281,7 +281,17 @@ function refreshTabs() {
 }
 
 // ---------------------------------------------------------------- API
+const STATIC = !!window.ARENA_STATIC;
+async function staticApi(path) {
+  if (path.startsWith("/api/config")) return (await fetch("config.json")).json();
+  if (path === "/api/recordings") return (await fetch("recordings/index.json")).json();
+  if (path.startsWith("/api/recordings/")) return (await fetch("recordings/" + path.split("/").pop())).json();
+  if (path === "/api/benchmark") return (await fetch("window_benchmark.json")).json();
+  if (path.startsWith("/api/events")) return { events: [], next: 0, boot: { state: "static", message: "Recorded runs" }, busy: [] };
+  return {};
+}
 async function api(path, body) {
+  if (STATIC) return staticApi(path);
   const r = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {});
   return r.json();
 }
@@ -341,12 +351,12 @@ async function playRecording(name) {
     const now = (performance.now() - t0) / 1000;
     while (i < evs.length && evs[i].t <= now) apply(evs[i++]);
     render(); refreshTabs();
-    if (i >= evs.length) { clearInterval(replayTimer); S.narr = "Replay finished. Click Back to live to return."; render(); showBackButton(); }
+    if (i >= evs.length) { clearInterval(replayTimer); S.narr = "Replay finished. Choose another run, or click a host to see its verdict."; render(); showBackButton(); }
   }, 100);
   showBackButton();
 }
 function showBackButton() {
-  if ($("#btn-back")) return;
+  if (STATIC || $("#btn-back")) return;
   const b = document.createElement("button"); b.id = "btn-back"; b.className = "btn primary"; b.textContent = "Back to live";
   b.onclick = () => { clearInterval(replayTimer); mode = "live"; b.remove(); $("#mode").textContent = "LIVE"; $("#mode").className = "pill live"; S = freshState(); nextEv = 0; poll(); };
   $(".actions").prepend(b);
@@ -361,7 +371,14 @@ async function loadRecordings() {
 (async function init() {
   CFG = await api("/api/config"); CFG.boot = CFG.boot.state;
   try { benchmark = await api("/api/benchmark"); } catch (e) { benchmark = null; }
-  buildMap(); refreshTabs(); loadRecordings();
+  buildMap(); refreshTabs(); await loadRecordings();
+  if (STATIC) {
+    ["#btn-boot", "#preset", "#btn-launch", "#btn-reset"].forEach((q) => ($(q).style.display = "none"));
+    $("#boot").style.display = "none";
+    const opts = [...document.querySelectorAll("#rec option")].map((o) => o.value).filter(Boolean);
+    const first = opts.find((n) => n.includes("14attack")) || opts[0];
+    if (first) playRecording(first);
+  }
   setInterval(poll, 450); setInterval(loadRecordings, 8000);
   requestAnimationFrame(frame); poll();
 })();
