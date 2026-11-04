@@ -3,15 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FL-IDS Live Arena</title>
-<link rel="stylesheet" href="/static/style.css?v=4">
+<title>FL-IDS Arena</title>
+<link rel="stylesheet" href="/static/style.css?v=5">
 </head>
 <body>
 <header>
-  <div class="brand">
-    <div class="logo">FL</div>
-    <div><h1>FL-IDS Live Arena</h1><p>Federated intrusion detection with SDN mitigation, running live</p></div>
-  </div>
+  <div class="brand"><span class="logo">FL-IDS<b>.</b></span><h1>Live arena</h1></div>
   <div class="actions">
     <span id="mode" class="pill live">LIVE</span>
     <span id="boot" class="pill">Network off</span>
@@ -22,7 +19,7 @@
       <option value="all14">All 14 attack types (rest normal)</option>
       <option value="normal">All hosts normal (false-alarm check)</option>
     </select>
-    <button id="btn-launch" class="btn go" disabled>▶ Play</button>
+    <button id="btn-launch" class="btn go" disabled>Play</button>
     <button id="btn-reset" class="btn" disabled>+ New run</button>
     <select id="rec" class="btn" title="Replay a saved run"><option value="">Replay a saved run…</option></select>
   </div>
@@ -63,6 +60,6 @@
     <div id="tab-bench" class="tabpane"></div>
   </aside>
 </main>
-<script src="/static/app.js?v=4"></script>
+<script src="/static/app.js?v=5"></script>
 </body>
 </html>

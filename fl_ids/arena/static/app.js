@@ -5,16 +5,17 @@ const SHORT = { normal: "Normal", idle: "Idle", Backdoor: "Backdoor", DDoS_HTTP:
   DDoS_UDP: "DDoS UDP", Fingerprinting: "Fingerprint", MITM: "MITM", Password: "Password", Port_Scanning: "Port scan",
   Ransomware: "Ransomware", SQL_injection: "SQL inj.", Uploading: "Uploading", Vulnerability_scanner: "Vuln. scan", XSS: "XSS", anomalous: "Anomalous", benign: "Normal" };
 const LONG = (s) => (s || "").replace(/_/g, " ");
-const C = { idle: "#9aa8bd", send: "#2e75b6", ana: "#e69b00", ok: "#16a34a", bad: "#dc2626", miss: "#7c3aed", warn: "#ea580c" };
+const C = { idle: "#A3A3A0", send: "#0A0A0A", ana: "#E0A100", ok: "#1F7A4D", bad: "#F03C4A", miss: "#0F6E7A", warn: "#8A5A00" };
 const NS = "http://www.w3.org/2000/svg";
 const $ = (s) => document.querySelector(s);
 const fmt = (n) => Number(n).toLocaleString("en-US");
+const fmtK = (n) => (n >= 1000 ? (n / 1000).toFixed(1) + "k" : fmt(n));
 const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
 const DEFAULT_TOPO = { 1: 3, 2: 3, 3: 3, 4: 3, 5: 3 };
 // The sample network every run starts from. "+ New run" always returns to exactly this.
 const BASE_ROLES = { c1h1: "SQL_injection", c1h2: "normal", c1h3: "normal", c2h1: "DDoS_UDP", c2h2: "normal", c2h3: "Password", c3h1: "Backdoor", c3h2: "normal", c3h3: "XSS",
   c4h1: "normal", c4h2: "Ransomware", c4h3: "Port_Scanning", c5h1: "normal", c5h2: "Uploading", c5h3: "DDoS_HTTP" };
-const BUILD = "build 4 Nov, v4";
+const BUILD = "build 4 Nov, v5";
 const NET_NOTE = { 9: "model flags about 22% of its own normal traffic (near the 25% rule)", 0: "calibrated on only 224 normal rows" };
 
 let CFG = null, V = null, S = freshState(), mode = "live", nextEv = 0, selected = null, replayTimer = null, benchmark = null, simT0 = 0, simTimers = [];
@@ -68,7 +69,7 @@ function hostStatus(h) {
     const attackTruth = v.truth !== "normal";
     if (m.action === "block") return attackTruth ? { t: "BLOCKED", c: C.bad } : { t: "FALSE ALARM", c: C.warn };
     if (m.action === "rate_limit") return { t: "RATE-LIMITED", c: C.warn };
-    return attackTruth ? { t: v.is_attack ? "NOT BLOCKED" : "MISSED", c: C.miss } : { t: "ALLOWED ✓", c: C.ok };
+    return attackTruth ? { t: v.is_attack ? "NOT BLOCKED" : "MISSED", c: C.miss } : { t: "ALLOWED", c: C.ok };
   }
   if (h.phase === "analysing") return { t: "ANALYSING", c: C.ana };
   if (h.phase === "sending") return { t: h.source === "dataset" ? "SCORING" : "SENDING", c: C.send };
@@ -124,38 +125,38 @@ function buildMap() {
   svg.setAttribute("viewBox", `0 0 ${L.W} ${L.H}`);
   svg.innerHTML = "";
   const g = el("g", {}, svg);
-  el("line", { x1: L.coreX, y1: L.ctrlY + 24, x2: L.coreX, y2: L.coreY - 20, stroke: "#9aa8bd", "stroke-width": 2, "stroke-dasharray": "5 5" }, g);
-  text(g, L.coreX + 78, 100, "OpenFlow control", { "font-size": 13, fill: "#5b6b85", "text-anchor": "start" });
+  el("line", { x1: L.coreX, y1: L.ctrlY + 24, x2: L.coreX, y2: L.coreY - 20, stroke: "#A3A3A0", "stroke-width": 2, "stroke-dasharray": "5 5" }, g);
+  text(g, L.coreX + 78, 100, "OpenFlow control", { "font-size": 13, fill: "#5C5C58", "text-anchor": "start" });
   const row1 = Object.values(L.nets).filter((n) => n.r === 1);
   const busY1 = row1.length ? Math.min(...row1.map((n) => n.swY)) - 52 : 0;
   if (row1.length) {
     const xs = row1.map((n) => n.cx);
-    el("line", { x1: L.coreX, y1: L.coreY + 20, x2: L.coreX, y2: busY1, stroke: "#b8c4d8", "stroke-width": 3 }, g);
-    el("line", { x1: Math.min(...xs), y1: busY1, x2: Math.max(...xs), y2: busY1, stroke: "#b8c4d8", "stroke-width": 3 }, g);
+    el("line", { x1: L.coreX, y1: L.coreY + 20, x2: L.coreX, y2: busY1, stroke: "#CFCFCA", "stroke-width": 3 }, g);
+    el("line", { x1: Math.min(...xs), y1: busY1, x2: Math.max(...xs), y2: busY1, stroke: "#CFCFCA", "stroke-width": 3 }, g);
   }
   const c = el("g", {}, g);
-  el("rect", { x: L.coreX - 170, y: L.ctrlY - 26, width: 340, height: 52, rx: 12, fill: "#1f3864" }, c);
+  el("rect", { x: L.coreX - 170, y: L.ctrlY - 26, width: 340, height: 52, rx: 12, fill: "#0A0A0A" }, c);
   text(c, L.coreX, L.ctrlY - 3, "SDN controller + mitigation bridge", { fill: "#fff", "font-size": 16, "font-weight": 700 });
-  text(c, L.coreX, L.ctrlY + 15, "installs drop / rate-limit rules", { fill: "#cadcfc", "font-size": 12.5 });
-  el("rect", { x: L.coreX - 90, y: L.coreY - 21, width: 180, height: 42, rx: 10, fill: "#e8eefb", stroke: "#2e75b6", "stroke-width": 2 }, g);
-  text(g, L.coreX, L.coreY + 5, "Core switch", { "font-size": 15, "font-weight": 700, fill: "#1f3864" });
+  text(c, L.coreX, L.ctrlY + 15, "installs drop / rate-limit rules", { fill: "#A3A3A0", "font-size": 12.5 });
+  el("rect", { x: L.coreX - 90, y: L.coreY - 21, width: 180, height: 42, rx: 10, fill: "#EBEBE8", stroke: "#0A0A0A", "stroke-width": 2 }, g);
+  text(g, L.coreX, L.coreY + 5, "Core switch", { "font-size": 15, "font-weight": 700, fill: "#0A0A0A" });
   L.ns.forEach((k) => {
     const { cx, swY, r } = L.nets[k], n = S.topo[k];
-    if (r === 0) el("line", { x1: L.coreX, y1: L.coreY + 21, x2: cx, y2: swY - 18, stroke: "#b8c4d8", "stroke-width": 3 }, g);
-    else el("line", { x1: cx, y1: busY1, x2: cx, y2: swY - 18, stroke: "#b8c4d8", "stroke-width": 3 }, g);
+    if (r === 0) el("line", { x1: L.coreX, y1: L.coreY + 21, x2: cx, y2: swY - 18, stroke: "#CFCFCA", "stroke-width": 3 }, g);
+    else el("line", { x1: cx, y1: busY1, x2: cx, y2: swY - 18, stroke: "#CFCFCA", "stroke-width": 3 }, g);
     const bx = cx - L.boxW / 2, by = swY + 36;
-    el("rect", { x: bx, y: by, width: L.boxW, height: L.boxH, rx: 16, fill: "#f4f7fb", stroke: "#dbe3ef", "stroke-width": 1.5 }, g);
-    el("rect", { x: cx - 58, y: swY - 18, width: 116, height: 36, rx: 9, fill: "#e8eefb", stroke: "#2e75b6", "stroke-width": 1.5 }, g);
-    text(g, cx, swY + 5, `Switch s${k + 1}`, { "font-size": 14, "font-weight": 600, fill: "#1f3864" });
-    for (let j = 1; j <= n; j++) { const p = hostPos[`c${k}h${j}`]; el("line", { x1: p.x, y1: p.y - 26, x2: cx, y2: swY + 18, stroke: "#b8c4d8", "stroke-width": 2, id: `link-c${k}h${j}` }, g); }
-    text(g, cx, by + L.boxH - 42, `Client ${k} network · ${n} host${n > 1 ? "s" : ""}`, { "font-size": 16, "font-weight": 700, fill: "#14213d" });
+    el("rect", { x: bx, y: by, width: L.boxW, height: L.boxH, rx: 16, fill: "#EBEBE8", stroke: "#D6D6D2", "stroke-width": 1.5 }, g);
+    el("rect", { x: cx - 58, y: swY - 18, width: 116, height: 36, rx: 9, fill: "#EBEBE8", stroke: "#0A0A0A", "stroke-width": 1.5 }, g);
+    text(g, cx, swY + 5, `Switch s${k + 1}`, { "font-size": 14, "font-weight": 600, fill: "#0A0A0A" });
+    for (let j = 1; j <= n; j++) { const p = hostPos[`c${k}h${j}`]; el("line", { x1: p.x, y1: p.y - 26, x2: cx, y2: swY + 18, stroke: "#CFCFCA", "stroke-width": 2, id: `link-c${k}h${j}` }, g); }
+    text(g, cx, by + L.boxH - 42, `Client ${k} network · ${n} host${n > 1 ? "s" : ""}`, { "font-size": 16, "font-weight": 700, fill: "#0A0A0A" });
     const note = NET_NOTE[CFG.bundle_clients ? CFG.bundle_clients[k] : -1];
-    text(g, cx, by + L.boxH - 24, note ? "⚠ " + note : "own model scaler + threshold", { "font-size": 11.5, fill: note ? "#b45309" : "#5b6b85" });
+    text(g, cx, by + L.boxH - 24, note ? note : "own model scaler + threshold", { "font-size": 11.5, fill: note ? "#8A5A00" : "#5C5C58" });
     const editable = canEdit();
     const btn = (x, label, act, ok) => {
       const b = el("g", { style: `cursor:${ok ? "pointer" : "not-allowed"}`, opacity: ok ? 1 : 0.35 }, g);
-      el("rect", { x: x - 24, y: by + L.boxH - 19, width: 48, height: 17, rx: 8.5, fill: "#fff", stroke: "#9aa8bd" }, b);
-      text(b, x, by + L.boxH - 6.5, label, { "font-size": 11.5, "font-weight": 700, fill: "#1f3864" });
+      el("rect", { x: x - 24, y: by + L.boxH - 19, width: 48, height: 17, rx: 8.5, fill: "#fff", stroke: "#A3A3A0" }, b);
+      text(b, x, by + L.boxH - 6.5, label, { "font-size": 11.5, "font-weight": 700, fill: "#0A0A0A" });
       if (ok) b.addEventListener("click", (e) => { e.stopPropagation(); topoChange(act, k); });
     };
     btn(bx + 34, "+ host", "add_host", editable && n < (CFG.max_hosts || 5));
@@ -180,26 +181,26 @@ function render(force) {
     const g = el("g", { class: "host", transform: `translate(${p.x},${p.y})` }, layer);
     g.addEventListener("click", () => { selected = id; activateTab("host"); refreshTabs(true); render(); });
     if (h.phase === "sending") el("circle", { class: "ring", cx: 0, cy: 0, r: 28, stroke: col }, g);
-    if (selected === id) el("circle", { cx: 0, cy: 0, r: 33, fill: "none", stroke: "#1f3864", "stroke-width": 2, "stroke-dasharray": "4 4" }, g);
+    if (selected === id) el("circle", { cx: 0, cy: 0, r: 33, fill: "none", stroke: "#0A0A0A", "stroke-width": 2, "stroke-dasharray": "4 4" }, g);
     el("circle", { class: "body", cx: 0, cy: 0, r: 25, fill: h.phase === "idle" ? "#fff" : col, stroke: col, "stroke-width": 3 }, g);
     const mono = h.phase === "idle" ? C.idle : "#fff";
     el("rect", { x: -11, y: -10, width: 22, height: 15, rx: 2.5, fill: "none", stroke: mono, "stroke-width": 2 }, g);
     el("line", { x1: -6, y1: 10, x2: 6, y2: 10, stroke: mono, "stroke-width": 2 }, g);
     if (h.phase === "analysing") el("circle", { class: "spin", cx: 0, cy: 0, r: 31, fill: "none", stroke: C.ana, "stroke-width": 3, "stroke-dasharray": "22 60" }, g);
-    if (h.mit && h.mit.action === "block") { el("circle", { cx: 18, cy: -18, r: 10, fill: C.bad, stroke: "#fff", "stroke-width": 2 }, g); text(g, 18, -13.5, "✖", { fill: "#fff", "font-size": 12, "font-weight": 700 }); }
-    text(g, 0, 45, id, { "font-size": 14, "font-weight": 700, fill: "#14213d" });
+    if (h.mit && h.mit.action === "block") { el("circle", { cx: 18, cy: -18, r: 10, fill: C.bad, stroke: "#fff", "stroke-width": 2 }, g); text(g, 18, -13.5, "×", { fill: "#fff", "font-size": 12, "font-weight": 700 }); }
+    text(g, 0, 45, id, { class: "mono", "font-size": 13, "font-weight": 600, fill: "#0A0A0A" });
     const label = SHORT[h.role] || h.role, w = Math.max(50, label.length * 6.2 + 12);
-    el("rect", { x: -w / 2, y: 52, width: w, height: 19, rx: 9.5, fill: h.role === "idle" ? "#edf1f7" : h.role === "normal" ? "#dcfce7" : "#fee2e2" }, g);
-    text(g, 0, 65.5, label, { "font-size": 11.5, "font-weight": 600, fill: h.role === "idle" ? "#7a889e" : h.role === "normal" ? "#166534" : "#991b1b" });
+    el("rect", { x: -w / 2, y: 52, width: w, height: 19, rx: 9.5, fill: h.role === "idle" ? "#EBEBE8" : h.role === "normal" ? "#DCEBE2" : "#FBD9DC" }, g);
+    text(g, 0, 65.5, label, { "font-size": 11.5, "font-weight": 600, fill: h.role === "idle" ? "#5C5C58" : h.role === "normal" ? "#1F7A4D" : "#C42B38" });
     if (st.t) text(g, 0, 87, st.t, { "font-size": 12, "font-weight": 700, fill: st.c });
     if (h.phase === "sending" && h.total) {
-      el("rect", { x: -30, y: 93, width: 60, height: 6, rx: 3, fill: "#e6ecf5" }, g);
+      el("rect", { x: -30, y: 93, width: 60, height: 6, rx: 3, fill: "#E0E0DC" }, g);
       el("rect", { x: -30, y: 93, width: Math.max(1, 60 * Math.min(1, h.packets / h.total)), height: 6, rx: 3, fill: C.send }, g);
     } else if (h.verdict) {
-      text(g, 0, 102, h.mit && h.mit.action === "block" && h.dropped ? `dropped ${fmt(h.dropped)}` : `${pct(h.verdict.confidence, 0)} conf.`, { "font-size": 11.5, fill: "#5b6b85" });
+      text(g, 0, 102, h.mit && h.mit.action === "block" && h.dropped ? `dropped ${fmtK(h.dropped)}` : `${pct(h.verdict.confidence, 0)} conf.`, { "font-size": 11.5, fill: "#5C5C58" });
     }
     const lk = $(`#link-${id}`);
-    if (lk) { const blocked = h.mit && h.mit.action === "block"; lk.setAttribute("stroke", blocked ? C.bad : h.phase === "sending" ? C.send : "#b8c4d8"); lk.setAttribute("stroke-dasharray", blocked ? "6 5" : ""); lk.setAttribute("stroke-width", blocked || h.phase === "sending" ? 3 : 2); }
+    if (lk) { const blocked = h.mit && h.mit.action === "block"; lk.setAttribute("stroke", blocked ? C.bad : h.phase === "sending" ? C.send : "#CFCFCA"); lk.setAttribute("stroke-dasharray", blocked ? "6 5" : ""); lk.setAttribute("stroke-width", blocked || h.phase === "sending" ? 3 : 2); }
   }
   $("#narr").textContent = S.narr || defaultNarr();
 }
@@ -257,7 +258,7 @@ function renderHostTab() {
   const h = H(selected), v = h.verdict, m = h.mit, ed = canEdit();
   const roles = ["normal", ...CFG.classes], net = Number(selected.slice(1, selected.indexOf("h"))), host = CFG.hosts.find((x) => x.id === selected);
   const note = NET_NOTE[CFG.bundle_clients ? CFG.bundle_clients[net] : -1];
-  let html = `<h3>${selected} <span class="sub">(client ${net}, ${host.ip})</span></h3>${note ? `<p class="sub" style="color:#b45309">⚠ This network's model ${note}.</p>` : ""}
+  let html = `<h3>${selected} <span class="sub">(client ${net}, ${host.ip})</span></h3>${note ? `<p class="sub" style="color:#8A5A00">Note: this network's model ${note}.</p>` : ""}
   <p class="sub">${h.role === "idle" ? "This host does nothing." : h.role === "normal" ? "This host is a normal device." : "This host is an attacker: " + LONG(h.role) + "."} ${ed ? "Change its role:" : S.finished ? "This run is finished. Click + New run to change roles." : "Roles can be changed when no host is running."}</p><div class="chips">` +
     roles.map((r) => `<button class="chip ${r === "normal" ? "normal" : ""} ${h.role === r ? "sel" : ""}" data-role="${r}" ${ed ? "" : "disabled"}>${r === "normal" ? "Normal device" : LONG(r)}</button>`).join("") +
     `</div><div class="btnrow"><button class="btn go" id="btn-launch-one" ${ed && h.role !== "idle" ? "" : "disabled"}>Launch this host</button><button class="btn" id="btn-clear-one" ${ed ? "" : "disabled"}>Set idle</button></div>`;
