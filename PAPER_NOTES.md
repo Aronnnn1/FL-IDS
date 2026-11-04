@@ -1769,7 +1769,8 @@ No new experiment. `deliverables/report/` was reorganised to the mandatory seven
 - *Updated*: cover title (SDN-enabled IoT title), abstract and conclusion (full-pool headline numbers instead of the 60k ones), class split of the final 1,985,768 rows (Table in 5.2), hardware (VMware VM, 20 vCPUs, 48 GB), test count.
 - *Tests re-run for the report* (`pytest -q`, 2026-11-03): 244 passed, 1 skipped (a test needing the authors' CSV next to the captures), 462.9 s.
 - *Work Plan dates* (added 2026-11-03): the owner gave the outline (work started January 2026; literature survey and problem, then novelty, then a comparison of many ML and DL models, then the build, finished 3 November 2026). The month-level periods in Table 1.1 are the owner-approved estimates of that outline, not logged timestamps; only the late-October to 3 November phases are backed by commit and run dates.
-- *Open*: Plagiarism and AI-content reports still to be attached. Figures 4.1 and 4.3 are drawn in TikZ in the report source.
+- *Plagiarism reports attached* (2026-11-04): DrillBit similarity 4% and AI-generated text 1.06% on the 90-page version (submission 7421657); the similarity page and page 1 of the AI report are included in the report after the references (deliverables/report/similarity_report.pdf, ai_report_p1.pdf).
+- *Open*: Figures 4.1 and 4.3 are drawn in TikZ in the report source.
 
 ### 8.18 Live arena for the final presentation (2026-11-04)
 No change to the models. `fl_ids/arena/` adds an interactive demo: 5 client networks x 3 hosts on a core switch, the existing controller and bridge, a web UI (`tools/run_arena.sh`, port 8090). Attack hosts replay real capture slices through the switches; each host is judged on its first window of packets and blocked through the bridge. Findings that qualify what the demo shows:

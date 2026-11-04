@@ -19,6 +19,7 @@
 \usepackage{float}
 \usepackage{array}
 \usepackage{longtable}
+\usepackage{pdfpages}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,fit}
 \setcounter{secnumdepth}{3}
@@ -205,8 +206,10 @@ Finally, we thank our families and friends for their constant support.
 \clearpage
 \chapter*{Plagiarism}
 \addcontentsline{toc}{chapter}{PLAGIARISM}
-The similarity report and the AI-generated-content report are to be attached here after the similarity check.
+The similarity check and the AI-generated-content check of this report were run with the DrillBit software (submission ID 7421657, 4 November 2026) on the 90-page version of the report. The similarity index is 4\% and the AI-generated text detected is 1.06\%. The two report pages follow.
 \clearpage
+\includepdf[pages=1,scale=0.92,pagecommand={\thispagestyle{empty}}]{similarity_report.pdf}
+\includepdf[pages=1,scale=0.92,pagecommand={\thispagestyle{empty}}]{ai_report_p1.pdf}
 
 % ----- Appendices -----
 \appendix
