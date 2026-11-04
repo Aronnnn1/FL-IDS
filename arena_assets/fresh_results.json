@@ -1,0 +1,542 @@
+{
+ "DDoS_HTTP": {
+  "packets": 3000,
+  "verdicts": [
+   {
+    "client": 1,
+    "label": "Backdoor",
+    "is_attack": true,
+    "confidence": 0.935,
+    "share": 0.577,
+    "stage": "boosting"
+   },
+   {
+    "client": 2,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 3,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 7,
+    "label": "Backdoor",
+    "is_attack": true,
+    "confidence": 0.935,
+    "share": 0.636,
+    "stage": "boosting"
+   },
+   {
+    "client": 8,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   }
+  ]
+ },
+ "DDoS_ICMP": {
+  "packets": 3000,
+  "verdicts": [
+   {
+    "client": 1,
+    "label": "DDoS_ICMP",
+    "is_attack": true,
+    "confidence": 0.997,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 2,
+    "label": "DDoS_ICMP",
+    "is_attack": true,
+    "confidence": 0.997,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 3,
+    "label": "DDoS_ICMP",
+    "is_attack": true,
+    "confidence": 0.997,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 7,
+    "label": "DDoS_ICMP",
+    "is_attack": true,
+    "confidence": 0.997,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 8,
+    "label": "DDoS_ICMP",
+    "is_attack": true,
+    "confidence": 0.997,
+    "share": 1.0,
+    "stage": "boosting"
+   }
+  ]
+ },
+ "DDoS_TCP": {
+  "packets": 3000,
+  "verdicts": [
+   {
+    "client": 1,
+    "label": "Port_Scanning",
+    "is_attack": true,
+    "confidence": 0.953,
+    "share": 0.852,
+    "stage": "boosting"
+   },
+   {
+    "client": 2,
+    "label": "Port_Scanning",
+    "is_attack": true,
+    "confidence": 0.953,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 3,
+    "label": "Port_Scanning",
+    "is_attack": true,
+    "confidence": 0.953,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 7,
+    "label": "Port_Scanning",
+    "is_attack": true,
+    "confidence": 0.953,
+    "share": 0.852,
+    "stage": "boosting"
+   },
+   {
+    "client": 8,
+    "label": "Port_Scanning",
+    "is_attack": true,
+    "confidence": 0.953,
+    "share": 1.0,
+    "stage": "boosting"
+   }
+  ]
+ },
+ "DDoS_UDP": {
+  "packets": 3000,
+  "verdicts": [
+   {
+    "client": 1,
+    "label": "benign",
+    "is_attack": false,
+    "confidence": 0.997,
+    "share": 0.003,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 2,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 3,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 7,
+    "label": "benign",
+    "is_attack": false,
+    "confidence": 0.997,
+    "share": 0.003,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 8,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   }
+  ]
+ },
+ "Fingerprinting": {
+  "packets": 4,
+  "verdicts": [
+   {
+    "client": 1,
+    "label": "benign",
+    "is_attack": false,
+    "confidence": 1.0,
+    "share": 0.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 2,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 0.369,
+    "share": 0.5,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 3,
+    "label": "benign",
+    "is_attack": false,
+    "confidence": 1.0,
+    "share": 0.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 7,
+    "label": "benign",
+    "is_attack": false,
+    "confidence": 1.0,
+    "share": 0.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 8,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 0.613,
+    "share": 0.5,
+    "stage": "autoencoder"
+   }
+  ]
+ },
+ "Normal": {
+  "packets": 3000,
+  "verdicts": [
+   {
+    "client": 1,
+    "label": "Backdoor",
+    "is_attack": true,
+    "confidence": 0.932,
+    "share": 0.604,
+    "stage": "boosting"
+   },
+   {
+    "client": 2,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 3,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 7,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 0.593,
+    "share": 0.733,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 8,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   }
+  ]
+ },
+ "Password": {
+  "packets": 3000,
+  "verdicts": [
+   {
+    "client": 1,
+    "label": "Ransomware",
+    "is_attack": true,
+    "confidence": 0.958,
+    "share": 0.986,
+    "stage": "boosting"
+   },
+   {
+    "client": 2,
+    "label": "Ransomware",
+    "is_attack": true,
+    "confidence": 0.958,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 3,
+    "label": "Ransomware",
+    "is_attack": true,
+    "confidence": 0.958,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 7,
+    "label": "Ransomware",
+    "is_attack": true,
+    "confidence": 0.958,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 8,
+    "label": "Ransomware",
+    "is_attack": true,
+    "confidence": 0.958,
+    "share": 1.0,
+    "stage": "boosting"
+   }
+  ]
+ },
+ "Port_Scanning": {
+  "packets": 9,
+  "verdicts": [
+   {
+    "client": 1,
+    "label": "benign",
+    "is_attack": false,
+    "confidence": 1.0,
+    "share": 0.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 2,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 0.385,
+    "share": 0.778,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 3,
+    "label": "benign",
+    "is_attack": false,
+    "confidence": 1.0,
+    "share": 0.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 7,
+    "label": "benign",
+    "is_attack": false,
+    "confidence": 1.0,
+    "share": 0.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 8,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 0.64,
+    "share": 0.778,
+    "stage": "autoencoder"
+   }
+  ]
+ },
+ "SQL_injection": {
+  "packets": 3000,
+  "verdicts": [
+   {
+    "client": 1,
+    "label": "XSS",
+    "is_attack": true,
+    "confidence": 0.987,
+    "share": 0.999,
+    "stage": "boosting"
+   },
+   {
+    "client": 2,
+    "label": "XSS",
+    "is_attack": true,
+    "confidence": 0.987,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 3,
+    "label": "XSS",
+    "is_attack": true,
+    "confidence": 0.987,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 7,
+    "label": "XSS",
+    "is_attack": true,
+    "confidence": 0.987,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 8,
+    "label": "XSS",
+    "is_attack": true,
+    "confidence": 0.987,
+    "share": 1.0,
+    "stage": "boosting"
+   }
+  ]
+ },
+ "Uploading": {
+  "packets": 3000,
+  "verdicts": [
+   {
+    "client": 1,
+    "label": "Uploading",
+    "is_attack": true,
+    "confidence": 0.98,
+    "share": 0.999,
+    "stage": "boosting"
+   },
+   {
+    "client": 2,
+    "label": "Uploading",
+    "is_attack": true,
+    "confidence": 0.98,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 3,
+    "label": "Uploading",
+    "is_attack": true,
+    "confidence": 0.98,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 7,
+    "label": "Uploading",
+    "is_attack": true,
+    "confidence": 0.98,
+    "share": 1.0,
+    "stage": "boosting"
+   },
+   {
+    "client": 8,
+    "label": "Uploading",
+    "is_attack": true,
+    "confidence": 0.98,
+    "share": 1.0,
+    "stage": "boosting"
+   }
+  ]
+ },
+ "Vulnerability_scanner": {
+  "packets": 3000,
+  "verdicts": [
+   {
+    "client": 1,
+    "label": "Backdoor",
+    "is_attack": true,
+    "confidence": 0.934,
+    "share": 0.64,
+    "stage": "boosting"
+   },
+   {
+    "client": 2,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 3,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 7,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 0.871,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 8,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   }
+  ]
+ },
+ "XSS": {
+  "packets": 2402,
+  "verdicts": [
+   {
+    "client": 1,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 2,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 3,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 7,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 0.993,
+    "share": 1.0,
+    "stage": "autoencoder"
+   },
+   {
+    "client": 8,
+    "label": "anomalous",
+    "is_attack": true,
+    "confidence": 1.0,
+    "share": 1.0,
+    "stage": "autoencoder"
+   }
+  ]
+ }
+}
