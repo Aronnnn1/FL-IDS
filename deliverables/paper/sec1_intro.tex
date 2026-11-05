@@ -1,0 +1,79 @@
+\section{Introduction}
+\label{sec:intro}
+Machine-learning intrusion detection for IoT and industrial IoT (IIoT) networks usually assumes that traffic from every site can be pooled in one place. The operators of a plant floor, a hospital wing or a building network often cannot send packet data off-site, for privacy, contractual or bandwidth reasons. Federated learning (FL)~\cite{mcmahan2017} avoids the transfer: each site trains on its own traffic and shares only model parameters. FL-based intrusion detection is by now an established area with its own systematic review~\cite{hernandez2025}, so a federated detector on its own is not a contribution. A system that could be deployed still has to deal with five problems at once.
+
+\textbf{1. Known and unknown attacks.} A supervised classifier names only the classes it was trained on. A new attack type is assigned to its nearest known class or to benign. An unsupervised detector flags departures from benign traffic, but cannot say what kind of attack it found.
+
+\textbf{2. Poisoned updates.} Any site in a federation can send any update it likes. Byzantine-robust aggregation~\cite{blanchard2017,yin2018,cao2021fltrust} limits the damage, but its performance drops when site data are non-IID~\cite{li2024experimental}, which is the normal case for IoT, because honest heterogeneous sites and attackers both look like outliers.
+
+\textbf{3. Enforcement.} A detection that nobody acts on does not stop the attack. Software-defined networking (SDN)~\cite{mckeown2008} provides a programmable point of enforcement.
+
+\textbf{4. Data integrity.} Results on a public dataset are only as sound as its released files. Preprocessing artifacts that encode the label make published numbers unreliable~\cite{galal2026,arp2022,engelen2021}.
+
+\textbf{5. Evaluation scale and leakage.} Packets of one connection share much of their information. A test set that contains packets from connections also seen in training rewards memorising connections, and evaluations on small subsamples hide how a federated system behaves with realistic data volumes.
+
+This paper describes FL-IDS, a system built to address all five in one pipeline, and reports what each part contributes when measured on its own. A LightGBM~\cite{ke2017} classifier labels known attack types first. Traffic it labels benign, or labels as an attack with low confidence, passes to an autoencoder at the site, whose reconstruction error flags anything unlike benign traffic. This ordering follows a centralised two-stage design by Zhang et al.~\cite{zhang2023twostage}. Here the autoencoder is trained federatedly with Flower~\cite{beutel2020}, and a server-side trust filter screens the sites' updates before a trimmed-mean aggregation. The combined verdict drives OpenFlow~1.3 flow rules in an emulated network. The choice of boosting for the first stage rests on a model-selection study that ran in three earlier stages of the project and was repeated on Edge-IIoTset for this paper (Section~\ref{sec:models}).
+
+\subsection*{Contributions}
+\begin{itemize}
+  \item \textbf{An integrated federated IDS} that combines a boosting-first detection cascade, a federated autoencoder, an update-level trust filter and SDN enforcement. Section~\ref{sec:related} compares it with the closest published systems; each covers some of these parts, and none we found covers all of them.
+  \item \textbf{An evaluation of the whole system on all 1,985,768 unique rows of Edge-IIoTset}~\cite{ferrag2022}, with every connection kept whole on one side of every split. It includes six real multi-process training runs (10 and 20 sites, three seeds), an ablation and a poisoning sweep over three seeds, a leave-one-class-out test for all 14 attack types over three seeds, and replays of all 14 attack captures through the SDN path.
+  \item \textbf{A measurement of how false alarms should be counted.} Counted per packet, false alarms are dominated by a few very long benign connections. Counted per connection, the rate is between 5.7 and 38 times lower.
+  \item \textbf{Three corrections to Edge-IIoTset.} A placeholder-spelling leak that lets one feature separate benign from attack traffic perfectly (found independently of Galal~\cite{galal2026}, who reports the same mechanism), a set of MITM rows whose values sit under the wrong column names, and a \texttt{tshark} version difference that silently zeroes a feature in live extraction. To our knowledge the last two have not been reported.
+  \item \textbf{A feature study} showing that the dataset's 91 standard features cap any classifier that sees only them at 0.969 macro recall, and that adding a service port, numeric payload-content features and connection-level aggregates lifts LightGBM to 0.983--0.985 macro F1 on connections it never saw in training.
+  \item \textbf{A model-selection study} in three stages: two earlier stages on other datasets (MQTTset, DataSense) and a broad comparison of tree ensembles, linear, instance-based and neural classifiers on Edge-IIoTset, which gives the evidence for choosing boosting as the first stage.
+  \item \textbf{Tests of the trust filter} against a white-box attacker that knows its rules, of pruning the autoencoder during and after training, and of a time-ordered split.
+\end{itemize}
+
+Section~\ref{sec:related} reviews related work. Section~\ref{sec:data} covers the dataset, its defects and the feature set. Section~\ref{sec:system} presents the system and Section~\ref{sec:setup} the experimental setup. Section~\ref{sec:results} reports the system results and Section~\ref{sec:models} the model-selection study. Section~\ref{sec:discussion} discusses the results and lists the limitations, and Section~\ref{sec:conclusion} concludes.
+
+\section{Related Work}
+\label{sec:related}
+\subsection{Federated intrusion and anomaly detection}
+Hern{\'a}ndez-Ramos et al.~\cite{hernandez2025} review FL-enabled IDS work from 2018 to 2022 and classify it by model, dataset, aggregation function and library. Mothukuri et al.~\cite{mothukuri2022} run federated training rounds on GRU models for IoT anomaly detection. DeepFed~\cite{li2021deepfed} trains a combined CNN and GRU classifier across industrial cyber-physical sites. Neither includes a supervised stage plus an unsupervised stage for traffic outside the trained label set.
+
+Autoencoders appear in several federated designs. Rey et al.~\cite{rey2022} train both a supervised MLP and an unsupervised autoencoder across IoT devices for malware detection. They also show that plain averaging is badly exposed to malicious participants and test alternative aggregation functions as countermeasures. FedMSE~\cite{nguyen2025fedmse} pairs a shrink autoencoder with a centroid one-class classifier and weights each local model by its error during aggregation. Kitsune~\cite{mirsky2018} showed earlier that an ensemble of autoencoders can detect network intrusions online without supervision. The closest system to ours on the FL side is TA-FHIDF~\cite{sazid2026}. It combines an autoencoder, a 1D-CNN and a BiLSTM at the edge, scores client reliability by cosine similarity before global aggregation, and evaluates on UNSW-NB15, CICIDS2017 and Edge-IIoTset. As described in its abstract, it has no supervised-first cascade and does not mention network enforcement.
+
+\subsection{Byzantine-robust aggregation}
+Krum~\cite{blanchard2017} chooses the update closest to its neighbours. Coordinate-wise median and trimmed mean~\cite{yin2018} bound the influence of any single client on each coordinate, but only up to their breakdown point: a trimmed mean that cuts $k$ updates from each side cannot absorb more than $k$ colluding attackers. Fang et al.~\cite{fang2020} showed that attackers who know the aggregation rule can craft updates that degrade these defences.
+
+Direction-based defences compare updates by angle. FLTrust~\cite{cao2021fltrust} holds a small clean root dataset on the server, computes a reference update from it, and weights each client by the ReLU-clipped cosine similarity of its update to that reference, so updates pointing away from the reference get no weight. SignGuard~\cite{xu2022signguard} derives magnitude, sign and similarity statistics from the received gradients and runs several filters on them before aggregation. Li et al.~\cite{li2021spatial} exclude faulty updates through their geometric properties in parameter space and use momentum-based speculation. FoolsGold~\cite{fung2020} identifies sybil clients from the diversity of their updates. Zhu et al.~\cite{zhu2024cosine} compare angles at the level of convolutional kernels instead of whole models. In the IDS setting, pFL-IDS~\cite{thein2024} analyses last-layer parameters, measures their angle to the centroid of the non-poisoned clients and re-weights clients with that score.
+
+Non-IID data is the known weakness of these methods. In a systematic comparison, Li, Ngai and Voigt~\cite{li2024experimental} found that the performance of all the aggregation schemes they tested drops significantly on non-IID data, and that some fail even when no Byzantine client is present. Our filter inherits this problem, and Section~\ref{sec:results} measures its effect.
+
+\subsection{Two-stage detection}
+Zhang et al.~\cite{zhang2023twostage} propose the cascade our detection stage follows. A LightGBM classifier with focal loss makes a first decision after recursive feature elimination. For samples it calls normal, a residual from an autoencoder makes a second decision. Their evaluation is on NSL-KDD and UNSW-NB15. We keep the ordering and move the autoencoder into a federation. Our boosting model is trained on a server-held labelled set and broadcast to the sites. Federated boosting schemes such as SecureBoost~\cite{cheng2021secureboost} would remove that central labelled set, at a cost in protocol complexity that we did not take on here.
+
+\subsection{Federated detection with SDN mitigation}
+FedDICE~\cite{thapa2021feddice} integrates FL with an SDN security architecture to detect ransomware spread across distributed clinical environments and uses SDN to remove infected devices. MiTFed~\cite{abouelhouda2023mitfed} combines FL, blockchain and SDN, with an Ethereum-based scheme to maintain collaboration. Both establish the FL-decides, SDN-enforces structure we use. Neither includes a supervised-first cascade or an update-level poisoning filter.
+
+\subsection{Dataset integrity}
+Sommer and Paxson~\cite{sommer2010} argued that machine learning for network intrusion detection faces problems specific to the domain, among them evaluating a detector soundly. Arp et al.~\cite{arp2022} list data snooping and spurious correlations among the common pitfalls of machine learning in security. Engelen et al.~\cite{engelen2021} found problems with traffic generation, flow construction, feature extraction and labelling in CICIDS2017~\cite{sharafaldin2018}, reconstructed or relabelled more than 20\% of its traffic traces, and regenerated the dataset from its packet captures, which is also how we repair the MITM rows (Section~\ref{sec:defects}). Outside security, Breck et al.~\cite{breck2019} treat the gap between training data and the data a deployed model sees as a central problem for data validation. Phase~B of our system checks for it directly (Section~\ref{sec:sdn}). For Edge-IIoTset in particular, Galal~\cite{galal2026} shows that the benign and attack captures were serialised differently: a missing field is the string ``0'' in the normal-traffic branch and ``0.0'' in the attack branch, which lets several categorical columns recover the label on their own. Six standard classifiers score $1.0000$ accuracy (the sixth $0.99998$) on the curated ML subset under the authors' recipe, and the same audit repeated on the larger DNN file finds the artifact there too. Galal then rebuilds a benchmark from the raw captures, and runs FedAvg on that. Section~\ref{sec:defects} describes the same leak as we found it, and two further defects that, as far as we know, are not reported elsewhere.
+
+\begin{table*}[t]
+\centering
+\caption{Components covered by the closest published systems. A blank cell means the component is not part of the system as its authors describe it in the sources we reviewed.}
+\label{tab:related}
+\small
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lcccccc}
+\toprule
+System & FL & Unsup.\ AE & Supervised-first cascade & Update-level poisoning defence & SDN enforcement & Edge-IIoTset leak corrected \\
+\midrule
+Mothukuri et al.~\cite{mothukuri2022} & \checkmark & & & & & \\
+DeepFed~\cite{li2021deepfed} & \checkmark & & & & & \\
+Rey et al.~\cite{rey2022} & \checkmark & \checkmark & & \checkmark & & \\
+FedMSE~\cite{nguyen2025fedmse} & \checkmark & \checkmark & & & & \\
+pFL-IDS~\cite{thein2024} & \checkmark & & & \checkmark & & \\
+TA-FHIDF~\cite{sazid2026} & \checkmark & \checkmark & & \checkmark & & \\
+Zhang et al.~\cite{zhang2023twostage} & & \checkmark & \checkmark & & & \\
+FedDICE~\cite{thapa2021feddice} & \checkmark & & & & \checkmark & \\
+MiTFed~\cite{abouelhouda2023mitfed} & \checkmark & & & & \checkmark & \\
+Galal~\cite{galal2026} & \checkmark & & & & & \checkmark \\
+\textbf{FL-IDS (this work)} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table*}
+
+Table~\ref{tab:related} summarises the comparison. Each component exists in prior work, and several systems combine two or three of them. Our searches did not find a system that combines all of them. These searches were targeted rather than systematic, so we present the combination as an integration contribution and do not claim it is the first.

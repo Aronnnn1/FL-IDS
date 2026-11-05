@@ -1,0 +1,52 @@
+\section{Discussion}
+\label{sec:discussion}
+\subsection{What each part contributes}
+Measured separately, the five parts do different jobs. The booster detects almost all known attacks (micro-recall 0.9954 to 0.9981 in the real runs). Because it is trained on the server, poisoned updates cannot reach it. The federated autoencoder adds at most 0.0008 on known attacks and supplies most of the system's benign false alarms. It earns its place on attack types the booster has never seen, where the cascade raises mean detection from 0.723--0.757 to 0.895--0.944, and on classes such as DDoS\_UDP and MITM it is nearly the whole defence. The trust filter, with the norm clip and trimmed mean, keeps the autoencoder usable at 30\% sign-flipping attackers, where plain FedAvg destroys it. SDN enforcement works end to end on all 14 captures, but only as batch classification of a finished capture.
+
+A cascade-level recall therefore says little about whether the federated part works. With 30\% attackers, plain FedAvg keeps 0.990 to 0.994 known-attack macro-recall while its autoencoder detects between 0.2\% and 9.2\% of attack packets. We think evaluations of hybrid federated detectors should report the federated component's own recall and its detection of unseen classes, not only the combined number.
+
+\subsection{False alarms}
+The packet false-alarm rate (2.5 to 16.3\%) would make the system unusable if it were the right measure. It is driven by a few very long benign connections. When one of them looks unusual to a client's autoencoder, thousands of packets are flagged at once. Per connection the rate is 0.34 to 1.04\%, and the median client sits near the 3\% the threshold implies. Two changes would address this directly. A device verdict could require a minimum share of flagged packets within a time window, rather than the current rule of any one non-benign packet. And the threshold could be set per connection rather than per packet. Neither is implemented.
+
+\subsection{The trust filter at scale}
+At 30\% attackers the filter admits attackers in 50 to 62\% of their rounds, and the stealth attacker passes even more often. The autoencoder still holds, which suggests that the norm clip and trimmed mean after the filter do much of the work, although we have not isolated their share. Even with no attackers, it excludes honest clients in 3 to 6\% of client-rounds. Both observations come from the same root. With non-IID data, honest clients' updates differ from the median by amounts that overlap those of attackers, a problem documented across robust aggregation rules~\cite{li2024experimental}. A client whose local data is poisoned, but which trains honestly on it, cannot be separated from an honest heterogeneous client by any test on update direction. The server already holds a labelled calibration set. Using it to compute a reference update, as FLTrust does with its root dataset~\cite{cao2021fltrust}, is the most direct improvement available, and we have not tested it. We have not established why the autoencoder is weak when used alone in some seeds (0.220 at 10 clients, seed 44). Candidates include the connection-grouped benign thresholds and the larger, more homogeneous local data at full scale.
+
+\subsection{How federated is the system?}
+Only the autoencoder is trained federatedly. The server holds about 100,000 labelled rows and trains the booster on 71,853 to 79,866 of them, and the incremental update moves up to 50 confirmed alert rows per surviving client to the server every three rounds. We chose this because labelled attack traffic is rare at the edge and a supervised first stage needs labels from somewhere. The feature study shows that the small set is enough: trained on 5\% of the rows, the final classifier reaches 0.979 macro F1 on held-out connections, against 0.983 with 72\%. A deployment that cannot accept any central labelled set would need federated boosting~\cite{cheng2021secureboost}, which we have not implemented.
+
+\subsection{Limitations and threats to validity}
+\begin{enumerate}
+  \item \textbf{One dataset for the system.} All system results are on Edge-IIoTset. The model-selection study includes two other datasets, but we have not tested whether the corrections, the filter's behaviour or the cascade's gains carry over to them.
+  \item \textbf{Replays are not held-out tests.} Phase~B replays the dataset's own captures. It classifies a whole capture before acting, so it does not block inline, and we report no mitigation latency.
+  \item \textbf{Three seeds at most.} The ablation, sweep, zero-day experiment and real runs have three seeds, which is too few for confidence intervals. Several measures vary widely between seeds, the autoencoder's recall above all. Pruning after training is a single run.
+  \item \textbf{Two attacker models.} We test sign-flipping and one white-box strategy. Other adaptive attacks~\cite{fang2020} are untested.
+  \item \textbf{Filter limits.} The filter admits many attackers at 20 to 40\%, fails at 50\%, and excludes honest non-IID clients. The trimmed mean alone cannot absorb more colluding attackers than it trims.
+  \item \textbf{False alarms.} The packet rate is high and concentrated in long connections. The device verdict fires on any single non-benign packet, so a benign device with enough traffic would almost certainly be flagged. We have not evaluated Phase~B on benign captures.
+  \item \textbf{MITM.} MITM is a single connection, so it cannot be split. It is never in a test slice and is scored only by the zero-day experiment and the replay, where it is blocked but misnamed.
+  \item \textbf{Clients without benign validation data} get an infinite threshold, so their autoencoder never flags. Up to three clients per run were affected.
+  \item \textbf{Testbed-specific features.} The service port and the keyword groups benefit from how Edge-IIoTset was built. Connection features summarise records of up to 120~s, so the system labels connection records, not single packets as they arrive.
+  \item \textbf{Privacy relaxation.} The incremental booster update sends confirmed alert rows to the server.
+  \item \textbf{In-process evaluation.} The ablation, sweep and zero-day experiments run in one process without network effects. The real runs agree with them closely (Section~\ref{sec:results}).
+  \item \textbf{Communication cost} excludes the booster broadcast, which is much larger than the autoencoder traffic.
+  \item \textbf{Comparability.} Because we correct the dataset and split by connection, our numbers are not directly comparable with results on the released CSV. Given the leak, we would expect those results to be inflated, but we have not re-run other published models to show it.
+  \item \textbf{Time order.} The CSV has no dates, so the time-ordered split orders rows by position, and no split by capture file was possible.
+  \item \textbf{Novelty.} Our search for systems that combine all five parts was targeted, not systematic.
+\end{enumerate}
+
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+FL-IDS combines a LightGBM first stage, a federated autoencoder, an update-level trust filter and OpenFlow enforcement. We trained and tested it on all 1,985,768 usable rows of Edge-IIoTset, with connections kept whole across every split, after correcting three defects in the released data. Known attacks are detected almost completely, mostly by the booster. The federated autoencoder raises detection of attack types withheld from training from 0.723--0.757 to 0.895--0.944 on average, and the trust filter keeps it working at 30\% sign-flipping attackers where plain FedAvg does not. The same results show where the system falls short. At this scale the filter admits many attackers, it fails at 50\%, and an attacker that knows its rules passes most of the time. Packet-level false alarms are high, though they are concentrated in a few long connections and fall to about 1\% when counted per connection.
+
+The next steps follow from these limits:
+\begin{itemize}
+  \item use the server's calibration set as a reference direction for the filter, and measure zero-day detection under the stealth attacker and for pruned models;
+  \item replace the any-packet device verdict with a windowed, connection-level rule, move to streaming classification, and measure detection-to-rule latency on held-out and benign traffic;
+  \item broadcast the booster only when it changes, and evaluate federated boosting so that no labelled data needs to be held centrally;
+  \item test the system on a second dataset.
+\end{itemize}
+
+\section*{Acknowledgements}
+We thank our project guide, Mr.\ Syed Akram, Department of Computer Science \& Engineering, BMS College of Engineering, for his guidance throughout this work.
+
+\section*{Code and Data Availability}
+The implementation, configurations, result files and test suite are at \url{https://github.com/Aronnnn1/FL-IDS}. Edge-IIoTset is available from its authors~\cite{ferrag2022}. The repaired MITM rows can be regenerated from the authors' capture with the repository's repair script.

@@ -1,0 +1,4181 @@
+{
+  "dataset": {
+    "name": "DataSense (CIC IIoT Dataset 2025)",
+    "note": "Public Kaggle CSV mirror of the official CIC processed-feature release (registration-gated at cicresearch.ca).",
+    "classes": [
+      "benign",
+      "bruteforce",
+      "ddos",
+      "dos",
+      "malware",
+      "mitm",
+      "recon",
+      "web"
+    ],
+    "n_train": 31538,
+    "n_test": 13517,
+    "n_features": 109
+  },
+  "ml_models": [
+    {
+      "name": "Random Forest",
+      "category": "ml",
+      "description": "An ensemble of 200 decision trees, each trained on a bootstrapped sample of rows and a random subset of features, voting on the final class. Robust, needs no feature scaling, and gives directly-inspectable feature importances.",
+      "hyperparams": {
+        "n_estimators": 200,
+        "class_weight": "balanced",
+        "max_depth": "unlimited"
+      },
+      "train_time_sec": 0.7629501819610596,
+      "inference_time_sec": 0.03735494613647461,
+      "inference_time_per_sample_ms": 0.0027635530174206268,
+      "accuracy": 0.9417770215284457,
+      "precision_macro": 0.8500925104367392,
+      "recall_macro": 0.9446620519852029,
+      "f1_macro": 0.8842398212235281,
+      "precision_weighted": 0.9485740846384171,
+      "recall_weighted": 0.9417770215284457,
+      "f1_weighted": 0.9438966616525848,
+      "confusion_matrix": [
+        [
+          7777,
+          68,
+          10,
+          4,
+          5,
+          6,
+          201,
+          137
+        ],
+        [
+          3,
+          102,
+          0,
+          0,
+          1,
+          0,
+          1,
+          5
+        ],
+        [
+          37,
+          0,
+          983,
+          18,
+          4,
+          7,
+          7,
+          3
+        ],
+        [
+          4,
+          0,
+          20,
+          1043,
+          1,
+          9,
+          1,
+          2
+        ],
+        [
+          7,
+          0,
+          2,
+          0,
+          433,
+          3,
+          2,
+          0
+        ],
+        [
+          12,
+          0,
+          0,
+          1,
+          1,
+          454,
+          4,
+          1
+        ],
+        [
+          171,
+          3,
+          1,
+          0,
+          8,
+          10,
+          1775,
+          3
+        ],
+        [
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          163
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9703056768558952,
+          "recall": 0.947490253411306,
+          "f1": 0.9587622511249461,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.5895953757225434,
+          "recall": 0.9107142857142857,
+          "f1": 0.7157894736842105,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.96751968503937,
+          "recall": 0.9282341831916903,
+          "f1": 0.9474698795180723,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.9784240150093808,
+          "recall": 0.9657407407407408,
+          "f1": 0.9720410065237651,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.9558498896247241,
+          "recall": 0.9686800894854586,
+          "f1": 0.9622222222222222,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.9284253578732107,
+          "recall": 0.959830866807611,
+          "f1": 0.9438669438669439,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.891511803114013,
+          "recall": 0.9005580923389143,
+          "f1": 0.8960121150933872,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.5191082802547771,
+          "recall": 0.9760479041916168,
+          "f1": 0.6777546777546778,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.97      0.95      0.96      8208\n  bruteforce       0.59      0.91      0.72       112\n        ddos       0.97      0.93      0.95      1059\n         dos       0.98      0.97      0.97      1080\n     malware       0.96      0.97      0.96       447\n        mitm       0.93      0.96      0.94       473\n       recon       0.89      0.90      0.90      1971\n         web       0.52      0.98      0.68       167\n\n    accuracy                           0.94     13517\n   macro avg       0.85      0.94      0.88     13517\nweighted avg       0.95      0.94      0.94     13517\n",
+      "model_size": "200 trees",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109,
+      "feature_importances": {
+        "log_data-ranges_avg": 0.002618402875935233,
+        "log_data-ranges_max": 0.003008388831865394,
+        "log_data-ranges_min": 0.0015709235033868512,
+        "log_data-ranges_std_deviation": 0.0018379900997564863,
+        "log_data-types_count": 0.003171214200610882,
+        "log_interval-messages": 0.0023492059961078573,
+        "log_messages_count": 0.003980397128664204,
+        "network_fragmentation-score": 0.0011213559544454071,
+        "network_fragmented-packets": 0.0018374459066992387,
+        "network_header-length_avg": 0.0007236780423949461,
+        "network_header-length_max": 0.0002780808679186978,
+        "network_header-length_min": 0.0004452869558177807,
+        "network_header-length_std_deviation": 4.033197533045018e-05,
+        "network_interval-packets": 0.02975667204766473,
+        "network_ip-flags_avg": 0.020885074890615484,
+        "network_ip-flags_max": 0.0009172724829440897,
+        "network_ip-flags_min": 0.001120378826821075,
+        "network_ip-flags_std_deviation": 0.008155247741504558,
+        "network_ip-length_avg": 0.027955439806335903,
+        "network_ip-length_max": 0.012130983024843823,
+        "network_ip-length_min": 0.017512842064873482,
+        "network_ip-length_std_deviation": 0.015893177917255284,
+        "network_ips_all_count": 0.017823564574182518,
+        "network_ips_dst_count": 0.015095475115509245,
+        "network_ips_src_count": 0.022532458670690824,
+        "network_macs_all_count": 0.019709757844429722,
+        "network_macs_dst_count": 0.01881538095454363,
+        "network_macs_src_count": 0.01919872635367086,
+        "network_mss_avg": 0.010876412634262707,
+        "network_mss_max": 0.0105986623946088,
+        "network_mss_min": 0.01084714478050888,
+        "network_mss_std_deviation": 0.0002557508395274055,
+        "network_packet-size_avg": 0.016853040744296027,
+        "network_packet-size_max": 0.009112295707815365,
+        "network_packet-size_min": 0.019022827703193464,
+        "network_packet-size_std_deviation": 0.016580747420533865,
+        "network_packets_all_count": 0.032659561344076785,
+        "network_packets_dst_count": 0.039573982304526356,
+        "network_packets_src_count": 0.015260446929814892,
+        "network_payload-length_avg": 0.012782682973973612,
+        "network_payload-length_max": 0.010228549284542697,
+        "network_payload-length_min": 0.0011442622487469964,
+        "network_payload-length_std_deviation": 0.017470686877766803,
+        "network_ports_all_count": 0.03279887776155887,
+        "network_ports_dst_count": 0.018737962373252526,
+        "network_ports_src_count": 0.023167412256903795,
+        "network_protocols_all_count": 0.002791922715724159,
+        "network_protocols_dst_count": 0.0046987656520967635,
+        "network_protocols_src_count": 0.0029356371152730355,
+        "network_tcp-flags-ack_count": 0.011021973062387391,
+        "network_tcp-flags-fin_count": 0.010447396858911441,
+        "network_tcp-flags-psh_count": 0.0075614016903390755,
+        "network_tcp-flags-rst_count": 0.021649838916008753,
+        "network_tcp-flags-syn_count": 0.013313416597514022,
+        "network_tcp-flags-urg_count": 3.3649382012335396e-05,
+        "network_tcp-flags_avg": 0.008789512601762299,
+        "network_tcp-flags_max": 0.002002269834813185,
+        "network_tcp-flags_min": 0.00349957680729415,
+        "network_tcp-flags_std_deviation": 0.020597381287674254,
+        "network_time-delta_avg": 0.04872415693129905,
+        "network_time-delta_max": 0.024742533951415055,
+        "network_time-delta_min": 0.012168874703113937,
+        "network_time-delta_std_deviation": 0.0367968686126012,
+        "network_ttl_avg": 0.016770019475867856,
+        "network_ttl_max": 0.005233374782947003,
+        "network_ttl_min": 0.023465915692916606,
+        "network_ttl_std_deviation": 0.019120901628628992,
+        "network_window-size_avg": 0.019255793809366192,
+        "network_window-size_max": 0.01407841831800229,
+        "network_window-size_min": 0.022595438022017255,
+        "network_window-size_std_deviation": 0.03680443572555889,
+        "device_accelerometer-sensor": 3.891841834258837e-05,
+        "device_ap": 0.0017124218143453253,
+        "device_blurams-camera": 0.00020606580652407828,
+        "device_dekco-camera": 0.0005414332959541694,
+        "device_edge1": 0.028074883203432183,
+        "device_flame-sensor": 0.0003336065989115486,
+        "device_gas-sensor": 3.754433103290529e-05,
+        "device_geeni-camera": 0.002080019465049427,
+        "device_light-sensor": 3.2674515007228276e-05,
+        "device_motion-sensor": 0.0005163364807720275,
+        "device_mqtt-broker": 0.000936823675006512,
+        "device_myq-camera": 0.0005147134245903105,
+        "device_plug-all-cameras": 0.0003982708476833264,
+        "device_plug-all-rpb": 0.0001612899769967668,
+        "device_plug-all-sensors": 0.0002677042725109924,
+        "device_plug-cameras-dekco-blurams": 8.84611228167924e-05,
+        "device_plug-cameras-geeni": 9.578737641128343e-05,
+        "device_plug-cameras-yi": 9.508250429232901e-05,
+        "device_plug-edge1": 0.0002553661438636285,
+        "device_plug-flame": 0.000249560801961894,
+        "device_plug-motion": 0.0002879069640547183,
+        "device_plug-mqtt": 0.0002499418025103585,
+        "device_plug-proximity": 0.0003887850973443194,
+        "device_plug-rfid": 0.00026993408695343365,
+        "device_plug-vibration": 0.0003131222787899881,
+        "device_proximity-collision-sensor": 0.0004212354359975216,
+        "device_rfid-sensor": 0.0002716985304085195,
+        "device_router": 0.0007750776349929313,
+        "device_soil-sensor": 0.00012195911305804066,
+        "device_sound-sensor": 5.616809901237629e-05,
+        "device_steam-sensor": 0.0002124630875695232,
+        "device_switch": 0.0006386603085158576,
+        "device_ultrasonic-sensor": 4.311485648260724e-05,
+        "device_vibration-sensor": 0.00045143659482873753,
+        "device_water-sensor": 0.00010797042819999328,
+        "device_weather-sensor": 7.381469803068971e-05,
+        "device_wisenet-camera": 0.0002825146970121463,
+        "device_yi-camera": 0.0008412968004592685
+      }
+    },
+    {
+      "name": "Logistic Regression",
+      "category": "ml",
+      "description": "A linear model: one weighted sum of the (standardized) features per class, turned into probabilities via softmax. The simplest possible baseline \u2014 if this does nearly as well as the ensembles, the classes are close to linearly separable in this feature space; if it does much worse, the boundary between traffic types is genuinely non-linear.",
+      "hyperparams": {
+        "solver": "lbfgs",
+        "max_iter": 1000,
+        "class_weight": "balanced"
+      },
+      "train_time_sec": 1.2646517753601074,
+      "inference_time_sec": 0.0008528232574462891,
+      "inference_time_per_sample_ms": 6.309264314909293e-05,
+      "accuracy": 0.8568469334911593,
+      "precision_macro": 0.6864749071338372,
+      "recall_macro": 0.8668415415217945,
+      "f1_macro": 0.7357064400521722,
+      "precision_weighted": 0.890504538465419,
+      "recall_weighted": 0.8568469334911593,
+      "f1_weighted": 0.8678701560185915,
+      "confusion_matrix": [
+        [
+          7087,
+          211,
+          14,
+          2,
+          109,
+          285,
+          299,
+          201
+        ],
+        [
+          2,
+          96,
+          0,
+          0,
+          1,
+          7,
+          0,
+          6
+        ],
+        [
+          43,
+          12,
+          889,
+          71,
+          11,
+          25,
+          3,
+          5
+        ],
+        [
+          9,
+          1,
+          65,
+          932,
+          12,
+          51,
+          6,
+          4
+        ],
+        [
+          11,
+          24,
+          0,
+          1,
+          396,
+          9,
+          5,
+          1
+        ],
+        [
+          58,
+          19,
+          1,
+          8,
+          5,
+          379,
+          2,
+          1
+        ],
+        [
+          267,
+          7,
+          2,
+          1,
+          34,
+          15,
+          1637,
+          8
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          166
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9477132923241508,
+          "recall": 0.8634259259259259,
+          "f1": 0.9036083131454801,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.2594594594594595,
+          "recall": 0.8571428571428571,
+          "f1": 0.3983402489626556,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.9155509783728115,
+          "recall": 0.8394711992445704,
+          "f1": 0.8758620689655172,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.9182266009852217,
+          "recall": 0.8629629629629629,
+          "f1": 0.8897374701670644,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.6971830985915493,
+          "recall": 0.8859060402684564,
+          "f1": 0.780295566502463,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.4915693904020752,
+          "recall": 0.8012684989429175,
+          "f1": 0.6093247588424437,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.8386270491803278,
+          "recall": 0.8305428716387621,
+          "f1": 0.8345653836349732,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.42346938775510207,
+          "recall": 0.9940119760479041,
+          "f1": 0.59391771019678,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.95      0.86      0.90      8208\n  bruteforce       0.26      0.86      0.40       112\n        ddos       0.92      0.84      0.88      1059\n         dos       0.92      0.86      0.89      1080\n     malware       0.70      0.89      0.78       447\n        mitm       0.49      0.80      0.61       473\n       recon       0.84      0.83      0.83      1971\n         web       0.42      0.99      0.59       167\n\n    accuracy                           0.86     13517\n   macro avg       0.69      0.87      0.74     13517\nweighted avg       0.89      0.86      0.87     13517\n",
+      "model_size": "880 weights",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "Gradient Boosting",
+      "category": "ml",
+      "description": "Histogram-based gradient boosting (sklearn's LightGBM-style implementation): builds 200 shallow trees sequentially, where each new tree is trained to correct the errors of all trees built so far, rather than voting independently like Random Forest. Usually the strongest classic-ML performer on tabular data.",
+      "hyperparams": {
+        "max_iter": 200,
+        "class_weight": "balanced"
+      },
+      "train_time_sec": 6.990016937255859,
+      "inference_time_sec": 0.13255810737609863,
+      "inference_time_per_sample_ms": 0.0098067697992231,
+      "accuracy": 0.9516164829473995,
+      "precision_macro": 0.8593051000777454,
+      "recall_macro": 0.9530192428462904,
+      "f1_macro": 0.8931304498091278,
+      "precision_weighted": 0.9581671484053229,
+      "recall_weighted": 0.9516164829473995,
+      "f1_weighted": 0.9536489839647968,
+      "confusion_matrix": [
+        [
+          7855,
+          64,
+          3,
+          1,
+          7,
+          3,
+          139,
+          136
+        ],
+        [
+          2,
+          104,
+          0,
+          0,
+          1,
+          0,
+          1,
+          4
+        ],
+        [
+          32,
+          2,
+          985,
+          16,
+          3,
+          7,
+          13,
+          1
+        ],
+        [
+          4,
+          0,
+          21,
+          1048,
+          1,
+          4,
+          0,
+          2
+        ],
+        [
+          6,
+          1,
+          2,
+          1,
+          433,
+          3,
+          1,
+          0
+        ],
+        [
+          10,
+          0,
+          0,
+          0,
+          0,
+          460,
+          2,
+          1
+        ],
+        [
+          129,
+          2,
+          2,
+          1,
+          7,
+          12,
+          1815,
+          3
+        ],
+        [
+          3,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          163
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9768685486879741,
+          "recall": 0.9569931773879142,
+          "f1": 0.9668287279217183,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.5977011494252874,
+          "recall": 0.9285714285714286,
+          "f1": 0.7272727272727273,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.9723593287265548,
+          "recall": 0.9301227573182247,
+          "f1": 0.9507722007722008,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.9821930646672915,
+          "recall": 0.9703703703703703,
+          "f1": 0.976245924545878,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.9579646017699115,
+          "recall": 0.9686800894854586,
+          "f1": 0.9632925472747497,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.9406952965235174,
+          "recall": 0.9725158562367865,
+          "f1": 0.9563409563409564,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.9208523592085236,
+          "recall": 0.9208523592085236,
+          "f1": 0.9208523592085236,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.5258064516129032,
+          "recall": 0.9760479041916168,
+          "f1": 0.6834381551362684,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.98      0.96      0.97      8208\n  bruteforce       0.60      0.93      0.73       112\n        ddos       0.97      0.93      0.95      1059\n         dos       0.98      0.97      0.98      1080\n     malware       0.96      0.97      0.96       447\n        mitm       0.94      0.97      0.96       473\n       recon       0.92      0.92      0.92      1971\n         web       0.53      0.98      0.68       167\n\n    accuracy                           0.95     13517\n   macro avg       0.86      0.95      0.89     13517\nweighted avg       0.96      0.95      0.95     13517\n",
+      "model_size": "200 boosting rounds",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "Naive Bayes",
+      "category": "ml",
+      "description": "Assumes every feature is independent and Gaussian within each class, then applies Bayes' rule directly \u2014 no iterative training at all, just per-class mean/variance estimates. Included as a 'how bad is the floor' reference: network/device telemetry features are clearly not independent of each other, so this tests how much that assumption costs here.",
+      "hyperparams": {},
+      "train_time_sec": 0.013047933578491211,
+      "inference_time_sec": 0.013128042221069336,
+      "inference_time_per_sample_ms": 0.0009712245484256371,
+      "accuracy": 0.4654879041207369,
+      "precision_macro": 0.48071424287231296,
+      "recall_macro": 0.630886179764787,
+      "f1_macro": 0.4343763654207239,
+      "precision_weighted": 0.8080346128468798,
+      "recall_weighted": 0.4654879041207369,
+      "f1_weighted": 0.5465540970748548,
+      "confusion_matrix": [
+        [
+          3242,
+          780,
+          0,
+          1,
+          1108,
+          2846,
+          16,
+          215
+        ],
+        [
+          0,
+          75,
+          0,
+          0,
+          1,
+          0,
+          0,
+          36
+        ],
+        [
+          23,
+          17,
+          658,
+          187,
+          39,
+          119,
+          7,
+          9
+        ],
+        [
+          12,
+          2,
+          366,
+          555,
+          27,
+          100,
+          12,
+          6
+        ],
+        [
+          0,
+          100,
+          0,
+          0,
+          319,
+          0,
+          0,
+          28
+        ],
+        [
+          2,
+          132,
+          0,
+          1,
+          31,
+          306,
+          0,
+          1
+        ],
+        [
+          294,
+          84,
+          41,
+          73,
+          320,
+          180,
+          971,
+          8
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          166
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9073607612650434,
+          "recall": 0.3949805068226121,
+          "f1": 0.5503777268483151,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.06297229219143577,
+          "recall": 0.6696428571428571,
+          "f1": 0.11511895625479662,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.6178403755868545,
+          "recall": 0.6213408876298395,
+          "f1": 0.6195856873822976,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.6793145654834761,
+          "recall": 0.5138888888888888,
+          "f1": 0.5851344227727991,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.17289972899728998,
+          "recall": 0.7136465324384788,
+          "f1": 0.27835951134380454,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.08617290903970712,
+          "recall": 0.6469344608879493,
+          "f1": 0.15208747514910537,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.9652087475149106,
+          "recall": 0.4926433282597666,
+          "f1": 0.6523345649983204,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.35394456289978676,
+          "recall": 0.9940119760479041,
+          "f1": 0.5220125786163522,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.91      0.39      0.55      8208\n  bruteforce       0.06      0.67      0.12       112\n        ddos       0.62      0.62      0.62      1059\n         dos       0.68      0.51      0.59      1080\n     malware       0.17      0.71      0.28       447\n        mitm       0.09      0.65      0.15       473\n       recon       0.97      0.49      0.65      1971\n         web       0.35      0.99      0.52       167\n\n    accuracy                           0.47     13517\n   macro avg       0.48      0.63      0.43     13517\nweighted avg       0.81      0.47      0.55     13517\n",
+      "model_size": "8 x 109 x 2 stats",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "K-Nearest Neighbors",
+      "category": "ml",
+      "description": "Classifies each test window by majority vote among its 5 nearest training windows in standardized feature space \u2014 no training phase to speak of, all the cost is at inference time (it has to search all 31,538 training rows for every one of the 13,517 test rows).",
+      "hyperparams": {
+        "n_neighbors": 5,
+        "metric": "euclidean"
+      },
+      "train_time_sec": 0.001712799072265625,
+      "inference_time_sec": 0.3272099494934082,
+      "inference_time_per_sample_ms": 0.024207290781490583,
+      "accuracy": 0.9128504845749796,
+      "precision_macro": 0.8773702571045785,
+      "recall_macro": 0.8196595611659729,
+      "f1_macro": 0.8452203533658152,
+      "precision_weighted": 0.9127502008829856,
+      "recall_weighted": 0.9128504845749796,
+      "f1_weighted": 0.9101974224674205,
+      "confusion_matrix": [
+        [
+          8100,
+          11,
+          5,
+          7,
+          3,
+          16,
+          65,
+          1
+        ],
+        [
+          23,
+          80,
+          0,
+          0,
+          1,
+          8,
+          0,
+          0
+        ],
+        [
+          78,
+          2,
+          799,
+          147,
+          5,
+          20,
+          4,
+          4
+        ],
+        [
+          18,
+          2,
+          77,
+          953,
+          0,
+          23,
+          6,
+          1
+        ],
+        [
+          46,
+          6,
+          0,
+          1,
+          384,
+          3,
+          4,
+          3
+        ],
+        [
+          130,
+          9,
+          1,
+          29,
+          1,
+          298,
+          5,
+          0
+        ],
+        [
+          379,
+          1,
+          2,
+          1,
+          9,
+          10,
+          1569,
+          0
+        ],
+        [
+          10,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          156
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9221311475409836,
+          "recall": 0.9868421052631579,
+          "f1": 0.9533898305084746,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.7207207207207207,
+          "recall": 0.7142857142857143,
+          "f1": 0.7174887892376681,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.9028248587570622,
+          "recall": 0.7544853635505193,
+          "f1": 0.8220164609053497,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.8374340949033392,
+          "recall": 0.8824074074074074,
+          "f1": 0.8593327321911632,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.9528535980148883,
+          "recall": 0.8590604026845637,
+          "f1": 0.9035294117647059,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.7883597883597884,
+          "recall": 0.6300211416490487,
+          "f1": 0.700352526439483,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.9491833030852994,
+          "recall": 0.7960426179604262,
+          "f1": 0.8658940397350994,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.9454545454545454,
+          "recall": 0.9341317365269461,
+          "f1": 0.9397590361445783,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.92      0.99      0.95      8208\n  bruteforce       0.72      0.71      0.72       112\n        ddos       0.90      0.75      0.82      1059\n         dos       0.84      0.88      0.86      1080\n     malware       0.95      0.86      0.90       447\n        mitm       0.79      0.63      0.70       473\n       recon       0.95      0.80      0.87      1971\n         web       0.95      0.93      0.94       167\n\n    accuracy                           0.91     13517\n   macro avg       0.88      0.82      0.85     13517\nweighted avg       0.91      0.91      0.91     13517\n",
+      "model_size": "lazy (stores all 31,538 training rows)",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "SVM (RBF)",
+      "category": "ml",
+      "description": "A Support Vector Machine with an RBF (Gaussian) kernel: finds the decision boundary that maximizes the margin between classes, implicitly projecting the standardized features into a higher-dimensional space where a non-linear boundary becomes linear. Unlike every other model here, training cost scales roughly quadratically with the number of rows, which is why this is the slowest model in the entire lineup to train despite being 'classic' ML.",
+      "hyperparams": {
+        "kernel": "rbf",
+        "class_weight": "balanced",
+        "cache_size_mb": 1000
+      },
+      "train_time_sec": 22.195895195007324,
+      "inference_time_sec": 19.573426008224487,
+      "inference_time_per_sample_ms": 1.448059925147924,
+      "accuracy": 0.8840719094473626,
+      "precision_macro": 0.7409325084304226,
+      "recall_macro": 0.8725198012362221,
+      "f1_macro": 0.7666569356491171,
+      "precision_weighted": 0.9105050401978197,
+      "recall_weighted": 0.8840719094473626,
+      "f1_weighted": 0.8929243357420575,
+      "confusion_matrix": [
+        [
+          7493,
+          216,
+          8,
+          0,
+          26,
+          122,
+          125,
+          218
+        ],
+        [
+          3,
+          99,
+          0,
+          0,
+          0,
+          4,
+          0,
+          6
+        ],
+        [
+          49,
+          12,
+          923,
+          40,
+          7,
+          21,
+          1,
+          6
+        ],
+        [
+          10,
+          3,
+          33,
+          982,
+          2,
+          46,
+          1,
+          3
+        ],
+        [
+          26,
+          28,
+          0,
+          0,
+          384,
+          3,
+          1,
+          5
+        ],
+        [
+          69,
+          36,
+          2,
+          2,
+          1,
+          360,
+          2,
+          1
+        ],
+        [
+          382,
+          7,
+          0,
+          1,
+          19,
+          12,
+          1542,
+          8
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          167
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9328934262948207,
+          "recall": 0.9128898635477583,
+          "f1": 0.922783251231527,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.24688279301745636,
+          "recall": 0.8839285714285714,
+          "f1": 0.38596491228070173,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.9554865424430642,
+          "recall": 0.8715769593956563,
+          "f1": 0.9116049382716049,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.9580487804878048,
+          "recall": 0.9092592592592592,
+          "f1": 0.9330166270783848,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.8747152619589977,
+          "recall": 0.8590604026845637,
+          "f1": 0.8668171557562077,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.6338028169014085,
+          "recall": 0.7610993657505285,
+          "f1": 0.69164265129683,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.9222488038277512,
+          "recall": 0.7823439878234398,
+          "f1": 0.8465550370573703,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.4033816425120773,
+          "recall": 1.0,
+          "f1": 0.5748709122203098,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.93      0.91      0.92      8208\n  bruteforce       0.25      0.88      0.39       112\n        ddos       0.96      0.87      0.91      1059\n         dos       0.96      0.91      0.93      1080\n     malware       0.87      0.86      0.87       447\n        mitm       0.63      0.76      0.69       473\n       recon       0.92      0.78      0.85      1971\n         web       0.40      1.00      0.57       167\n\n    accuracy                           0.88     13517\n   macro avg       0.74      0.87      0.77     13517\nweighted avg       0.91      0.88      0.89     13517\n",
+      "model_size": "15227 support vectors",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    }
+  ],
+  "dl_models": [
+    {
+      "name": "MLP",
+      "category": "dl",
+      "description": "A fully-connected feed-forward network: every input feature connects to every neuron in the first hidden layer, then the next, etc. No assumption about spatial or sequential structure among the features \u2014 it has to learn any useful feature interactions from scratch via dense weight matrices.",
+      "hyperparams": {
+        "architecture": "109->128->64->32->8",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "regularization": "BatchNorm + Dropout(0.3)",
+        "device": "mps"
+      },
+      "train_time_sec": 63.919113874435425,
+      "inference_time_sec": 0.12749814987182617,
+      "inference_time_per_sample_ms": 0.009432429523698022,
+      "accuracy": 0.9448102389583487,
+      "precision_macro": 0.9012761991883731,
+      "recall_macro": 0.8917957290887275,
+      "f1_macro": 0.8947998587937015,
+      "precision_weighted": 0.9457025987573597,
+      "recall_weighted": 0.9448102389583487,
+      "f1_weighted": 0.9444210094000174,
+      "confusion_matrix": [
+        [
+          8079,
+          24,
+          1,
+          0,
+          0,
+          15,
+          83,
+          6
+        ],
+        [
+          14,
+          86,
+          0,
+          0,
+          0,
+          12,
+          0,
+          0
+        ],
+        [
+          58,
+          2,
+          945,
+          36,
+          4,
+          8,
+          4,
+          2
+        ],
+        [
+          12,
+          1,
+          15,
+          1022,
+          3,
+          25,
+          1,
+          1
+        ],
+        [
+          32,
+          12,
+          0,
+          0,
+          394,
+          3,
+          4,
+          2
+        ],
+        [
+          39,
+          11,
+          0,
+          3,
+          0,
+          409,
+          11,
+          0
+        ],
+        [
+          273,
+          1,
+          0,
+          0,
+          8,
+          11,
+          1678,
+          0
+        ],
+        [
+          9,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          158
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9486848285580085,
+          "recall": 0.9842836257309941,
+          "f1": 0.9661564219086343,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.6277372262773723,
+          "recall": 0.7678571428571429,
+          "f1": 0.6907630522088354,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.9833506763787722,
+          "recall": 0.8923512747875354,
+          "f1": 0.9356435643564357,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.9632422243166824,
+          "recall": 0.9462962962962963,
+          "f1": 0.9546940681924334,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.9633251833740831,
+          "recall": 0.8814317673378076,
+          "f1": 0.9205607476635514,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.8467908902691511,
+          "recall": 0.864693446088795,
+          "f1": 0.8556485355648535,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.9421673217293656,
+          "recall": 0.8513444951801116,
+          "f1": 0.894456289978678,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.9349112426035503,
+          "recall": 0.9461077844311377,
+          "f1": 0.9404761904761905,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.95      0.98      0.97      8208\n  bruteforce       0.63      0.77      0.69       112\n        ddos       0.98      0.89      0.94      1059\n         dos       0.96      0.95      0.95      1080\n     malware       0.96      0.88      0.92       447\n        mitm       0.85      0.86      0.86       473\n       recon       0.94      0.85      0.89      1971\n         web       0.93      0.95      0.94       167\n\n    accuracy                           0.94     13517\n   macro avg       0.90      0.89      0.89     13517\nweighted avg       0.95      0.94      0.94     13517\n",
+      "model_size": "25064 params",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "1D-CNN",
+      "category": "dl",
+      "description": "Treats the standardized device/network telemetry features as a 1-dimensional signal and slides learned convolutional filters across neighboring features, looking for local patterns before pooling into a fixed-size representation. As with the MQTTset project, there's no genuine spatial relationship between adjacent feature columns here \u2014 this is a fair test of the algorithm on these features, not a fair test of what CNNs are built for.",
+      "hyperparams": {
+        "architecture": "Conv1d(1->32)->Conv1d(32->64)->GlobalAvgPool->FC(64->32->8)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 39.75075101852417,
+      "inference_time_sec": 0.5324950218200684,
+      "inference_time_per_sample_ms": 0.03939446784198183,
+      "accuracy": 0.9243915069911963,
+      "precision_macro": 0.8892298509737333,
+      "recall_macro": 0.8461752784646726,
+      "f1_macro": 0.8595960241272473,
+      "precision_weighted": 0.9306604617914014,
+      "recall_weighted": 0.9243915069911963,
+      "f1_weighted": 0.9241684563062722,
+      "confusion_matrix": [
+        [
+          8061,
+          6,
+          0,
+          6,
+          4,
+          57,
+          74,
+          0
+        ],
+        [
+          11,
+          68,
+          0,
+          2,
+          0,
+          30,
+          0,
+          1
+        ],
+        [
+          67,
+          0,
+          835,
+          107,
+          2,
+          44,
+          4,
+          0
+        ],
+        [
+          23,
+          0,
+          6,
+          1019,
+          5,
+          26,
+          1,
+          0
+        ],
+        [
+          32,
+          6,
+          0,
+          1,
+          375,
+          23,
+          5,
+          5
+        ],
+        [
+          38,
+          0,
+          0,
+          13,
+          0,
+          417,
+          5,
+          0
+        ],
+        [
+          304,
+          2,
+          0,
+          8,
+          5,
+          88,
+          1564,
+          0
+        ],
+        [
+          10,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          156
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9432483032997894,
+          "recall": 0.9820906432748538,
+          "f1": 0.9622776650352155,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.8192771084337349,
+          "recall": 0.6071428571428571,
+          "f1": 0.6974358974358974,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.9928656361474435,
+          "recall": 0.7884796978281398,
+          "f1": 0.8789473684210526,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.8814878892733564,
+          "recall": 0.9435185185185185,
+          "f1": 0.9114490161001789,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.959079283887468,
+          "recall": 0.8389261744966443,
+          "f1": 0.8949880668257757,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.6087591240875913,
+          "recall": 0.8816067653276956,
+          "f1": 0.7202072538860104,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.9461584996975196,
+          "recall": 0.793505834601725,
+          "f1": 0.8631346578366446,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.9629629629629629,
+          "recall": 0.9341317365269461,
+          "f1": 0.9483282674772037,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.94      0.98      0.96      8208\n  bruteforce       0.82      0.61      0.70       112\n        ddos       0.99      0.79      0.88      1059\n         dos       0.88      0.94      0.91      1080\n     malware       0.96      0.84      0.89       447\n        mitm       0.61      0.88      0.72       473\n       recon       0.95      0.79      0.86      1971\n         web       0.96      0.93      0.95       167\n\n    accuracy                           0.92     13517\n   macro avg       0.89      0.85      0.86     13517\nweighted avg       0.93      0.92      0.92     13517\n",
+      "model_size": "8872 params",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "GRU (Recurrent)",
+      "category": "dl",
+      "description": "A Gated Recurrent Unit, reading the standardized features one at a time as if they were a short time series, carrying a hidden state forward, then classifying from the final hidden state. The features have no real temporal order here (they're a mix of packet-size stats, TCP flag counts, device counts, etc.), so this tests whether recurrent processing helps or just adds overhead on data that isn't actually sequential.",
+      "hyperparams": {
+        "architecture": "GRU(hidden=64, layers=1) -> FC(64->32->8)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 126.48569512367249,
+      "inference_time_sec": 0.608811616897583,
+      "inference_time_per_sample_ms": 0.045040439217103136,
+      "accuracy": 0.8672042613005845,
+      "precision_macro": 0.7784073610791088,
+      "recall_macro": 0.7340208895269512,
+      "f1_macro": 0.746953932040095,
+      "precision_weighted": 0.8815407115949124,
+      "recall_weighted": 0.8672042613005845,
+      "f1_weighted": 0.8701767923024966,
+      "confusion_matrix": [
+        [
+          7876,
+          12,
+          8,
+          2,
+          5,
+          209,
+          96,
+          0
+        ],
+        [
+          15,
+          56,
+          0,
+          0,
+          4,
+          30,
+          7,
+          0
+        ],
+        [
+          98,
+          7,
+          729,
+          61,
+          19,
+          104,
+          40,
+          1
+        ],
+        [
+          31,
+          5,
+          73,
+          816,
+          12,
+          125,
+          18,
+          0
+        ],
+        [
+          34,
+          22,
+          25,
+          1,
+          312,
+          41,
+          11,
+          1
+        ],
+        [
+          145,
+          4,
+          17,
+          0,
+          1,
+          298,
+          8,
+          0
+        ],
+        [
+          416,
+          11,
+          10,
+          0,
+          9,
+          38,
+          1487,
+          0
+        ],
+        [
+          9,
+          6,
+          0,
+          0,
+          3,
+          1,
+          0,
+          148
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9132653061224489,
+          "recall": 0.9595516569200779,
+          "f1": 0.9358365019011406,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.45528455284552843,
+          "recall": 0.5,
+          "f1": 0.4765957446808511,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.845707656612529,
+          "recall": 0.6883852691218131,
+          "f1": 0.7589796980739199,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.9272727272727272,
+          "recall": 0.7555555555555555,
+          "f1": 0.8326530612244898,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.8547945205479452,
+          "recall": 0.697986577181208,
+          "f1": 0.7684729064039408,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.35224586288416077,
+          "recall": 0.6300211416490487,
+          "f1": 0.4518574677786202,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.8920215956808638,
+          "recall": 0.7544393708777271,
+          "f1": 0.817482133040132,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.9866666666666667,
+          "recall": 0.8862275449101796,
+          "f1": 0.9337539432176656,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.91      0.96      0.94      8208\n  bruteforce       0.46      0.50      0.48       112\n        ddos       0.85      0.69      0.76      1059\n         dos       0.93      0.76      0.83      1080\n     malware       0.85      0.70      0.77       447\n        mitm       0.35      0.63      0.45       473\n       recon       0.89      0.75      0.82      1971\n         web       0.99      0.89      0.93       167\n\n    accuracy                           0.87     13517\n   macro avg       0.78      0.73      0.75     13517\nweighted avg       0.88      0.87      0.87     13517\n",
+      "model_size": "15208 params",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "RNN (Vanilla)",
+      "category": "dl",
+      "description": "A plain (Elman) recurrent network \u2014 the architecture GRU and LSTM were both built to fix. Reads the standardized features one at a time, carrying a single hidden state forward with a simple tanh update and no gating mechanism at all. Included as the 'how much do the gates actually buy you' reference point against GRU and LSTM \u2014 vanilla RNNs are known to struggle with longer sequences due to vanishing gradients, which the gated variants were designed to fix.",
+      "hyperparams": {
+        "architecture": "RNN(hidden=64, layers=1, tanh) -> FC(64->32->8)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 103.0105459690094,
+      "inference_time_sec": 0.5413920879364014,
+      "inference_time_per_sample_ms": 0.04005268091561747,
+      "accuracy": 0.6072353332840127,
+      "precision_macro": 0.07590441666050159,
+      "recall_macro": 0.125,
+      "f1_macro": 0.09445339470655927,
+      "precision_weighted": 0.368734749988546,
+      "recall_weighted": 0.6072353332840127,
+      "f1_weighted": 0.45884350891555137,
+      "confusion_matrix": [
+        [
+          8208,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          112,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1059,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1080,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          447,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          473,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1971,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          167,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.6072353332840127,
+          "recall": 1.0,
+          "f1": 0.7556271576524741,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.61      1.00      0.76      8208\n  bruteforce       0.00      0.00      0.00       112\n        ddos       0.00      0.00      0.00      1059\n         dos       0.00      0.00      0.00      1080\n     malware       0.00      0.00      0.00       447\n        mitm       0.00      0.00      0.00       473\n       recon       0.00      0.00      0.00      1971\n         web       0.00      0.00      0.00       167\n\n    accuracy                           0.61     13517\n   macro avg       0.08      0.12      0.09     13517\nweighted avg       0.37      0.61      0.46     13517\n",
+      "model_size": "6632 params",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "LSTM",
+      "category": "dl",
+      "description": "Long Short-Term Memory \u2014 the original gated recurrent architecture, and (along with GRU) explicitly named in this project's survey as a common IDS approach. Maintains a separate cell state alongside the hidden state, controlled by input/forget/output gates, which is more expressive (and has more parameters) than GRU's single gating mechanism. Same caveat as GRU/RNN: the features have no genuine temporal order here, so this tests whether that extra gating complexity earns its keep on data that isn't actually sequential.",
+      "hyperparams": {
+        "architecture": "LSTM(hidden=64, layers=1) -> FC(64->32->8)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 94.36344909667969,
+      "inference_time_sec": 2.974730968475342,
+      "inference_time_per_sample_ms": 0.22007331275248515,
+      "accuracy": 0.6228453059110749,
+      "precision_macro": 0.25254578335100125,
+      "recall_macro": 0.3360405132309228,
+      "f1_macro": 0.24339154172724725,
+      "precision_weighted": 0.5741828124619313,
+      "recall_weighted": 0.6228453059110749,
+      "f1_weighted": 0.5770161460605749,
+      "confusion_matrix": [
+        [
+          6961,
+          0,
+          1,
+          804,
+          18,
+          0,
+          177,
+          247
+        ],
+        [
+          41,
+          0,
+          0,
+          22,
+          2,
+          0,
+          32,
+          15
+        ],
+        [
+          391,
+          0,
+          0,
+          593,
+          1,
+          0,
+          57,
+          17
+        ],
+        [
+          320,
+          0,
+          0,
+          741,
+          5,
+          0,
+          6,
+          8
+        ],
+        [
+          217,
+          0,
+          0,
+          40,
+          7,
+          0,
+          49,
+          134
+        ],
+        [
+          341,
+          0,
+          0,
+          114,
+          0,
+          0,
+          9,
+          9
+        ],
+        [
+          1075,
+          0,
+          0,
+          155,
+          10,
+          0,
+          568,
+          163
+        ],
+        [
+          5,
+          0,
+          0,
+          2,
+          0,
+          0,
+          18,
+          142
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.744412362314191,
+          "recall": 0.8480750487329435,
+          "f1": 0.7928697534028134,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.2998785916632942,
+          "recall": 0.6861111111111111,
+          "f1": 0.4173472261334835,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.16279069767441862,
+          "recall": 0.015659955257270694,
+          "f1": 0.02857142857142857,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.6200873362445415,
+          "recall": 0.28817858954845255,
+          "f1": 0.3934880498787669,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.19319727891156463,
+          "recall": 0.8502994011976048,
+          "f1": 0.3148558758314856,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.74      0.85      0.79      8208\n  bruteforce       0.00      0.00      0.00       112\n        ddos       0.00      0.00      0.00      1059\n         dos       0.30      0.69      0.42      1080\n     malware       0.16      0.02      0.03       447\n        mitm       0.00      0.00      0.00       473\n       recon       0.62      0.29      0.39      1971\n         web       0.19      0.85      0.31       167\n\n    accuracy                           0.62     13517\n   macro avg       0.25      0.34      0.24     13517\nweighted avg       0.57      0.62      0.58     13517\n",
+      "model_size": "19496 params",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    }
+  ],
+  "multiclass_all_sorted": [
+    {
+      "name": "MLP",
+      "category": "dl",
+      "description": "A fully-connected feed-forward network: every input feature connects to every neuron in the first hidden layer, then the next, etc. No assumption about spatial or sequential structure among the features \u2014 it has to learn any useful feature interactions from scratch via dense weight matrices.",
+      "hyperparams": {
+        "architecture": "109->128->64->32->8",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "regularization": "BatchNorm + Dropout(0.3)",
+        "device": "mps"
+      },
+      "train_time_sec": 63.919113874435425,
+      "inference_time_sec": 0.12749814987182617,
+      "inference_time_per_sample_ms": 0.009432429523698022,
+      "accuracy": 0.9448102389583487,
+      "precision_macro": 0.9012761991883731,
+      "recall_macro": 0.8917957290887275,
+      "f1_macro": 0.8947998587937015,
+      "precision_weighted": 0.9457025987573597,
+      "recall_weighted": 0.9448102389583487,
+      "f1_weighted": 0.9444210094000174,
+      "confusion_matrix": [
+        [
+          8079,
+          24,
+          1,
+          0,
+          0,
+          15,
+          83,
+          6
+        ],
+        [
+          14,
+          86,
+          0,
+          0,
+          0,
+          12,
+          0,
+          0
+        ],
+        [
+          58,
+          2,
+          945,
+          36,
+          4,
+          8,
+          4,
+          2
+        ],
+        [
+          12,
+          1,
+          15,
+          1022,
+          3,
+          25,
+          1,
+          1
+        ],
+        [
+          32,
+          12,
+          0,
+          0,
+          394,
+          3,
+          4,
+          2
+        ],
+        [
+          39,
+          11,
+          0,
+          3,
+          0,
+          409,
+          11,
+          0
+        ],
+        [
+          273,
+          1,
+          0,
+          0,
+          8,
+          11,
+          1678,
+          0
+        ],
+        [
+          9,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          158
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9486848285580085,
+          "recall": 0.9842836257309941,
+          "f1": 0.9661564219086343,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.6277372262773723,
+          "recall": 0.7678571428571429,
+          "f1": 0.6907630522088354,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.9833506763787722,
+          "recall": 0.8923512747875354,
+          "f1": 0.9356435643564357,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.9632422243166824,
+          "recall": 0.9462962962962963,
+          "f1": 0.9546940681924334,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.9633251833740831,
+          "recall": 0.8814317673378076,
+          "f1": 0.9205607476635514,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.8467908902691511,
+          "recall": 0.864693446088795,
+          "f1": 0.8556485355648535,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.9421673217293656,
+          "recall": 0.8513444951801116,
+          "f1": 0.894456289978678,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.9349112426035503,
+          "recall": 0.9461077844311377,
+          "f1": 0.9404761904761905,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.95      0.98      0.97      8208\n  bruteforce       0.63      0.77      0.69       112\n        ddos       0.98      0.89      0.94      1059\n         dos       0.96      0.95      0.95      1080\n     malware       0.96      0.88      0.92       447\n        mitm       0.85      0.86      0.86       473\n       recon       0.94      0.85      0.89      1971\n         web       0.93      0.95      0.94       167\n\n    accuracy                           0.94     13517\n   macro avg       0.90      0.89      0.89     13517\nweighted avg       0.95      0.94      0.94     13517\n",
+      "model_size": "25064 params",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "Gradient Boosting",
+      "category": "ml",
+      "description": "Histogram-based gradient boosting (sklearn's LightGBM-style implementation): builds 200 shallow trees sequentially, where each new tree is trained to correct the errors of all trees built so far, rather than voting independently like Random Forest. Usually the strongest classic-ML performer on tabular data.",
+      "hyperparams": {
+        "max_iter": 200,
+        "class_weight": "balanced"
+      },
+      "train_time_sec": 6.990016937255859,
+      "inference_time_sec": 0.13255810737609863,
+      "inference_time_per_sample_ms": 0.0098067697992231,
+      "accuracy": 0.9516164829473995,
+      "precision_macro": 0.8593051000777454,
+      "recall_macro": 0.9530192428462904,
+      "f1_macro": 0.8931304498091278,
+      "precision_weighted": 0.9581671484053229,
+      "recall_weighted": 0.9516164829473995,
+      "f1_weighted": 0.9536489839647968,
+      "confusion_matrix": [
+        [
+          7855,
+          64,
+          3,
+          1,
+          7,
+          3,
+          139,
+          136
+        ],
+        [
+          2,
+          104,
+          0,
+          0,
+          1,
+          0,
+          1,
+          4
+        ],
+        [
+          32,
+          2,
+          985,
+          16,
+          3,
+          7,
+          13,
+          1
+        ],
+        [
+          4,
+          0,
+          21,
+          1048,
+          1,
+          4,
+          0,
+          2
+        ],
+        [
+          6,
+          1,
+          2,
+          1,
+          433,
+          3,
+          1,
+          0
+        ],
+        [
+          10,
+          0,
+          0,
+          0,
+          0,
+          460,
+          2,
+          1
+        ],
+        [
+          129,
+          2,
+          2,
+          1,
+          7,
+          12,
+          1815,
+          3
+        ],
+        [
+          3,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          163
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9768685486879741,
+          "recall": 0.9569931773879142,
+          "f1": 0.9668287279217183,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.5977011494252874,
+          "recall": 0.9285714285714286,
+          "f1": 0.7272727272727273,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.9723593287265548,
+          "recall": 0.9301227573182247,
+          "f1": 0.9507722007722008,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.9821930646672915,
+          "recall": 0.9703703703703703,
+          "f1": 0.976245924545878,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.9579646017699115,
+          "recall": 0.9686800894854586,
+          "f1": 0.9632925472747497,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.9406952965235174,
+          "recall": 0.9725158562367865,
+          "f1": 0.9563409563409564,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.9208523592085236,
+          "recall": 0.9208523592085236,
+          "f1": 0.9208523592085236,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.5258064516129032,
+          "recall": 0.9760479041916168,
+          "f1": 0.6834381551362684,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.98      0.96      0.97      8208\n  bruteforce       0.60      0.93      0.73       112\n        ddos       0.97      0.93      0.95      1059\n         dos       0.98      0.97      0.98      1080\n     malware       0.96      0.97      0.96       447\n        mitm       0.94      0.97      0.96       473\n       recon       0.92      0.92      0.92      1971\n         web       0.53      0.98      0.68       167\n\n    accuracy                           0.95     13517\n   macro avg       0.86      0.95      0.89     13517\nweighted avg       0.96      0.95      0.95     13517\n",
+      "model_size": "200 boosting rounds",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "Random Forest",
+      "category": "ml",
+      "description": "An ensemble of 200 decision trees, each trained on a bootstrapped sample of rows and a random subset of features, voting on the final class. Robust, needs no feature scaling, and gives directly-inspectable feature importances.",
+      "hyperparams": {
+        "n_estimators": 200,
+        "class_weight": "balanced",
+        "max_depth": "unlimited"
+      },
+      "train_time_sec": 0.7629501819610596,
+      "inference_time_sec": 0.03735494613647461,
+      "inference_time_per_sample_ms": 0.0027635530174206268,
+      "accuracy": 0.9417770215284457,
+      "precision_macro": 0.8500925104367392,
+      "recall_macro": 0.9446620519852029,
+      "f1_macro": 0.8842398212235281,
+      "precision_weighted": 0.9485740846384171,
+      "recall_weighted": 0.9417770215284457,
+      "f1_weighted": 0.9438966616525848,
+      "confusion_matrix": [
+        [
+          7777,
+          68,
+          10,
+          4,
+          5,
+          6,
+          201,
+          137
+        ],
+        [
+          3,
+          102,
+          0,
+          0,
+          1,
+          0,
+          1,
+          5
+        ],
+        [
+          37,
+          0,
+          983,
+          18,
+          4,
+          7,
+          7,
+          3
+        ],
+        [
+          4,
+          0,
+          20,
+          1043,
+          1,
+          9,
+          1,
+          2
+        ],
+        [
+          7,
+          0,
+          2,
+          0,
+          433,
+          3,
+          2,
+          0
+        ],
+        [
+          12,
+          0,
+          0,
+          1,
+          1,
+          454,
+          4,
+          1
+        ],
+        [
+          171,
+          3,
+          1,
+          0,
+          8,
+          10,
+          1775,
+          3
+        ],
+        [
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          163
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9703056768558952,
+          "recall": 0.947490253411306,
+          "f1": 0.9587622511249461,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.5895953757225434,
+          "recall": 0.9107142857142857,
+          "f1": 0.7157894736842105,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.96751968503937,
+          "recall": 0.9282341831916903,
+          "f1": 0.9474698795180723,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.9784240150093808,
+          "recall": 0.9657407407407408,
+          "f1": 0.9720410065237651,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.9558498896247241,
+          "recall": 0.9686800894854586,
+          "f1": 0.9622222222222222,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.9284253578732107,
+          "recall": 0.959830866807611,
+          "f1": 0.9438669438669439,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.891511803114013,
+          "recall": 0.9005580923389143,
+          "f1": 0.8960121150933872,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.5191082802547771,
+          "recall": 0.9760479041916168,
+          "f1": 0.6777546777546778,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.97      0.95      0.96      8208\n  bruteforce       0.59      0.91      0.72       112\n        ddos       0.97      0.93      0.95      1059\n         dos       0.98      0.97      0.97      1080\n     malware       0.96      0.97      0.96       447\n        mitm       0.93      0.96      0.94       473\n       recon       0.89      0.90      0.90      1971\n         web       0.52      0.98      0.68       167\n\n    accuracy                           0.94     13517\n   macro avg       0.85      0.94      0.88     13517\nweighted avg       0.95      0.94      0.94     13517\n",
+      "model_size": "200 trees",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109,
+      "feature_importances": {
+        "log_data-ranges_avg": 0.002618402875935233,
+        "log_data-ranges_max": 0.003008388831865394,
+        "log_data-ranges_min": 0.0015709235033868512,
+        "log_data-ranges_std_deviation": 0.0018379900997564863,
+        "log_data-types_count": 0.003171214200610882,
+        "log_interval-messages": 0.0023492059961078573,
+        "log_messages_count": 0.003980397128664204,
+        "network_fragmentation-score": 0.0011213559544454071,
+        "network_fragmented-packets": 0.0018374459066992387,
+        "network_header-length_avg": 0.0007236780423949461,
+        "network_header-length_max": 0.0002780808679186978,
+        "network_header-length_min": 0.0004452869558177807,
+        "network_header-length_std_deviation": 4.033197533045018e-05,
+        "network_interval-packets": 0.02975667204766473,
+        "network_ip-flags_avg": 0.020885074890615484,
+        "network_ip-flags_max": 0.0009172724829440897,
+        "network_ip-flags_min": 0.001120378826821075,
+        "network_ip-flags_std_deviation": 0.008155247741504558,
+        "network_ip-length_avg": 0.027955439806335903,
+        "network_ip-length_max": 0.012130983024843823,
+        "network_ip-length_min": 0.017512842064873482,
+        "network_ip-length_std_deviation": 0.015893177917255284,
+        "network_ips_all_count": 0.017823564574182518,
+        "network_ips_dst_count": 0.015095475115509245,
+        "network_ips_src_count": 0.022532458670690824,
+        "network_macs_all_count": 0.019709757844429722,
+        "network_macs_dst_count": 0.01881538095454363,
+        "network_macs_src_count": 0.01919872635367086,
+        "network_mss_avg": 0.010876412634262707,
+        "network_mss_max": 0.0105986623946088,
+        "network_mss_min": 0.01084714478050888,
+        "network_mss_std_deviation": 0.0002557508395274055,
+        "network_packet-size_avg": 0.016853040744296027,
+        "network_packet-size_max": 0.009112295707815365,
+        "network_packet-size_min": 0.019022827703193464,
+        "network_packet-size_std_deviation": 0.016580747420533865,
+        "network_packets_all_count": 0.032659561344076785,
+        "network_packets_dst_count": 0.039573982304526356,
+        "network_packets_src_count": 0.015260446929814892,
+        "network_payload-length_avg": 0.012782682973973612,
+        "network_payload-length_max": 0.010228549284542697,
+        "network_payload-length_min": 0.0011442622487469964,
+        "network_payload-length_std_deviation": 0.017470686877766803,
+        "network_ports_all_count": 0.03279887776155887,
+        "network_ports_dst_count": 0.018737962373252526,
+        "network_ports_src_count": 0.023167412256903795,
+        "network_protocols_all_count": 0.002791922715724159,
+        "network_protocols_dst_count": 0.0046987656520967635,
+        "network_protocols_src_count": 0.0029356371152730355,
+        "network_tcp-flags-ack_count": 0.011021973062387391,
+        "network_tcp-flags-fin_count": 0.010447396858911441,
+        "network_tcp-flags-psh_count": 0.0075614016903390755,
+        "network_tcp-flags-rst_count": 0.021649838916008753,
+        "network_tcp-flags-syn_count": 0.013313416597514022,
+        "network_tcp-flags-urg_count": 3.3649382012335396e-05,
+        "network_tcp-flags_avg": 0.008789512601762299,
+        "network_tcp-flags_max": 0.002002269834813185,
+        "network_tcp-flags_min": 0.00349957680729415,
+        "network_tcp-flags_std_deviation": 0.020597381287674254,
+        "network_time-delta_avg": 0.04872415693129905,
+        "network_time-delta_max": 0.024742533951415055,
+        "network_time-delta_min": 0.012168874703113937,
+        "network_time-delta_std_deviation": 0.0367968686126012,
+        "network_ttl_avg": 0.016770019475867856,
+        "network_ttl_max": 0.005233374782947003,
+        "network_ttl_min": 0.023465915692916606,
+        "network_ttl_std_deviation": 0.019120901628628992,
+        "network_window-size_avg": 0.019255793809366192,
+        "network_window-size_max": 0.01407841831800229,
+        "network_window-size_min": 0.022595438022017255,
+        "network_window-size_std_deviation": 0.03680443572555889,
+        "device_accelerometer-sensor": 3.891841834258837e-05,
+        "device_ap": 0.0017124218143453253,
+        "device_blurams-camera": 0.00020606580652407828,
+        "device_dekco-camera": 0.0005414332959541694,
+        "device_edge1": 0.028074883203432183,
+        "device_flame-sensor": 0.0003336065989115486,
+        "device_gas-sensor": 3.754433103290529e-05,
+        "device_geeni-camera": 0.002080019465049427,
+        "device_light-sensor": 3.2674515007228276e-05,
+        "device_motion-sensor": 0.0005163364807720275,
+        "device_mqtt-broker": 0.000936823675006512,
+        "device_myq-camera": 0.0005147134245903105,
+        "device_plug-all-cameras": 0.0003982708476833264,
+        "device_plug-all-rpb": 0.0001612899769967668,
+        "device_plug-all-sensors": 0.0002677042725109924,
+        "device_plug-cameras-dekco-blurams": 8.84611228167924e-05,
+        "device_plug-cameras-geeni": 9.578737641128343e-05,
+        "device_plug-cameras-yi": 9.508250429232901e-05,
+        "device_plug-edge1": 0.0002553661438636285,
+        "device_plug-flame": 0.000249560801961894,
+        "device_plug-motion": 0.0002879069640547183,
+        "device_plug-mqtt": 0.0002499418025103585,
+        "device_plug-proximity": 0.0003887850973443194,
+        "device_plug-rfid": 0.00026993408695343365,
+        "device_plug-vibration": 0.0003131222787899881,
+        "device_proximity-collision-sensor": 0.0004212354359975216,
+        "device_rfid-sensor": 0.0002716985304085195,
+        "device_router": 0.0007750776349929313,
+        "device_soil-sensor": 0.00012195911305804066,
+        "device_sound-sensor": 5.616809901237629e-05,
+        "device_steam-sensor": 0.0002124630875695232,
+        "device_switch": 0.0006386603085158576,
+        "device_ultrasonic-sensor": 4.311485648260724e-05,
+        "device_vibration-sensor": 0.00045143659482873753,
+        "device_water-sensor": 0.00010797042819999328,
+        "device_weather-sensor": 7.381469803068971e-05,
+        "device_wisenet-camera": 0.0002825146970121463,
+        "device_yi-camera": 0.0008412968004592685
+      }
+    },
+    {
+      "name": "1D-CNN",
+      "category": "dl",
+      "description": "Treats the standardized device/network telemetry features as a 1-dimensional signal and slides learned convolutional filters across neighboring features, looking for local patterns before pooling into a fixed-size representation. As with the MQTTset project, there's no genuine spatial relationship between adjacent feature columns here \u2014 this is a fair test of the algorithm on these features, not a fair test of what CNNs are built for.",
+      "hyperparams": {
+        "architecture": "Conv1d(1->32)->Conv1d(32->64)->GlobalAvgPool->FC(64->32->8)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 39.75075101852417,
+      "inference_time_sec": 0.5324950218200684,
+      "inference_time_per_sample_ms": 0.03939446784198183,
+      "accuracy": 0.9243915069911963,
+      "precision_macro": 0.8892298509737333,
+      "recall_macro": 0.8461752784646726,
+      "f1_macro": 0.8595960241272473,
+      "precision_weighted": 0.9306604617914014,
+      "recall_weighted": 0.9243915069911963,
+      "f1_weighted": 0.9241684563062722,
+      "confusion_matrix": [
+        [
+          8061,
+          6,
+          0,
+          6,
+          4,
+          57,
+          74,
+          0
+        ],
+        [
+          11,
+          68,
+          0,
+          2,
+          0,
+          30,
+          0,
+          1
+        ],
+        [
+          67,
+          0,
+          835,
+          107,
+          2,
+          44,
+          4,
+          0
+        ],
+        [
+          23,
+          0,
+          6,
+          1019,
+          5,
+          26,
+          1,
+          0
+        ],
+        [
+          32,
+          6,
+          0,
+          1,
+          375,
+          23,
+          5,
+          5
+        ],
+        [
+          38,
+          0,
+          0,
+          13,
+          0,
+          417,
+          5,
+          0
+        ],
+        [
+          304,
+          2,
+          0,
+          8,
+          5,
+          88,
+          1564,
+          0
+        ],
+        [
+          10,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          156
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9432483032997894,
+          "recall": 0.9820906432748538,
+          "f1": 0.9622776650352155,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.8192771084337349,
+          "recall": 0.6071428571428571,
+          "f1": 0.6974358974358974,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.9928656361474435,
+          "recall": 0.7884796978281398,
+          "f1": 0.8789473684210526,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.8814878892733564,
+          "recall": 0.9435185185185185,
+          "f1": 0.9114490161001789,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.959079283887468,
+          "recall": 0.8389261744966443,
+          "f1": 0.8949880668257757,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.6087591240875913,
+          "recall": 0.8816067653276956,
+          "f1": 0.7202072538860104,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.9461584996975196,
+          "recall": 0.793505834601725,
+          "f1": 0.8631346578366446,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.9629629629629629,
+          "recall": 0.9341317365269461,
+          "f1": 0.9483282674772037,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.94      0.98      0.96      8208\n  bruteforce       0.82      0.61      0.70       112\n        ddos       0.99      0.79      0.88      1059\n         dos       0.88      0.94      0.91      1080\n     malware       0.96      0.84      0.89       447\n        mitm       0.61      0.88      0.72       473\n       recon       0.95      0.79      0.86      1971\n         web       0.96      0.93      0.95       167\n\n    accuracy                           0.92     13517\n   macro avg       0.89      0.85      0.86     13517\nweighted avg       0.93      0.92      0.92     13517\n",
+      "model_size": "8872 params",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "K-Nearest Neighbors",
+      "category": "ml",
+      "description": "Classifies each test window by majority vote among its 5 nearest training windows in standardized feature space \u2014 no training phase to speak of, all the cost is at inference time (it has to search all 31,538 training rows for every one of the 13,517 test rows).",
+      "hyperparams": {
+        "n_neighbors": 5,
+        "metric": "euclidean"
+      },
+      "train_time_sec": 0.001712799072265625,
+      "inference_time_sec": 0.3272099494934082,
+      "inference_time_per_sample_ms": 0.024207290781490583,
+      "accuracy": 0.9128504845749796,
+      "precision_macro": 0.8773702571045785,
+      "recall_macro": 0.8196595611659729,
+      "f1_macro": 0.8452203533658152,
+      "precision_weighted": 0.9127502008829856,
+      "recall_weighted": 0.9128504845749796,
+      "f1_weighted": 0.9101974224674205,
+      "confusion_matrix": [
+        [
+          8100,
+          11,
+          5,
+          7,
+          3,
+          16,
+          65,
+          1
+        ],
+        [
+          23,
+          80,
+          0,
+          0,
+          1,
+          8,
+          0,
+          0
+        ],
+        [
+          78,
+          2,
+          799,
+          147,
+          5,
+          20,
+          4,
+          4
+        ],
+        [
+          18,
+          2,
+          77,
+          953,
+          0,
+          23,
+          6,
+          1
+        ],
+        [
+          46,
+          6,
+          0,
+          1,
+          384,
+          3,
+          4,
+          3
+        ],
+        [
+          130,
+          9,
+          1,
+          29,
+          1,
+          298,
+          5,
+          0
+        ],
+        [
+          379,
+          1,
+          2,
+          1,
+          9,
+          10,
+          1569,
+          0
+        ],
+        [
+          10,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          156
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9221311475409836,
+          "recall": 0.9868421052631579,
+          "f1": 0.9533898305084746,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.7207207207207207,
+          "recall": 0.7142857142857143,
+          "f1": 0.7174887892376681,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.9028248587570622,
+          "recall": 0.7544853635505193,
+          "f1": 0.8220164609053497,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.8374340949033392,
+          "recall": 0.8824074074074074,
+          "f1": 0.8593327321911632,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.9528535980148883,
+          "recall": 0.8590604026845637,
+          "f1": 0.9035294117647059,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.7883597883597884,
+          "recall": 0.6300211416490487,
+          "f1": 0.700352526439483,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.9491833030852994,
+          "recall": 0.7960426179604262,
+          "f1": 0.8658940397350994,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.9454545454545454,
+          "recall": 0.9341317365269461,
+          "f1": 0.9397590361445783,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.92      0.99      0.95      8208\n  bruteforce       0.72      0.71      0.72       112\n        ddos       0.90      0.75      0.82      1059\n         dos       0.84      0.88      0.86      1080\n     malware       0.95      0.86      0.90       447\n        mitm       0.79      0.63      0.70       473\n       recon       0.95      0.80      0.87      1971\n         web       0.95      0.93      0.94       167\n\n    accuracy                           0.91     13517\n   macro avg       0.88      0.82      0.85     13517\nweighted avg       0.91      0.91      0.91     13517\n",
+      "model_size": "lazy (stores all 31,538 training rows)",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "SVM (RBF)",
+      "category": "ml",
+      "description": "A Support Vector Machine with an RBF (Gaussian) kernel: finds the decision boundary that maximizes the margin between classes, implicitly projecting the standardized features into a higher-dimensional space where a non-linear boundary becomes linear. Unlike every other model here, training cost scales roughly quadratically with the number of rows, which is why this is the slowest model in the entire lineup to train despite being 'classic' ML.",
+      "hyperparams": {
+        "kernel": "rbf",
+        "class_weight": "balanced",
+        "cache_size_mb": 1000
+      },
+      "train_time_sec": 22.195895195007324,
+      "inference_time_sec": 19.573426008224487,
+      "inference_time_per_sample_ms": 1.448059925147924,
+      "accuracy": 0.8840719094473626,
+      "precision_macro": 0.7409325084304226,
+      "recall_macro": 0.8725198012362221,
+      "f1_macro": 0.7666569356491171,
+      "precision_weighted": 0.9105050401978197,
+      "recall_weighted": 0.8840719094473626,
+      "f1_weighted": 0.8929243357420575,
+      "confusion_matrix": [
+        [
+          7493,
+          216,
+          8,
+          0,
+          26,
+          122,
+          125,
+          218
+        ],
+        [
+          3,
+          99,
+          0,
+          0,
+          0,
+          4,
+          0,
+          6
+        ],
+        [
+          49,
+          12,
+          923,
+          40,
+          7,
+          21,
+          1,
+          6
+        ],
+        [
+          10,
+          3,
+          33,
+          982,
+          2,
+          46,
+          1,
+          3
+        ],
+        [
+          26,
+          28,
+          0,
+          0,
+          384,
+          3,
+          1,
+          5
+        ],
+        [
+          69,
+          36,
+          2,
+          2,
+          1,
+          360,
+          2,
+          1
+        ],
+        [
+          382,
+          7,
+          0,
+          1,
+          19,
+          12,
+          1542,
+          8
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          167
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9328934262948207,
+          "recall": 0.9128898635477583,
+          "f1": 0.922783251231527,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.24688279301745636,
+          "recall": 0.8839285714285714,
+          "f1": 0.38596491228070173,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.9554865424430642,
+          "recall": 0.8715769593956563,
+          "f1": 0.9116049382716049,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.9580487804878048,
+          "recall": 0.9092592592592592,
+          "f1": 0.9330166270783848,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.8747152619589977,
+          "recall": 0.8590604026845637,
+          "f1": 0.8668171557562077,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.6338028169014085,
+          "recall": 0.7610993657505285,
+          "f1": 0.69164265129683,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.9222488038277512,
+          "recall": 0.7823439878234398,
+          "f1": 0.8465550370573703,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.4033816425120773,
+          "recall": 1.0,
+          "f1": 0.5748709122203098,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.93      0.91      0.92      8208\n  bruteforce       0.25      0.88      0.39       112\n        ddos       0.96      0.87      0.91      1059\n         dos       0.96      0.91      0.93      1080\n     malware       0.87      0.86      0.87       447\n        mitm       0.63      0.76      0.69       473\n       recon       0.92      0.78      0.85      1971\n         web       0.40      1.00      0.57       167\n\n    accuracy                           0.88     13517\n   macro avg       0.74      0.87      0.77     13517\nweighted avg       0.91      0.88      0.89     13517\n",
+      "model_size": "15227 support vectors",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "GRU (Recurrent)",
+      "category": "dl",
+      "description": "A Gated Recurrent Unit, reading the standardized features one at a time as if they were a short time series, carrying a hidden state forward, then classifying from the final hidden state. The features have no real temporal order here (they're a mix of packet-size stats, TCP flag counts, device counts, etc.), so this tests whether recurrent processing helps or just adds overhead on data that isn't actually sequential.",
+      "hyperparams": {
+        "architecture": "GRU(hidden=64, layers=1) -> FC(64->32->8)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 126.48569512367249,
+      "inference_time_sec": 0.608811616897583,
+      "inference_time_per_sample_ms": 0.045040439217103136,
+      "accuracy": 0.8672042613005845,
+      "precision_macro": 0.7784073610791088,
+      "recall_macro": 0.7340208895269512,
+      "f1_macro": 0.746953932040095,
+      "precision_weighted": 0.8815407115949124,
+      "recall_weighted": 0.8672042613005845,
+      "f1_weighted": 0.8701767923024966,
+      "confusion_matrix": [
+        [
+          7876,
+          12,
+          8,
+          2,
+          5,
+          209,
+          96,
+          0
+        ],
+        [
+          15,
+          56,
+          0,
+          0,
+          4,
+          30,
+          7,
+          0
+        ],
+        [
+          98,
+          7,
+          729,
+          61,
+          19,
+          104,
+          40,
+          1
+        ],
+        [
+          31,
+          5,
+          73,
+          816,
+          12,
+          125,
+          18,
+          0
+        ],
+        [
+          34,
+          22,
+          25,
+          1,
+          312,
+          41,
+          11,
+          1
+        ],
+        [
+          145,
+          4,
+          17,
+          0,
+          1,
+          298,
+          8,
+          0
+        ],
+        [
+          416,
+          11,
+          10,
+          0,
+          9,
+          38,
+          1487,
+          0
+        ],
+        [
+          9,
+          6,
+          0,
+          0,
+          3,
+          1,
+          0,
+          148
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9132653061224489,
+          "recall": 0.9595516569200779,
+          "f1": 0.9358365019011406,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.45528455284552843,
+          "recall": 0.5,
+          "f1": 0.4765957446808511,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.845707656612529,
+          "recall": 0.6883852691218131,
+          "f1": 0.7589796980739199,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.9272727272727272,
+          "recall": 0.7555555555555555,
+          "f1": 0.8326530612244898,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.8547945205479452,
+          "recall": 0.697986577181208,
+          "f1": 0.7684729064039408,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.35224586288416077,
+          "recall": 0.6300211416490487,
+          "f1": 0.4518574677786202,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.8920215956808638,
+          "recall": 0.7544393708777271,
+          "f1": 0.817482133040132,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.9866666666666667,
+          "recall": 0.8862275449101796,
+          "f1": 0.9337539432176656,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.91      0.96      0.94      8208\n  bruteforce       0.46      0.50      0.48       112\n        ddos       0.85      0.69      0.76      1059\n         dos       0.93      0.76      0.83      1080\n     malware       0.85      0.70      0.77       447\n        mitm       0.35      0.63      0.45       473\n       recon       0.89      0.75      0.82      1971\n         web       0.99      0.89      0.93       167\n\n    accuracy                           0.87     13517\n   macro avg       0.78      0.73      0.75     13517\nweighted avg       0.88      0.87      0.87     13517\n",
+      "model_size": "15208 params",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "Logistic Regression",
+      "category": "ml",
+      "description": "A linear model: one weighted sum of the (standardized) features per class, turned into probabilities via softmax. The simplest possible baseline \u2014 if this does nearly as well as the ensembles, the classes are close to linearly separable in this feature space; if it does much worse, the boundary between traffic types is genuinely non-linear.",
+      "hyperparams": {
+        "solver": "lbfgs",
+        "max_iter": 1000,
+        "class_weight": "balanced"
+      },
+      "train_time_sec": 1.2646517753601074,
+      "inference_time_sec": 0.0008528232574462891,
+      "inference_time_per_sample_ms": 6.309264314909293e-05,
+      "accuracy": 0.8568469334911593,
+      "precision_macro": 0.6864749071338372,
+      "recall_macro": 0.8668415415217945,
+      "f1_macro": 0.7357064400521722,
+      "precision_weighted": 0.890504538465419,
+      "recall_weighted": 0.8568469334911593,
+      "f1_weighted": 0.8678701560185915,
+      "confusion_matrix": [
+        [
+          7087,
+          211,
+          14,
+          2,
+          109,
+          285,
+          299,
+          201
+        ],
+        [
+          2,
+          96,
+          0,
+          0,
+          1,
+          7,
+          0,
+          6
+        ],
+        [
+          43,
+          12,
+          889,
+          71,
+          11,
+          25,
+          3,
+          5
+        ],
+        [
+          9,
+          1,
+          65,
+          932,
+          12,
+          51,
+          6,
+          4
+        ],
+        [
+          11,
+          24,
+          0,
+          1,
+          396,
+          9,
+          5,
+          1
+        ],
+        [
+          58,
+          19,
+          1,
+          8,
+          5,
+          379,
+          2,
+          1
+        ],
+        [
+          267,
+          7,
+          2,
+          1,
+          34,
+          15,
+          1637,
+          8
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          166
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9477132923241508,
+          "recall": 0.8634259259259259,
+          "f1": 0.9036083131454801,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.2594594594594595,
+          "recall": 0.8571428571428571,
+          "f1": 0.3983402489626556,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.9155509783728115,
+          "recall": 0.8394711992445704,
+          "f1": 0.8758620689655172,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.9182266009852217,
+          "recall": 0.8629629629629629,
+          "f1": 0.8897374701670644,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.6971830985915493,
+          "recall": 0.8859060402684564,
+          "f1": 0.780295566502463,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.4915693904020752,
+          "recall": 0.8012684989429175,
+          "f1": 0.6093247588424437,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.8386270491803278,
+          "recall": 0.8305428716387621,
+          "f1": 0.8345653836349732,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.42346938775510207,
+          "recall": 0.9940119760479041,
+          "f1": 0.59391771019678,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.95      0.86      0.90      8208\n  bruteforce       0.26      0.86      0.40       112\n        ddos       0.92      0.84      0.88      1059\n         dos       0.92      0.86      0.89      1080\n     malware       0.70      0.89      0.78       447\n        mitm       0.49      0.80      0.61       473\n       recon       0.84      0.83      0.83      1971\n         web       0.42      0.99      0.59       167\n\n    accuracy                           0.86     13517\n   macro avg       0.69      0.87      0.74     13517\nweighted avg       0.89      0.86      0.87     13517\n",
+      "model_size": "880 weights",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "Naive Bayes",
+      "category": "ml",
+      "description": "Assumes every feature is independent and Gaussian within each class, then applies Bayes' rule directly \u2014 no iterative training at all, just per-class mean/variance estimates. Included as a 'how bad is the floor' reference: network/device telemetry features are clearly not independent of each other, so this tests how much that assumption costs here.",
+      "hyperparams": {},
+      "train_time_sec": 0.013047933578491211,
+      "inference_time_sec": 0.013128042221069336,
+      "inference_time_per_sample_ms": 0.0009712245484256371,
+      "accuracy": 0.4654879041207369,
+      "precision_macro": 0.48071424287231296,
+      "recall_macro": 0.630886179764787,
+      "f1_macro": 0.4343763654207239,
+      "precision_weighted": 0.8080346128468798,
+      "recall_weighted": 0.4654879041207369,
+      "f1_weighted": 0.5465540970748548,
+      "confusion_matrix": [
+        [
+          3242,
+          780,
+          0,
+          1,
+          1108,
+          2846,
+          16,
+          215
+        ],
+        [
+          0,
+          75,
+          0,
+          0,
+          1,
+          0,
+          0,
+          36
+        ],
+        [
+          23,
+          17,
+          658,
+          187,
+          39,
+          119,
+          7,
+          9
+        ],
+        [
+          12,
+          2,
+          366,
+          555,
+          27,
+          100,
+          12,
+          6
+        ],
+        [
+          0,
+          100,
+          0,
+          0,
+          319,
+          0,
+          0,
+          28
+        ],
+        [
+          2,
+          132,
+          0,
+          1,
+          31,
+          306,
+          0,
+          1
+        ],
+        [
+          294,
+          84,
+          41,
+          73,
+          320,
+          180,
+          971,
+          8
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          166
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.9073607612650434,
+          "recall": 0.3949805068226121,
+          "f1": 0.5503777268483151,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.06297229219143577,
+          "recall": 0.6696428571428571,
+          "f1": 0.11511895625479662,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.6178403755868545,
+          "recall": 0.6213408876298395,
+          "f1": 0.6195856873822976,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.6793145654834761,
+          "recall": 0.5138888888888888,
+          "f1": 0.5851344227727991,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.17289972899728998,
+          "recall": 0.7136465324384788,
+          "f1": 0.27835951134380454,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.08617290903970712,
+          "recall": 0.6469344608879493,
+          "f1": 0.15208747514910537,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.9652087475149106,
+          "recall": 0.4926433282597666,
+          "f1": 0.6523345649983204,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.35394456289978676,
+          "recall": 0.9940119760479041,
+          "f1": 0.5220125786163522,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.91      0.39      0.55      8208\n  bruteforce       0.06      0.67      0.12       112\n        ddos       0.62      0.62      0.62      1059\n         dos       0.68      0.51      0.59      1080\n     malware       0.17      0.71      0.28       447\n        mitm       0.09      0.65      0.15       473\n       recon       0.97      0.49      0.65      1971\n         web       0.35      0.99      0.52       167\n\n    accuracy                           0.47     13517\n   macro avg       0.48      0.63      0.43     13517\nweighted avg       0.81      0.47      0.55     13517\n",
+      "model_size": "8 x 109 x 2 stats",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "LSTM",
+      "category": "dl",
+      "description": "Long Short-Term Memory \u2014 the original gated recurrent architecture, and (along with GRU) explicitly named in this project's survey as a common IDS approach. Maintains a separate cell state alongside the hidden state, controlled by input/forget/output gates, which is more expressive (and has more parameters) than GRU's single gating mechanism. Same caveat as GRU/RNN: the features have no genuine temporal order here, so this tests whether that extra gating complexity earns its keep on data that isn't actually sequential.",
+      "hyperparams": {
+        "architecture": "LSTM(hidden=64, layers=1) -> FC(64->32->8)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 94.36344909667969,
+      "inference_time_sec": 2.974730968475342,
+      "inference_time_per_sample_ms": 0.22007331275248515,
+      "accuracy": 0.6228453059110749,
+      "precision_macro": 0.25254578335100125,
+      "recall_macro": 0.3360405132309228,
+      "f1_macro": 0.24339154172724725,
+      "precision_weighted": 0.5741828124619313,
+      "recall_weighted": 0.6228453059110749,
+      "f1_weighted": 0.5770161460605749,
+      "confusion_matrix": [
+        [
+          6961,
+          0,
+          1,
+          804,
+          18,
+          0,
+          177,
+          247
+        ],
+        [
+          41,
+          0,
+          0,
+          22,
+          2,
+          0,
+          32,
+          15
+        ],
+        [
+          391,
+          0,
+          0,
+          593,
+          1,
+          0,
+          57,
+          17
+        ],
+        [
+          320,
+          0,
+          0,
+          741,
+          5,
+          0,
+          6,
+          8
+        ],
+        [
+          217,
+          0,
+          0,
+          40,
+          7,
+          0,
+          49,
+          134
+        ],
+        [
+          341,
+          0,
+          0,
+          114,
+          0,
+          0,
+          9,
+          9
+        ],
+        [
+          1075,
+          0,
+          0,
+          155,
+          10,
+          0,
+          568,
+          163
+        ],
+        [
+          5,
+          0,
+          0,
+          2,
+          0,
+          0,
+          18,
+          142
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.744412362314191,
+          "recall": 0.8480750487329435,
+          "f1": 0.7928697534028134,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.2998785916632942,
+          "recall": 0.6861111111111111,
+          "f1": 0.4173472261334835,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.16279069767441862,
+          "recall": 0.015659955257270694,
+          "f1": 0.02857142857142857,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.6200873362445415,
+          "recall": 0.28817858954845255,
+          "f1": 0.3934880498787669,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.19319727891156463,
+          "recall": 0.8502994011976048,
+          "f1": 0.3148558758314856,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.74      0.85      0.79      8208\n  bruteforce       0.00      0.00      0.00       112\n        ddos       0.00      0.00      0.00      1059\n         dos       0.30      0.69      0.42      1080\n     malware       0.16      0.02      0.03       447\n        mitm       0.00      0.00      0.00       473\n       recon       0.62      0.29      0.39      1971\n         web       0.19      0.85      0.31       167\n\n    accuracy                           0.62     13517\n   macro avg       0.25      0.34      0.24     13517\nweighted avg       0.57      0.62      0.58     13517\n",
+      "model_size": "19496 params",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    },
+    {
+      "name": "RNN (Vanilla)",
+      "category": "dl",
+      "description": "A plain (Elman) recurrent network \u2014 the architecture GRU and LSTM were both built to fix. Reads the standardized features one at a time, carrying a single hidden state forward with a simple tanh update and no gating mechanism at all. Included as the 'how much do the gates actually buy you' reference point against GRU and LSTM \u2014 vanilla RNNs are known to struggle with longer sequences due to vanishing gradients, which the gated variants were designed to fix.",
+      "hyperparams": {
+        "architecture": "RNN(hidden=64, layers=1, tanh) -> FC(64->32->8)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 103.0105459690094,
+      "inference_time_sec": 0.5413920879364014,
+      "inference_time_per_sample_ms": 0.04005268091561747,
+      "accuracy": 0.6072353332840127,
+      "precision_macro": 0.07590441666050159,
+      "recall_macro": 0.125,
+      "f1_macro": 0.09445339470655927,
+      "precision_weighted": 0.368734749988546,
+      "recall_weighted": 0.6072353332840127,
+      "f1_weighted": 0.45884350891555137,
+      "confusion_matrix": [
+        [
+          8208,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          112,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1059,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1080,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          447,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          473,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1971,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          167,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "class_names": [
+        "benign",
+        "bruteforce",
+        "ddos",
+        "dos",
+        "malware",
+        "mitm",
+        "recon",
+        "web"
+      ],
+      "per_class": [
+        {
+          "class": "benign",
+          "precision": 0.6072353332840127,
+          "recall": 1.0,
+          "f1": 0.7556271576524741,
+          "support": 8208
+        },
+        {
+          "class": "bruteforce",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 112
+        },
+        {
+          "class": "ddos",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1059
+        },
+        {
+          "class": "dos",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1080
+        },
+        {
+          "class": "malware",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 447
+        },
+        {
+          "class": "mitm",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 473
+        },
+        {
+          "class": "recon",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1971
+        },
+        {
+          "class": "web",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 167
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n      benign       0.61      1.00      0.76      8208\n  bruteforce       0.00      0.00      0.00       112\n        ddos       0.00      0.00      0.00      1059\n         dos       0.00      0.00      0.00      1080\n     malware       0.00      0.00      0.00       447\n        mitm       0.00      0.00      0.00       473\n       recon       0.00      0.00      0.00      1971\n         web       0.00      0.00      0.00       167\n\n    accuracy                           0.61     13517\n   macro avg       0.08      0.12      0.09     13517\nweighted avg       0.37      0.61      0.46     13517\n",
+      "model_size": "6632 params",
+      "n_train_samples": 31538,
+      "n_test_samples": 13517,
+      "n_features": 109
+    }
+  ],
+  "anomaly_models": [
+    {
+      "name": "Autoencoder (Anomaly Detector)",
+      "category": "dl",
+      "task": "binary_anomaly_detection",
+      "description": "An encoder-decoder network trained ONLY on benign device/network telemetry to reconstruct its own input. It never sees a single labeled attack example. At test time, any window the network reconstructs poorly (high error) is flagged as anomalous \u2014 useful for catching attack types the model has genuinely never seen labeled, i.e. zero-day detection.",
+      "hyperparams": {
+        "architecture": "109->64->24->8 (bottleneck)->24->64->109",
+        "epochs": 30,
+        "optimizer": "Adam(lr=1e-3)",
+        "threshold_rule": "95th percentile of reconstruction error on benign training data",
+        "device": "mps"
+      },
+      "threshold": 0.1678382307291031,
+      "train_time_sec": 6.087299108505249,
+      "inference_time_sec": 0.005602121353149414,
+      "inference_time_per_sample_ms": 0.0004144500520196356,
+      "accuracy": 0.9026411185914034,
+      "precision": 0.904887446765362,
+      "recall": 0.840459596910906,
+      "f1": 0.871484375,
+      "roc_auc": 0.9222695323730309,
+      "confusion_matrix": [
+        [
+          7739,
+          469
+        ],
+        [
+          847,
+          4462
+        ]
+      ],
+      "confusion_matrix_labels": [
+        "benign",
+        "attack"
+      ],
+      "per_class_detection": {
+        "benign": {
+          "n_samples": 8208,
+          "flagged_as_attack_rate": 0.05713937621832359,
+          "interpretation": "false-positive rate (should be low)"
+        },
+        "bruteforce": {
+          "n_samples": 112,
+          "flagged_as_attack_rate": 0.6696428571428571,
+          "interpretation": "detection rate / recall (should be high)"
+        },
+        "ddos": {
+          "n_samples": 1059,
+          "flagged_as_attack_rate": 0.9263456090651558,
+          "interpretation": "detection rate / recall (should be high)"
+        },
+        "dos": {
+          "n_samples": 1080,
+          "flagged_as_attack_rate": 0.987037037037037,
+          "interpretation": "detection rate / recall (should be high)"
+        },
+        "malware": {
+          "n_samples": 447,
+          "flagged_as_attack_rate": 0.8814317673378076,
+          "interpretation": "detection rate / recall (should be high)"
+        },
+        "mitm": {
+          "n_samples": 473,
+          "flagged_as_attack_rate": 0.5369978858350951,
+          "interpretation": "detection rate / recall (should be high)"
+        },
+        "recon": {
+          "n_samples": 1971,
+          "flagged_as_attack_rate": 0.778285134449518,
+          "interpretation": "detection rate / recall (should be high)"
+        },
+        "web": {
+          "n_samples": 167,
+          "flagged_as_attack_rate": 0.9461077844311377,
+          "interpretation": "detection rate / recall (should be high)"
+        }
+      },
+      "model_size": "17701 params",
+      "n_train_samples_benign_only": 19152,
+      "n_test_samples": 13517,
+      "n_features": 109
+    }
+  ]
+}

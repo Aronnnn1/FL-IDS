@@ -1,0 +1,3778 @@
+{
+  "dataset": {
+    "name": "MQTTset",
+    "note": "Substitute for the gated BCCC-MQTT-Augmented-IDS-2026; MQTTset is one of its three constituent source datasets.",
+    "classes": [
+      "bruteforce",
+      "dos",
+      "flood",
+      "legitimate",
+      "malformed",
+      "slowite"
+    ],
+    "n_train": 231646,
+    "n_test": 99290,
+    "n_features": 33,
+    "sequence_window": 8,
+    "sequence_stride": 4,
+    "sequence_max_windows_per_class": 15000,
+    "sequence_window_counts": {
+      "bruteforce": [
+        1001,
+        458
+      ],
+      "dos": [
+        15000,
+        8506
+      ],
+      "flood": [
+        98,
+        89
+      ],
+      "malformed": [
+        979,
+        411
+      ],
+      "slowite": [
+        710,
+        306
+      ],
+      "legitimate": [
+        15000,
+        15000
+      ]
+    },
+    "sequence_n_train_windows": 32788,
+    "sequence_n_test_windows": 24770
+  },
+  "ml_models": [
+    {
+      "name": "Random Forest",
+      "category": "ml",
+      "description": "An ensemble of 200 decision trees, each trained on a bootstrapped sample of rows and a random subset of features, voting on the final class. Robust, needs no feature scaling, and gives directly-inspectable feature importances.",
+      "hyperparams": {
+        "n_estimators": 200,
+        "class_weight": "balanced",
+        "max_depth": "unlimited"
+      },
+      "train_time_sec": 1.6202778816223145,
+      "inference_time_sec": 0.10806131362915039,
+      "inference_time_per_sample_ms": 0.001088340352796358,
+      "accuracy": 0.8855675294591601,
+      "precision_macro": 0.7180959672597602,
+      "recall_macro": 0.8424063794419648,
+      "f1_macro": 0.7156954174829716,
+      "precision_weighted": 0.9406878954172937,
+      "recall_weighted": 0.8855675294591601,
+      "f1_weighted": 0.9111232231642702,
+      "confusion_matrix": [
+        [
+          3329,
+          211,
+          16,
+          6,
+          789,
+          0
+        ],
+        [
+          390,
+          34468,
+          1496,
+          2338,
+          385,
+          0
+        ],
+        [
+          1,
+          1,
+          155,
+          26,
+          1,
+          0
+        ],
+        [
+          1,
+          390,
+          4159,
+          45061,
+          28,
+          0
+        ],
+        [
+          962,
+          111,
+          46,
+          5,
+          2154,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          2761
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7108691010036301,
+          "recall": 0.7651114686279016,
+          "f1": 0.7369935798096081,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9797333788124272,
+          "recall": 0.8820533817846815,
+          "f1": 0.9283309542406205,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.026396457765667576,
+          "recall": 0.842391304347826,
+          "f1": 0.0511889035667107,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.9499325406863985,
+          "recall": 0.9077741292129172,
+          "f1": 0.9283749678083956,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.6416443252904379,
+          "recall": 0.6571079926784624,
+          "f1": 0.6492840994724943,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.71      0.77      0.74      4351\n         dos       0.98      0.88      0.93     39077\n       flood       0.03      0.84      0.05       184\n  legitimate       0.95      0.91      0.93     49639\n   malformed       0.64      0.66      0.65      3278\n     slowite       1.00      1.00      1.00      2761\n\n    accuracy                           0.89     99290\n   macro avg       0.72      0.84      0.72     99290\nweighted avg       0.94      0.89      0.91     99290\n",
+      "model_size": "200 trees",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33,
+      "feature_importances": {
+        "tcp.flags": 0.09222765359658545,
+        "tcp.time_delta": 0.23551973192390294,
+        "tcp.len": 0.10043096008987094,
+        "mqtt.conack.flags": 0.0,
+        "mqtt.conack.flags.reserved": 0.0,
+        "mqtt.conack.flags.sp": 0.0,
+        "mqtt.conack.val": 0.015593528668433564,
+        "mqtt.conflag.cleansess": 0.001753505358104829,
+        "mqtt.conflag.passwd": 0.004499954624189148,
+        "mqtt.conflag.qos": 0.0,
+        "mqtt.conflag.reserved": 0.0,
+        "mqtt.conflag.retain": 0.0,
+        "mqtt.conflag.uname": 0.005766704563208843,
+        "mqtt.conflag.willflag": 0.0,
+        "mqtt.conflags": 0.006427121575948614,
+        "mqtt.dupflag": 0.0024770490859355645,
+        "mqtt.hdrflags": 0.08359357014544411,
+        "mqtt.kalive": 0.005878958689654096,
+        "mqtt.len": 0.08269801161296644,
+        "mqtt.msgid": 0.07343211118416511,
+        "mqtt.msgtype": 0.05236099059037743,
+        "mqtt.proto_len": 0.0031648478522258742,
+        "mqtt.protoname": 0.0020641280870889156,
+        "mqtt.qos": 0.014333963042938668,
+        "mqtt.retain": 0.0010968922912438018,
+        "mqtt.sub.qos": 0.0,
+        "mqtt.suback.qos": 0.0,
+        "mqtt.ver": 0.002315646114147115,
+        "mqtt.willmsg": 0.0,
+        "mqtt.willmsg_len": 0.0,
+        "mqtt.willtopic": 0.0,
+        "mqtt.willtopic_len": 0.0,
+        "mqtt_msg_len": 0.21436467090356853
+      }
+    },
+    {
+      "name": "Logistic Regression",
+      "category": "ml",
+      "description": "A linear model: one weighted sum of the (standardized) features per class, turned into probabilities via softmax. The simplest possible baseline \u2014 if this does nearly as well as the ensembles, the classes are close to linearly separable; if it does much worse, the boundary between traffic types is genuinely non-linear.",
+      "hyperparams": {
+        "solver": "lbfgs",
+        "max_iter": 1000,
+        "class_weight": "balanced"
+      },
+      "train_time_sec": 9.749835014343262,
+      "inference_time_sec": 0.006742000579833984,
+      "inference_time_per_sample_ms": 6.790211078491273e-05,
+      "accuracy": 0.6519790512639743,
+      "precision_macro": 0.7350765159505124,
+      "recall_macro": 0.6854674283663904,
+      "f1_macro": 0.6304921726561064,
+      "precision_weighted": 0.9324332045028594,
+      "recall_weighted": 0.6519790512639743,
+      "f1_weighted": 0.7421310593805145,
+      "confusion_matrix": [
+        [
+          3869,
+          0,
+          0,
+          27,
+          455,
+          0
+        ],
+        [
+          11198,
+          27866,
+          0,
+          13,
+          0,
+          0
+        ],
+        [
+          93,
+          0,
+          87,
+          1,
+          3,
+          0
+        ],
+        [
+          18471,
+          0,
+          2,
+          28642,
+          2524,
+          0
+        ],
+        [
+          1424,
+          0,
+          0,
+          343,
+          1510,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          2761
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.11036941948366852,
+          "recall": 0.889220868765801,
+          "f1": 0.19636603562909202,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 1.0,
+          "recall": 0.7131048954628042,
+          "f1": 0.8325291666044247,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.9775280898876404,
+          "recall": 0.47282608695652173,
+          "f1": 0.6373626373626373,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.9867704816371529,
+          "recall": 0.5770059831986946,
+          "f1": 0.7282018686836585,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.336153161175423,
+          "recall": 0.46064673581452104,
+          "f1": 0.3886743886743887,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 0.999637943519189,
+          "recall": 1.0,
+          "f1": 0.9998189389824371,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.11      0.89      0.20      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.98      0.47      0.64       184\n  legitimate       0.99      0.58      0.73     49639\n   malformed       0.34      0.46      0.39      3278\n     slowite       1.00      1.00      1.00      2761\n\n    accuracy                           0.65     99290\n   macro avg       0.74      0.69      0.63     99290\nweighted avg       0.93      0.65      0.74     99290\n",
+      "model_size": "204 weights",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "Gradient Boosting",
+      "category": "ml",
+      "description": "Histogram-based gradient boosting (sklearn's LightGBM-style implementation): builds 200 shallow trees sequentially, where each new tree is trained to correct the errors of all trees built so far, rather than voting independently like Random Forest. Usually the strongest classic-ML performer on tabular data.",
+      "hyperparams": {
+        "max_iter": 200,
+        "class_weight": "balanced"
+      },
+      "train_time_sec": 4.414218902587891,
+      "inference_time_sec": 0.1607370376586914,
+      "inference_time_per_sample_ms": 0.0016188643132107102,
+      "accuracy": 0.88828683653943,
+      "precision_macro": 0.7255143803589038,
+      "recall_macro": 0.8502331221329186,
+      "f1_macro": 0.7235074856749645,
+      "precision_weighted": 0.9421867765535304,
+      "recall_weighted": 0.88828683653943,
+      "f1_weighted": 0.913131911899154,
+      "confusion_matrix": [
+        [
+          3559,
+          195,
+          42,
+          5,
+          550,
+          0
+        ],
+        [
+          375,
+          34440,
+          1416,
+          2394,
+          452,
+          0
+        ],
+        [
+          1,
+          1,
+          154,
+          27,
+          1,
+          0
+        ],
+        [
+          1,
+          392,
+          4085,
+          45134,
+          27,
+          0
+        ],
+        [
+          1005,
+          80,
+          36,
+          7,
+          2150,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          2761
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7202995345071848,
+          "recall": 0.8179728797977477,
+          "f1": 0.7660352991820921,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9809729976073829,
+          "recall": 0.8813368477621107,
+          "f1": 0.9284895868437015,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.026862026862026864,
+          "recall": 0.8369565217391305,
+          "f1": 0.052053405441946934,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.9488510942460109,
+          "recall": 0.9092447470738734,
+          "f1": 0.9286258049914614,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.6761006289308176,
+          "recall": 0.6558877364246491,
+          "f1": 0.6658408175905853,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.72      0.82      0.77      4351\n         dos       0.98      0.88      0.93     39077\n       flood       0.03      0.84      0.05       184\n  legitimate       0.95      0.91      0.93     49639\n   malformed       0.68      0.66      0.67      3278\n     slowite       1.00      1.00      1.00      2761\n\n    accuracy                           0.89     99290\n   macro avg       0.73      0.85      0.72     99290\nweighted avg       0.94      0.89      0.91     99290\n",
+      "model_size": "200 boosting rounds",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "Naive Bayes",
+      "category": "ml",
+      "description": "Assumes every feature is independent and Gaussian within each class, then applies Bayes' rule directly \u2014 no iterative training at all, just per-class mean/variance estimates. Included as a 'how bad is the floor' reference: MQTT header fields are clearly not independent of each other, so this tests how much that assumption actually costs.",
+      "hyperparams": {},
+      "train_time_sec": 0.0568850040435791,
+      "inference_time_sec": 0.017712116241455078,
+      "inference_time_per_sample_ms": 0.00017838771519241694,
+      "accuracy": 0.7946117433779837,
+      "precision_macro": 0.8743183707286061,
+      "recall_macro": 0.4256805420839361,
+      "f1_macro": 0.47590577094260195,
+      "precision_weighted": 0.8447352194029443,
+      "recall_weighted": 0.7946117433779837,
+      "f1_weighted": 0.7660976557165853,
+      "confusion_matrix": [
+        [
+          836,
+          44,
+          7,
+          3463,
+          1,
+          0
+        ],
+        [
+          0,
+          27866,
+          0,
+          11211,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          89,
+          95,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          49639,
+          0,
+          0
+        ],
+        [
+          212,
+          82,
+          22,
+          2892,
+          70,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          2364,
+          0,
+          397
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7977099236641222,
+          "recall": 0.19213973799126638,
+          "f1": 0.3096869790701982,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9954987139182624,
+          "recall": 0.7131048954628042,
+          "f1": 0.8309651254678018,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.7542372881355932,
+          "recall": 0.483695652173913,
+          "f1": 0.5894039735099338,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.7125488056959118,
+          "recall": 1.0,
+          "f1": 0.8321500716662615,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.9859154929577465,
+          "recall": 0.021354484441732765,
+          "f1": 0.04180352343983278,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 0.14378848243390077,
+          "f1": 0.25142495250158325,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.80      0.19      0.31      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.75      0.48      0.59       184\n  legitimate       0.71      1.00      0.83     49639\n   malformed       0.99      0.02      0.04      3278\n     slowite       1.00      0.14      0.25      2761\n\n    accuracy                           0.79     99290\n   macro avg       0.87      0.43      0.48     99290\nweighted avg       0.84      0.79      0.77     99290\n",
+      "model_size": "6 x 33 x 2 stats",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "K-Nearest Neighbors",
+      "category": "ml",
+      "description": "Classifies each test packet by majority vote among its 5 nearest training packets in standardized feature space \u2014 no training phase to speak of, all the cost is at inference time (it has to search all 231,646 training rows for every one of the 99,290 test rows).",
+      "hyperparams": {
+        "n_neighbors": 5,
+        "metric": "euclidean"
+      },
+      "train_time_sec": 0.009560108184814453,
+      "inference_time_sec": 8.661317825317383,
+      "inference_time_per_sample_ms": 0.08723252921056886,
+      "accuracy": 0.913616678416759,
+      "precision_macro": 0.8845362534810203,
+      "recall_macro": 0.7842384718223702,
+      "f1_macro": 0.8188283451308308,
+      "precision_weighted": 0.9135679244491351,
+      "recall_weighted": 0.913616678416759,
+      "f1_weighted": 0.9129977293154524,
+      "confusion_matrix": [
+        [
+          3338,
+          470,
+          4,
+          15,
+          524,
+          0
+        ],
+        [
+          262,
+          36248,
+          0,
+          2518,
+          49,
+          0
+        ],
+        [
+          1,
+          36,
+          86,
+          57,
+          4,
+          0
+        ],
+        [
+          0,
+          3364,
+          0,
+          46274,
+          1,
+          0
+        ],
+        [
+          944,
+          290,
+          0,
+          22,
+          2022,
+          0
+        ],
+        [
+          5,
+          0,
+          0,
+          0,
+          11,
+          2745
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7336263736263736,
+          "recall": 0.7671799586301999,
+          "f1": 0.7500280867318279,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.897050089091269,
+          "recall": 0.9276044732195409,
+          "f1": 0.9120714600239039,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.9555555555555556,
+          "recall": 0.4673913043478261,
+          "f1": 0.6277372262773723,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.9465695700200466,
+          "recall": 0.9322105602449686,
+          "f1": 0.9393351941131692,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.7744159325928763,
+          "recall": 0.6168395363026236,
+          "f1": 0.6867040244523688,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 0.9942049981890619,
+          "f1": 0.9970940791863422,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.73      0.77      0.75      4351\n         dos       0.90      0.93      0.91     39077\n       flood       0.96      0.47      0.63       184\n  legitimate       0.95      0.93      0.94     49639\n   malformed       0.77      0.62      0.69      3278\n     slowite       1.00      0.99      1.00      2761\n\n    accuracy                           0.91     99290\n   macro avg       0.88      0.78      0.82     99290\nweighted avg       0.91      0.91      0.91     99290\n",
+      "model_size": "lazy (stores all 231,646 training rows)",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "SVM (RBF)",
+      "category": "ml",
+      "description": "A Support Vector Machine with an RBF (Gaussian) kernel: finds the decision boundary that maximizes the margin between classes, implicitly projecting the standardized features into a higher-dimensional space where a non-linear boundary becomes linear. Unlike every other model here, training cost scales roughly quadratically with the number of rows, which is why this is the slowest model in the entire lineup to train despite being 'classic' ML. A full 231,646-row fit was attempted first and killed after 20+ minutes with no end in sight (RBF-kernel SVC training scales roughly O(n^2), and memory usage was still climbing) \u2014 this result trains on a stratified 40,000-row subsample instead, same practical tradeoff made elsewhere in this project for oversized data.",
+      "hyperparams": {
+        "kernel": "rbf",
+        "class_weight": "balanced",
+        "cache_size_mb": 1000,
+        "train_subsample": "40,000 of 231,646 rows (stratified)"
+      },
+      "train_time_sec": 23.366756916046143,
+      "inference_time_sec": 66.98077297210693,
+      "inference_time_per_sample_ms": 0.6745973710555638,
+      "accuracy": 0.6467015812267096,
+      "precision_macro": 0.7458260217365998,
+      "recall_macro": 0.6158860272347485,
+      "f1_macro": 0.5679123436661805,
+      "precision_weighted": 0.9742012740468625,
+      "recall_weighted": 0.6467015812267096,
+      "f1_weighted": 0.7747841590224175,
+      "confusion_matrix": [
+        [
+          2208,
+          0,
+          1664,
+          4,
+          475,
+          0
+        ],
+        [
+          29,
+          27866,
+          11169,
+          13,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          170,
+          1,
+          11,
+          0
+        ],
+        [
+          0,
+          0,
+          18471,
+          31166,
+          0,
+          2
+        ],
+        [
+          561,
+          24,
+          873,
+          218,
+          1602,
+          0
+        ],
+        [
+          123,
+          0,
+          1316,
+          0,
+          123,
+          1199
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7553882996920972,
+          "recall": 0.5074695472305217,
+          "f1": 0.6070937585922463,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9991394765148799,
+          "recall": 0.7131048954628042,
+          "f1": 0.8322308002448967,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.005050054956480409,
+          "recall": 0.9239130434782609,
+          "f1": 0.010045203415369162,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.9924845551238775,
+          "recall": 0.6278530993775056,
+          "f1": 0.7691415456373935,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.7245590230664858,
+          "recall": 0.48871262965222695,
+          "f1": 0.5837128803060667,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 0.9983347210657785,
+          "recall": 0.4342629482071713,
+          "f1": 0.6052498738011105,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.76      0.51      0.61      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.01      0.92      0.01       184\n  legitimate       0.99      0.63      0.77     49639\n   malformed       0.72      0.49      0.58      3278\n     slowite       1.00      0.43      0.61      2761\n\n    accuracy                           0.65     99290\n   macro avg       0.75      0.62      0.57     99290\nweighted avg       0.97      0.65      0.77     99290\n",
+      "model_size": "18433 support vectors",
+      "n_train_samples": 40000,
+      "n_test_samples": 99290,
+      "n_features": 33
+    }
+  ],
+  "dl_models": [
+    {
+      "name": "MLP",
+      "category": "dl",
+      "description": "A fully-connected feed-forward network: every input feature connects to every neuron in the first hidden layer, then the next, etc. No assumption about spatial or sequential structure among the 33 features \u2014 it has to learn any useful feature interactions from scratch via dense weight matrices.",
+      "hyperparams": {
+        "architecture": "33->128->64->32->6",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "regularization": "BatchNorm + Dropout(0.3)",
+        "device": "mps"
+      },
+      "train_time_sec": 42.77182221412659,
+      "inference_time_sec": 0.08379030227661133,
+      "inference_time_per_sample_ms": 0.0008438946749583173,
+      "accuracy": 0.8512941887400544,
+      "precision_macro": 0.913062531566286,
+      "recall_macro": 0.7118327267281598,
+      "f1_macro": 0.7767630041064275,
+      "precision_weighted": 0.8783361158454185,
+      "recall_weighted": 0.8512941887400544,
+      "f1_weighted": 0.8457889598904265,
+      "confusion_matrix": [
+        [
+          2627,
+          0,
+          0,
+          1663,
+          61,
+          0
+        ],
+        [
+          29,
+          27866,
+          0,
+          11182,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          87,
+          93,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          49604,
+          35,
+          0
+        ],
+        [
+          822,
+          12,
+          0,
+          864,
+          1580,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          2761
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7548850574712643,
+          "recall": 0.6037692484486324,
+          "f1": 0.6709232537351552,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9995695530525863,
+          "recall": 0.7131048954628042,
+          "f1": 0.8323799566873273,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 1.0,
+          "recall": 0.47282608695652173,
+          "f1": 0.6420664206642066,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.7823234394221367,
+          "recall": 0.9992949092447471,
+          "f1": 0.8775974169578487,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.9415971394517283,
+          "recall": 0.4820012202562538,
+          "f1": 0.6376109765940274,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.75      0.60      0.67      4351\n         dos       1.00      0.71      0.83     39077\n       flood       1.00      0.47      0.64       184\n  legitimate       0.78      1.00      0.88     49639\n   malformed       0.94      0.48      0.64      3278\n     slowite       1.00      1.00      1.00      2761\n\n    accuracy                           0.85     99290\n   macro avg       0.91      0.71      0.78     99290\nweighted avg       0.88      0.85      0.85     99290\n",
+      "model_size": "15270 params",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "1D-CNN",
+      "category": "dl",
+      "description": "Treats the 33 standardized packet/session features as a 1-dimensional signal and slides learned convolutional filters across neighboring features, looking for local patterns (e.g. a TCP-flag feature next to a length feature behaving a particular way together) before pooling into a fixed-size representation. Common in the MQTT/network-traffic classification literature this project's survey cites. (See the 'DL Home Turf' tab for a follow-up experiment giving this architecture a genuine packet sequence to convolve over, instead of one packet's unrelated header fields.)",
+      "hyperparams": {
+        "architecture": "Conv1d(1->32)->Conv1d(32->64)->GlobalAvgPool->FC(64->32->6)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 99.93773579597473,
+      "inference_time_sec": 0.4305989742279053,
+      "inference_time_per_sample_ms": 0.004336780886573726,
+      "accuracy": 0.7311813878537617,
+      "precision_macro": 0.8935841463702761,
+      "recall_macro": 0.5293288482182964,
+      "f1_macro": 0.6206947921920193,
+      "precision_weighted": 0.8152736010424807,
+      "recall_weighted": 0.7311813878537617,
+      "f1_weighted": 0.708749955286021,
+      "confusion_matrix": [
+        [
+          1708,
+          0,
+          0,
+          2604,
+          39,
+          0
+        ],
+        [
+          19,
+          18315,
+          0,
+          20738,
+          5,
+          0
+        ],
+        [
+          1,
+          0,
+          61,
+          121,
+          1,
+          0
+        ],
+        [
+          0,
+          2,
+          0,
+          49630,
+          7,
+          0
+        ],
+        [
+          542,
+          7,
+          0,
+          1652,
+          1077,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          953,
+          0,
+          1808
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7524229074889868,
+          "recall": 0.39255343599172604,
+          "f1": 0.5159341489201027,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.99950884086444,
+          "recall": 0.4686900222637357,
+          "f1": 0.6381421926447275,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 1.0,
+          "recall": 0.33152173913043476,
+          "f1": 0.49795918367346936,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.655631588681339,
+          "recall": 0.9998186909486493,
+          "f1": 0.7919449165051022,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.953941541186891,
+          "recall": 0.3285539963392312,
+          "f1": 0.48876786929884275,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 0.6548352046360014,
+          "f1": 0.7914204421098708,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.75      0.39      0.52      4351\n         dos       1.00      0.47      0.64     39077\n       flood       1.00      0.33      0.50       184\n  legitimate       0.66      1.00      0.79     49639\n   malformed       0.95      0.33      0.49      3278\n     slowite       1.00      0.65      0.79      2761\n\n    accuracy                           0.73     99290\n   macro avg       0.89      0.53      0.62     99290\nweighted avg       0.82      0.73      0.71     99290\n",
+      "model_size": "8806 params",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "GRU (Recurrent)",
+      "category": "dl",
+      "description": "A Gated Recurrent Unit \u2014 the more efficient sibling of the LSTM, both explicitly named in this project's survey as common IDS architectures. Reads the 33 features one at a time as if they were a short time series, carrying a hidden state forward, then classifies from the final hidden state. The features have no real temporal order here, so this tests whether recurrent processing helps or just adds overhead on data that isn't actually sequential. (See the 'DL Home Turf' tab for a follow-up experiment giving this architecture a genuine packet sequence to read, instead of one packet's unrelated header fields relabeled as fake timesteps.)",
+      "hyperparams": {
+        "architecture": "GRU(hidden=64, layers=1) -> FC(64->32->6)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 122.73469090461731,
+      "inference_time_sec": 0.7817211151123047,
+      "inference_time_per_sample_ms": 0.007873110233782905,
+      "accuracy": 0.8496021754456642,
+      "precision_macro": 0.8858675753286365,
+      "recall_macro": 0.7076600842828661,
+      "f1_macro": 0.7680949124238895,
+      "precision_weighted": 0.8743488397376662,
+      "recall_weighted": 0.8496021754456642,
+      "f1_weighted": 0.8438691699814015,
+      "confusion_matrix": [
+        [
+          2208,
+          0,
+          1,
+          1662,
+          480,
+          0
+        ],
+        [
+          29,
+          27865,
+          2,
+          11181,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          86,
+          94,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          49604,
+          33,
+          2
+        ],
+        [
+          561,
+          12,
+          0,
+          864,
+          1841,
+          0
+        ],
+        [
+          8,
+          0,
+          0,
+          0,
+          0,
+          2753
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7863247863247863,
+          "recall": 0.5074695472305217,
+          "f1": 0.6168459282022629,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9995695376116511,
+          "recall": 0.7130793049619981,
+          "f1": 0.8323625175493623,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.9662921348314607,
+          "recall": 0.4673913043478261,
+          "f1": 0.63003663003663,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.782335777935494,
+          "recall": 0.9992949092447471,
+          "f1": 0.8776051802837833,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.7814091680814941,
+          "recall": 0.5616229408175717,
+          "f1": 0.6535321263755769,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 0.9992740471869328,
+          "recall": 0.997102499094531,
+          "f1": 0.9981870920957215,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.79      0.51      0.62      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.97      0.47      0.63       184\n  legitimate       0.78      1.00      0.88     49639\n   malformed       0.78      0.56      0.65      3278\n     slowite       1.00      1.00      1.00      2761\n\n    accuracy                           0.85     99290\n   macro avg       0.89      0.71      0.77     99290\nweighted avg       0.87      0.85      0.84     99290\n",
+      "model_size": "15142 params",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "RNN (Vanilla)",
+      "category": "dl",
+      "description": "A plain (Elman) recurrent network \u2014 the architecture GRU and LSTM were both built to fix. Reads the 33 features one at a time, carrying a single hidden state forward with a simple tanh update and no gating mechanism at all. Included as the 'how much do the gates actually buy you' reference point against GRU and LSTM below \u2014 vanilla RNNs are known to struggle with longer sequences due to vanishing gradients, which the gated variants were designed to fix.",
+      "hyperparams": {
+        "architecture": "RNN(hidden=64, layers=1, tanh) -> FC(64->32->6)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 212.9413938522339,
+      "inference_time_sec": 0.6356468200683594,
+      "inference_time_per_sample_ms": 0.006401921845788694,
+      "accuracy": 0.8202437304864538,
+      "precision_macro": 0.6780288769936007,
+      "recall_macro": 0.46187968247894373,
+      "f1_macro": 0.5037828306753628,
+      "precision_weighted": 0.8496853649137615,
+      "recall_weighted": 0.8202437304864538,
+      "f1_weighted": 0.8068926517611487,
+      "confusion_matrix": [
+        [
+          2208,
+          11,
+          0,
+          1667,
+          465,
+          0
+        ],
+        [
+          29,
+          27866,
+          0,
+          11182,
+          0,
+          0
+        ],
+        [
+          66,
+          23,
+          0,
+          93,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          49637,
+          2,
+          0
+        ],
+        [
+          548,
+          50,
+          0,
+          1346,
+          1334,
+          0
+        ],
+        [
+          123,
+          0,
+          0,
+          1714,
+          527,
+          397
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7424344317417619,
+          "recall": 0.5074695472305217,
+          "f1": 0.6028668941979523,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9969946332737031,
+          "recall": 0.7131048954628042,
+          "f1": 0.8314858191475077,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.7562120081049376,
+          "recall": 0.9999597090996998,
+          "f1": 0.8611703881052759,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.5725321888412017,
+          "recall": 0.4069554606467358,
+          "f1": 0.47574893009985736,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 0.14378848243390077,
+          "f1": 0.25142495250158325,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.74      0.51      0.60      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.00      0.00      0.00       184\n  legitimate       0.76      1.00      0.86     49639\n   malformed       0.57      0.41      0.48      3278\n     slowite       1.00      0.14      0.25      2761\n\n    accuracy                           0.82     99290\n   macro avg       0.68      0.46      0.50     99290\nweighted avg       0.85      0.82      0.81     99290\n",
+      "model_size": "6566 params",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "LSTM",
+      "category": "dl",
+      "description": "Long Short-Term Memory \u2014 the original gated recurrent architecture, and (along with GRU) explicitly named in this project's survey as a common IDS approach. Maintains a separate cell state alongside the hidden state, controlled by input/forget/output gates, which is more expressive (and has more parameters) than GRU's single gating mechanism. Same caveat as GRU/RNN: the 33 features have no genuine temporal order here, so this tests whether that extra gating complexity earns its keep on data that isn't actually sequential.",
+      "hyperparams": {
+        "architecture": "LSTM(hidden=64, layers=1) -> FC(64->32->6)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 276.8212859630585,
+      "inference_time_sec": 19.842162132263184,
+      "inference_time_per_sample_ms": 0.19984048879306257,
+      "accuracy": 0.8285728673582435,
+      "precision_macro": 0.85479205797554,
+      "recall_macro": 0.5790647110492676,
+      "f1_macro": 0.6560460253855366,
+      "precision_weighted": 0.8599733835374517,
+      "recall_weighted": 0.8285728673582435,
+      "f1_weighted": 0.8186159404756134,
+      "confusion_matrix": [
+        [
+          2624,
+          0,
+          5,
+          1666,
+          48,
+          8
+        ],
+        [
+          29,
+          27865,
+          0,
+          11182,
+          1,
+          0
+        ],
+        [
+          1,
+          0,
+          85,
+          95,
+          1,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          49637,
+          0,
+          2
+        ],
+        [
+          823,
+          24,
+          3,
+          1302,
+          859,
+          267
+        ],
+        [
+          238,
+          0,
+          0,
+          1316,
+          8,
+          1199
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7063257065948856,
+          "recall": 0.6030797517811998,
+          "f1": 0.6506322836598066,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.999139445659579,
+          "recall": 0.7130793049619981,
+          "f1": 0.8322133620045994,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.9139784946236559,
+          "recall": 0.46195652173913043,
+          "f1": 0.6137184115523465,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.7613270345716127,
+          "recall": 0.9999597090996998,
+          "f1": 0.8644774767714238,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.9367502726281353,
+          "recall": 0.26205003050640635,
+          "f1": 0.4095351609058403,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 0.8112313937753721,
+          "recall": 0.4342629482071713,
+          "f1": 0.5656994574192027,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.71      0.60      0.65      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.91      0.46      0.61       184\n  legitimate       0.76      1.00      0.86     49639\n   malformed       0.94      0.26      0.41      3278\n     slowite       0.81      0.43      0.57      2761\n\n    accuracy                           0.83     99290\n   macro avg       0.85      0.58      0.66     99290\nweighted avg       0.86      0.83      0.82     99290\n",
+      "model_size": "19430 params",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    }
+  ],
+  "multiclass_all_sorted": [
+    {
+      "name": "K-Nearest Neighbors",
+      "category": "ml",
+      "description": "Classifies each test packet by majority vote among its 5 nearest training packets in standardized feature space \u2014 no training phase to speak of, all the cost is at inference time (it has to search all 231,646 training rows for every one of the 99,290 test rows).",
+      "hyperparams": {
+        "n_neighbors": 5,
+        "metric": "euclidean"
+      },
+      "train_time_sec": 0.009560108184814453,
+      "inference_time_sec": 8.661317825317383,
+      "inference_time_per_sample_ms": 0.08723252921056886,
+      "accuracy": 0.913616678416759,
+      "precision_macro": 0.8845362534810203,
+      "recall_macro": 0.7842384718223702,
+      "f1_macro": 0.8188283451308308,
+      "precision_weighted": 0.9135679244491351,
+      "recall_weighted": 0.913616678416759,
+      "f1_weighted": 0.9129977293154524,
+      "confusion_matrix": [
+        [
+          3338,
+          470,
+          4,
+          15,
+          524,
+          0
+        ],
+        [
+          262,
+          36248,
+          0,
+          2518,
+          49,
+          0
+        ],
+        [
+          1,
+          36,
+          86,
+          57,
+          4,
+          0
+        ],
+        [
+          0,
+          3364,
+          0,
+          46274,
+          1,
+          0
+        ],
+        [
+          944,
+          290,
+          0,
+          22,
+          2022,
+          0
+        ],
+        [
+          5,
+          0,
+          0,
+          0,
+          11,
+          2745
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7336263736263736,
+          "recall": 0.7671799586301999,
+          "f1": 0.7500280867318279,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.897050089091269,
+          "recall": 0.9276044732195409,
+          "f1": 0.9120714600239039,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.9555555555555556,
+          "recall": 0.4673913043478261,
+          "f1": 0.6277372262773723,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.9465695700200466,
+          "recall": 0.9322105602449686,
+          "f1": 0.9393351941131692,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.7744159325928763,
+          "recall": 0.6168395363026236,
+          "f1": 0.6867040244523688,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 0.9942049981890619,
+          "f1": 0.9970940791863422,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.73      0.77      0.75      4351\n         dos       0.90      0.93      0.91     39077\n       flood       0.96      0.47      0.63       184\n  legitimate       0.95      0.93      0.94     49639\n   malformed       0.77      0.62      0.69      3278\n     slowite       1.00      0.99      1.00      2761\n\n    accuracy                           0.91     99290\n   macro avg       0.88      0.78      0.82     99290\nweighted avg       0.91      0.91      0.91     99290\n",
+      "model_size": "lazy (stores all 231,646 training rows)",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "MLP",
+      "category": "dl",
+      "description": "A fully-connected feed-forward network: every input feature connects to every neuron in the first hidden layer, then the next, etc. No assumption about spatial or sequential structure among the 33 features \u2014 it has to learn any useful feature interactions from scratch via dense weight matrices.",
+      "hyperparams": {
+        "architecture": "33->128->64->32->6",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "regularization": "BatchNorm + Dropout(0.3)",
+        "device": "mps"
+      },
+      "train_time_sec": 42.77182221412659,
+      "inference_time_sec": 0.08379030227661133,
+      "inference_time_per_sample_ms": 0.0008438946749583173,
+      "accuracy": 0.8512941887400544,
+      "precision_macro": 0.913062531566286,
+      "recall_macro": 0.7118327267281598,
+      "f1_macro": 0.7767630041064275,
+      "precision_weighted": 0.8783361158454185,
+      "recall_weighted": 0.8512941887400544,
+      "f1_weighted": 0.8457889598904265,
+      "confusion_matrix": [
+        [
+          2627,
+          0,
+          0,
+          1663,
+          61,
+          0
+        ],
+        [
+          29,
+          27866,
+          0,
+          11182,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          87,
+          93,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          49604,
+          35,
+          0
+        ],
+        [
+          822,
+          12,
+          0,
+          864,
+          1580,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          2761
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7548850574712643,
+          "recall": 0.6037692484486324,
+          "f1": 0.6709232537351552,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9995695530525863,
+          "recall": 0.7131048954628042,
+          "f1": 0.8323799566873273,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 1.0,
+          "recall": 0.47282608695652173,
+          "f1": 0.6420664206642066,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.7823234394221367,
+          "recall": 0.9992949092447471,
+          "f1": 0.8775974169578487,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.9415971394517283,
+          "recall": 0.4820012202562538,
+          "f1": 0.6376109765940274,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.75      0.60      0.67      4351\n         dos       1.00      0.71      0.83     39077\n       flood       1.00      0.47      0.64       184\n  legitimate       0.78      1.00      0.88     49639\n   malformed       0.94      0.48      0.64      3278\n     slowite       1.00      1.00      1.00      2761\n\n    accuracy                           0.85     99290\n   macro avg       0.91      0.71      0.78     99290\nweighted avg       0.88      0.85      0.85     99290\n",
+      "model_size": "15270 params",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "GRU (Recurrent)",
+      "category": "dl",
+      "description": "A Gated Recurrent Unit \u2014 the more efficient sibling of the LSTM, both explicitly named in this project's survey as common IDS architectures. Reads the 33 features one at a time as if they were a short time series, carrying a hidden state forward, then classifies from the final hidden state. The features have no real temporal order here, so this tests whether recurrent processing helps or just adds overhead on data that isn't actually sequential. (See the 'DL Home Turf' tab for a follow-up experiment giving this architecture a genuine packet sequence to read, instead of one packet's unrelated header fields relabeled as fake timesteps.)",
+      "hyperparams": {
+        "architecture": "GRU(hidden=64, layers=1) -> FC(64->32->6)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 122.73469090461731,
+      "inference_time_sec": 0.7817211151123047,
+      "inference_time_per_sample_ms": 0.007873110233782905,
+      "accuracy": 0.8496021754456642,
+      "precision_macro": 0.8858675753286365,
+      "recall_macro": 0.7076600842828661,
+      "f1_macro": 0.7680949124238895,
+      "precision_weighted": 0.8743488397376662,
+      "recall_weighted": 0.8496021754456642,
+      "f1_weighted": 0.8438691699814015,
+      "confusion_matrix": [
+        [
+          2208,
+          0,
+          1,
+          1662,
+          480,
+          0
+        ],
+        [
+          29,
+          27865,
+          2,
+          11181,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          86,
+          94,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          49604,
+          33,
+          2
+        ],
+        [
+          561,
+          12,
+          0,
+          864,
+          1841,
+          0
+        ],
+        [
+          8,
+          0,
+          0,
+          0,
+          0,
+          2753
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7863247863247863,
+          "recall": 0.5074695472305217,
+          "f1": 0.6168459282022629,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9995695376116511,
+          "recall": 0.7130793049619981,
+          "f1": 0.8323625175493623,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.9662921348314607,
+          "recall": 0.4673913043478261,
+          "f1": 0.63003663003663,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.782335777935494,
+          "recall": 0.9992949092447471,
+          "f1": 0.8776051802837833,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.7814091680814941,
+          "recall": 0.5616229408175717,
+          "f1": 0.6535321263755769,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 0.9992740471869328,
+          "recall": 0.997102499094531,
+          "f1": 0.9981870920957215,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.79      0.51      0.62      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.97      0.47      0.63       184\n  legitimate       0.78      1.00      0.88     49639\n   malformed       0.78      0.56      0.65      3278\n     slowite       1.00      1.00      1.00      2761\n\n    accuracy                           0.85     99290\n   macro avg       0.89      0.71      0.77     99290\nweighted avg       0.87      0.85      0.84     99290\n",
+      "model_size": "15142 params",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "Gradient Boosting",
+      "category": "ml",
+      "description": "Histogram-based gradient boosting (sklearn's LightGBM-style implementation): builds 200 shallow trees sequentially, where each new tree is trained to correct the errors of all trees built so far, rather than voting independently like Random Forest. Usually the strongest classic-ML performer on tabular data.",
+      "hyperparams": {
+        "max_iter": 200,
+        "class_weight": "balanced"
+      },
+      "train_time_sec": 4.414218902587891,
+      "inference_time_sec": 0.1607370376586914,
+      "inference_time_per_sample_ms": 0.0016188643132107102,
+      "accuracy": 0.88828683653943,
+      "precision_macro": 0.7255143803589038,
+      "recall_macro": 0.8502331221329186,
+      "f1_macro": 0.7235074856749645,
+      "precision_weighted": 0.9421867765535304,
+      "recall_weighted": 0.88828683653943,
+      "f1_weighted": 0.913131911899154,
+      "confusion_matrix": [
+        [
+          3559,
+          195,
+          42,
+          5,
+          550,
+          0
+        ],
+        [
+          375,
+          34440,
+          1416,
+          2394,
+          452,
+          0
+        ],
+        [
+          1,
+          1,
+          154,
+          27,
+          1,
+          0
+        ],
+        [
+          1,
+          392,
+          4085,
+          45134,
+          27,
+          0
+        ],
+        [
+          1005,
+          80,
+          36,
+          7,
+          2150,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          2761
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7202995345071848,
+          "recall": 0.8179728797977477,
+          "f1": 0.7660352991820921,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9809729976073829,
+          "recall": 0.8813368477621107,
+          "f1": 0.9284895868437015,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.026862026862026864,
+          "recall": 0.8369565217391305,
+          "f1": 0.052053405441946934,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.9488510942460109,
+          "recall": 0.9092447470738734,
+          "f1": 0.9286258049914614,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.6761006289308176,
+          "recall": 0.6558877364246491,
+          "f1": 0.6658408175905853,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.72      0.82      0.77      4351\n         dos       0.98      0.88      0.93     39077\n       flood       0.03      0.84      0.05       184\n  legitimate       0.95      0.91      0.93     49639\n   malformed       0.68      0.66      0.67      3278\n     slowite       1.00      1.00      1.00      2761\n\n    accuracy                           0.89     99290\n   macro avg       0.73      0.85      0.72     99290\nweighted avg       0.94      0.89      0.91     99290\n",
+      "model_size": "200 boosting rounds",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "Random Forest",
+      "category": "ml",
+      "description": "An ensemble of 200 decision trees, each trained on a bootstrapped sample of rows and a random subset of features, voting on the final class. Robust, needs no feature scaling, and gives directly-inspectable feature importances.",
+      "hyperparams": {
+        "n_estimators": 200,
+        "class_weight": "balanced",
+        "max_depth": "unlimited"
+      },
+      "train_time_sec": 1.6202778816223145,
+      "inference_time_sec": 0.10806131362915039,
+      "inference_time_per_sample_ms": 0.001088340352796358,
+      "accuracy": 0.8855675294591601,
+      "precision_macro": 0.7180959672597602,
+      "recall_macro": 0.8424063794419648,
+      "f1_macro": 0.7156954174829716,
+      "precision_weighted": 0.9406878954172937,
+      "recall_weighted": 0.8855675294591601,
+      "f1_weighted": 0.9111232231642702,
+      "confusion_matrix": [
+        [
+          3329,
+          211,
+          16,
+          6,
+          789,
+          0
+        ],
+        [
+          390,
+          34468,
+          1496,
+          2338,
+          385,
+          0
+        ],
+        [
+          1,
+          1,
+          155,
+          26,
+          1,
+          0
+        ],
+        [
+          1,
+          390,
+          4159,
+          45061,
+          28,
+          0
+        ],
+        [
+          962,
+          111,
+          46,
+          5,
+          2154,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          2761
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7108691010036301,
+          "recall": 0.7651114686279016,
+          "f1": 0.7369935798096081,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9797333788124272,
+          "recall": 0.8820533817846815,
+          "f1": 0.9283309542406205,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.026396457765667576,
+          "recall": 0.842391304347826,
+          "f1": 0.0511889035667107,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.9499325406863985,
+          "recall": 0.9077741292129172,
+          "f1": 0.9283749678083956,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.6416443252904379,
+          "recall": 0.6571079926784624,
+          "f1": 0.6492840994724943,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.71      0.77      0.74      4351\n         dos       0.98      0.88      0.93     39077\n       flood       0.03      0.84      0.05       184\n  legitimate       0.95      0.91      0.93     49639\n   malformed       0.64      0.66      0.65      3278\n     slowite       1.00      1.00      1.00      2761\n\n    accuracy                           0.89     99290\n   macro avg       0.72      0.84      0.72     99290\nweighted avg       0.94      0.89      0.91     99290\n",
+      "model_size": "200 trees",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33,
+      "feature_importances": {
+        "tcp.flags": 0.09222765359658545,
+        "tcp.time_delta": 0.23551973192390294,
+        "tcp.len": 0.10043096008987094,
+        "mqtt.conack.flags": 0.0,
+        "mqtt.conack.flags.reserved": 0.0,
+        "mqtt.conack.flags.sp": 0.0,
+        "mqtt.conack.val": 0.015593528668433564,
+        "mqtt.conflag.cleansess": 0.001753505358104829,
+        "mqtt.conflag.passwd": 0.004499954624189148,
+        "mqtt.conflag.qos": 0.0,
+        "mqtt.conflag.reserved": 0.0,
+        "mqtt.conflag.retain": 0.0,
+        "mqtt.conflag.uname": 0.005766704563208843,
+        "mqtt.conflag.willflag": 0.0,
+        "mqtt.conflags": 0.006427121575948614,
+        "mqtt.dupflag": 0.0024770490859355645,
+        "mqtt.hdrflags": 0.08359357014544411,
+        "mqtt.kalive": 0.005878958689654096,
+        "mqtt.len": 0.08269801161296644,
+        "mqtt.msgid": 0.07343211118416511,
+        "mqtt.msgtype": 0.05236099059037743,
+        "mqtt.proto_len": 0.0031648478522258742,
+        "mqtt.protoname": 0.0020641280870889156,
+        "mqtt.qos": 0.014333963042938668,
+        "mqtt.retain": 0.0010968922912438018,
+        "mqtt.sub.qos": 0.0,
+        "mqtt.suback.qos": 0.0,
+        "mqtt.ver": 0.002315646114147115,
+        "mqtt.willmsg": 0.0,
+        "mqtt.willmsg_len": 0.0,
+        "mqtt.willtopic": 0.0,
+        "mqtt.willtopic_len": 0.0,
+        "mqtt_msg_len": 0.21436467090356853
+      }
+    },
+    {
+      "name": "LSTM",
+      "category": "dl",
+      "description": "Long Short-Term Memory \u2014 the original gated recurrent architecture, and (along with GRU) explicitly named in this project's survey as a common IDS approach. Maintains a separate cell state alongside the hidden state, controlled by input/forget/output gates, which is more expressive (and has more parameters) than GRU's single gating mechanism. Same caveat as GRU/RNN: the 33 features have no genuine temporal order here, so this tests whether that extra gating complexity earns its keep on data that isn't actually sequential.",
+      "hyperparams": {
+        "architecture": "LSTM(hidden=64, layers=1) -> FC(64->32->6)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 276.8212859630585,
+      "inference_time_sec": 19.842162132263184,
+      "inference_time_per_sample_ms": 0.19984048879306257,
+      "accuracy": 0.8285728673582435,
+      "precision_macro": 0.85479205797554,
+      "recall_macro": 0.5790647110492676,
+      "f1_macro": 0.6560460253855366,
+      "precision_weighted": 0.8599733835374517,
+      "recall_weighted": 0.8285728673582435,
+      "f1_weighted": 0.8186159404756134,
+      "confusion_matrix": [
+        [
+          2624,
+          0,
+          5,
+          1666,
+          48,
+          8
+        ],
+        [
+          29,
+          27865,
+          0,
+          11182,
+          1,
+          0
+        ],
+        [
+          1,
+          0,
+          85,
+          95,
+          1,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          49637,
+          0,
+          2
+        ],
+        [
+          823,
+          24,
+          3,
+          1302,
+          859,
+          267
+        ],
+        [
+          238,
+          0,
+          0,
+          1316,
+          8,
+          1199
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7063257065948856,
+          "recall": 0.6030797517811998,
+          "f1": 0.6506322836598066,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.999139445659579,
+          "recall": 0.7130793049619981,
+          "f1": 0.8322133620045994,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.9139784946236559,
+          "recall": 0.46195652173913043,
+          "f1": 0.6137184115523465,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.7613270345716127,
+          "recall": 0.9999597090996998,
+          "f1": 0.8644774767714238,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.9367502726281353,
+          "recall": 0.26205003050640635,
+          "f1": 0.4095351609058403,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 0.8112313937753721,
+          "recall": 0.4342629482071713,
+          "f1": 0.5656994574192027,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.71      0.60      0.65      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.91      0.46      0.61       184\n  legitimate       0.76      1.00      0.86     49639\n   malformed       0.94      0.26      0.41      3278\n     slowite       0.81      0.43      0.57      2761\n\n    accuracy                           0.83     99290\n   macro avg       0.85      0.58      0.66     99290\nweighted avg       0.86      0.83      0.82     99290\n",
+      "model_size": "19430 params",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "Logistic Regression",
+      "category": "ml",
+      "description": "A linear model: one weighted sum of the (standardized) features per class, turned into probabilities via softmax. The simplest possible baseline \u2014 if this does nearly as well as the ensembles, the classes are close to linearly separable; if it does much worse, the boundary between traffic types is genuinely non-linear.",
+      "hyperparams": {
+        "solver": "lbfgs",
+        "max_iter": 1000,
+        "class_weight": "balanced"
+      },
+      "train_time_sec": 9.749835014343262,
+      "inference_time_sec": 0.006742000579833984,
+      "inference_time_per_sample_ms": 6.790211078491273e-05,
+      "accuracy": 0.6519790512639743,
+      "precision_macro": 0.7350765159505124,
+      "recall_macro": 0.6854674283663904,
+      "f1_macro": 0.6304921726561064,
+      "precision_weighted": 0.9324332045028594,
+      "recall_weighted": 0.6519790512639743,
+      "f1_weighted": 0.7421310593805145,
+      "confusion_matrix": [
+        [
+          3869,
+          0,
+          0,
+          27,
+          455,
+          0
+        ],
+        [
+          11198,
+          27866,
+          0,
+          13,
+          0,
+          0
+        ],
+        [
+          93,
+          0,
+          87,
+          1,
+          3,
+          0
+        ],
+        [
+          18471,
+          0,
+          2,
+          28642,
+          2524,
+          0
+        ],
+        [
+          1424,
+          0,
+          0,
+          343,
+          1510,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          2761
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.11036941948366852,
+          "recall": 0.889220868765801,
+          "f1": 0.19636603562909202,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 1.0,
+          "recall": 0.7131048954628042,
+          "f1": 0.8325291666044247,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.9775280898876404,
+          "recall": 0.47282608695652173,
+          "f1": 0.6373626373626373,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.9867704816371529,
+          "recall": 0.5770059831986946,
+          "f1": 0.7282018686836585,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.336153161175423,
+          "recall": 0.46064673581452104,
+          "f1": 0.3886743886743887,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 0.999637943519189,
+          "recall": 1.0,
+          "f1": 0.9998189389824371,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.11      0.89      0.20      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.98      0.47      0.64       184\n  legitimate       0.99      0.58      0.73     49639\n   malformed       0.34      0.46      0.39      3278\n     slowite       1.00      1.00      1.00      2761\n\n    accuracy                           0.65     99290\n   macro avg       0.74      0.69      0.63     99290\nweighted avg       0.93      0.65      0.74     99290\n",
+      "model_size": "204 weights",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "1D-CNN",
+      "category": "dl",
+      "description": "Treats the 33 standardized packet/session features as a 1-dimensional signal and slides learned convolutional filters across neighboring features, looking for local patterns (e.g. a TCP-flag feature next to a length feature behaving a particular way together) before pooling into a fixed-size representation. Common in the MQTT/network-traffic classification literature this project's survey cites. (See the 'DL Home Turf' tab for a follow-up experiment giving this architecture a genuine packet sequence to convolve over, instead of one packet's unrelated header fields.)",
+      "hyperparams": {
+        "architecture": "Conv1d(1->32)->Conv1d(32->64)->GlobalAvgPool->FC(64->32->6)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 99.93773579597473,
+      "inference_time_sec": 0.4305989742279053,
+      "inference_time_per_sample_ms": 0.004336780886573726,
+      "accuracy": 0.7311813878537617,
+      "precision_macro": 0.8935841463702761,
+      "recall_macro": 0.5293288482182964,
+      "f1_macro": 0.6206947921920193,
+      "precision_weighted": 0.8152736010424807,
+      "recall_weighted": 0.7311813878537617,
+      "f1_weighted": 0.708749955286021,
+      "confusion_matrix": [
+        [
+          1708,
+          0,
+          0,
+          2604,
+          39,
+          0
+        ],
+        [
+          19,
+          18315,
+          0,
+          20738,
+          5,
+          0
+        ],
+        [
+          1,
+          0,
+          61,
+          121,
+          1,
+          0
+        ],
+        [
+          0,
+          2,
+          0,
+          49630,
+          7,
+          0
+        ],
+        [
+          542,
+          7,
+          0,
+          1652,
+          1077,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          953,
+          0,
+          1808
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7524229074889868,
+          "recall": 0.39255343599172604,
+          "f1": 0.5159341489201027,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.99950884086444,
+          "recall": 0.4686900222637357,
+          "f1": 0.6381421926447275,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 1.0,
+          "recall": 0.33152173913043476,
+          "f1": 0.49795918367346936,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.655631588681339,
+          "recall": 0.9998186909486493,
+          "f1": 0.7919449165051022,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.953941541186891,
+          "recall": 0.3285539963392312,
+          "f1": 0.48876786929884275,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 0.6548352046360014,
+          "f1": 0.7914204421098708,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.75      0.39      0.52      4351\n         dos       1.00      0.47      0.64     39077\n       flood       1.00      0.33      0.50       184\n  legitimate       0.66      1.00      0.79     49639\n   malformed       0.95      0.33      0.49      3278\n     slowite       1.00      0.65      0.79      2761\n\n    accuracy                           0.73     99290\n   macro avg       0.89      0.53      0.62     99290\nweighted avg       0.82      0.73      0.71     99290\n",
+      "model_size": "8806 params",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "SVM (RBF)",
+      "category": "ml",
+      "description": "A Support Vector Machine with an RBF (Gaussian) kernel: finds the decision boundary that maximizes the margin between classes, implicitly projecting the standardized features into a higher-dimensional space where a non-linear boundary becomes linear. Unlike every other model here, training cost scales roughly quadratically with the number of rows, which is why this is the slowest model in the entire lineup to train despite being 'classic' ML. A full 231,646-row fit was attempted first and killed after 20+ minutes with no end in sight (RBF-kernel SVC training scales roughly O(n^2), and memory usage was still climbing) \u2014 this result trains on a stratified 40,000-row subsample instead, same practical tradeoff made elsewhere in this project for oversized data.",
+      "hyperparams": {
+        "kernel": "rbf",
+        "class_weight": "balanced",
+        "cache_size_mb": 1000,
+        "train_subsample": "40,000 of 231,646 rows (stratified)"
+      },
+      "train_time_sec": 23.366756916046143,
+      "inference_time_sec": 66.98077297210693,
+      "inference_time_per_sample_ms": 0.6745973710555638,
+      "accuracy": 0.6467015812267096,
+      "precision_macro": 0.7458260217365998,
+      "recall_macro": 0.6158860272347485,
+      "f1_macro": 0.5679123436661805,
+      "precision_weighted": 0.9742012740468625,
+      "recall_weighted": 0.6467015812267096,
+      "f1_weighted": 0.7747841590224175,
+      "confusion_matrix": [
+        [
+          2208,
+          0,
+          1664,
+          4,
+          475,
+          0
+        ],
+        [
+          29,
+          27866,
+          11169,
+          13,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          170,
+          1,
+          11,
+          0
+        ],
+        [
+          0,
+          0,
+          18471,
+          31166,
+          0,
+          2
+        ],
+        [
+          561,
+          24,
+          873,
+          218,
+          1602,
+          0
+        ],
+        [
+          123,
+          0,
+          1316,
+          0,
+          123,
+          1199
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7553882996920972,
+          "recall": 0.5074695472305217,
+          "f1": 0.6070937585922463,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9991394765148799,
+          "recall": 0.7131048954628042,
+          "f1": 0.8322308002448967,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.005050054956480409,
+          "recall": 0.9239130434782609,
+          "f1": 0.010045203415369162,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.9924845551238775,
+          "recall": 0.6278530993775056,
+          "f1": 0.7691415456373935,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.7245590230664858,
+          "recall": 0.48871262965222695,
+          "f1": 0.5837128803060667,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 0.9983347210657785,
+          "recall": 0.4342629482071713,
+          "f1": 0.6052498738011105,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.76      0.51      0.61      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.01      0.92      0.01       184\n  legitimate       0.99      0.63      0.77     49639\n   malformed       0.72      0.49      0.58      3278\n     slowite       1.00      0.43      0.61      2761\n\n    accuracy                           0.65     99290\n   macro avg       0.75      0.62      0.57     99290\nweighted avg       0.97      0.65      0.77     99290\n",
+      "model_size": "18433 support vectors",
+      "n_train_samples": 40000,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "RNN (Vanilla)",
+      "category": "dl",
+      "description": "A plain (Elman) recurrent network \u2014 the architecture GRU and LSTM were both built to fix. Reads the 33 features one at a time, carrying a single hidden state forward with a simple tanh update and no gating mechanism at all. Included as the 'how much do the gates actually buy you' reference point against GRU and LSTM below \u2014 vanilla RNNs are known to struggle with longer sequences due to vanishing gradients, which the gated variants were designed to fix.",
+      "hyperparams": {
+        "architecture": "RNN(hidden=64, layers=1, tanh) -> FC(64->32->6)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps"
+      },
+      "train_time_sec": 212.9413938522339,
+      "inference_time_sec": 0.6356468200683594,
+      "inference_time_per_sample_ms": 0.006401921845788694,
+      "accuracy": 0.8202437304864538,
+      "precision_macro": 0.6780288769936007,
+      "recall_macro": 0.46187968247894373,
+      "f1_macro": 0.5037828306753628,
+      "precision_weighted": 0.8496853649137615,
+      "recall_weighted": 0.8202437304864538,
+      "f1_weighted": 0.8068926517611487,
+      "confusion_matrix": [
+        [
+          2208,
+          11,
+          0,
+          1667,
+          465,
+          0
+        ],
+        [
+          29,
+          27866,
+          0,
+          11182,
+          0,
+          0
+        ],
+        [
+          66,
+          23,
+          0,
+          93,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          49637,
+          2,
+          0
+        ],
+        [
+          548,
+          50,
+          0,
+          1346,
+          1334,
+          0
+        ],
+        [
+          123,
+          0,
+          0,
+          1714,
+          527,
+          397
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7424344317417619,
+          "recall": 0.5074695472305217,
+          "f1": 0.6028668941979523,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9969946332737031,
+          "recall": 0.7131048954628042,
+          "f1": 0.8314858191475077,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.7562120081049376,
+          "recall": 0.9999597090996998,
+          "f1": 0.8611703881052759,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.5725321888412017,
+          "recall": 0.4069554606467358,
+          "f1": 0.47574893009985736,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 0.14378848243390077,
+          "f1": 0.25142495250158325,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.74      0.51      0.60      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.00      0.00      0.00       184\n  legitimate       0.76      1.00      0.86     49639\n   malformed       0.57      0.41      0.48      3278\n     slowite       1.00      0.14      0.25      2761\n\n    accuracy                           0.82     99290\n   macro avg       0.68      0.46      0.50     99290\nweighted avg       0.85      0.82      0.81     99290\n",
+      "model_size": "6566 params",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    },
+    {
+      "name": "Naive Bayes",
+      "category": "ml",
+      "description": "Assumes every feature is independent and Gaussian within each class, then applies Bayes' rule directly \u2014 no iterative training at all, just per-class mean/variance estimates. Included as a 'how bad is the floor' reference: MQTT header fields are clearly not independent of each other, so this tests how much that assumption actually costs.",
+      "hyperparams": {},
+      "train_time_sec": 0.0568850040435791,
+      "inference_time_sec": 0.017712116241455078,
+      "inference_time_per_sample_ms": 0.00017838771519241694,
+      "accuracy": 0.7946117433779837,
+      "precision_macro": 0.8743183707286061,
+      "recall_macro": 0.4256805420839361,
+      "f1_macro": 0.47590577094260195,
+      "precision_weighted": 0.8447352194029443,
+      "recall_weighted": 0.7946117433779837,
+      "f1_weighted": 0.7660976557165853,
+      "confusion_matrix": [
+        [
+          836,
+          44,
+          7,
+          3463,
+          1,
+          0
+        ],
+        [
+          0,
+          27866,
+          0,
+          11211,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          89,
+          95,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          49639,
+          0,
+          0
+        ],
+        [
+          212,
+          82,
+          22,
+          2892,
+          70,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          2364,
+          0,
+          397
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 0.7977099236641222,
+          "recall": 0.19213973799126638,
+          "f1": 0.3096869790701982,
+          "support": 4351
+        },
+        {
+          "class": "dos",
+          "precision": 0.9954987139182624,
+          "recall": 0.7131048954628042,
+          "f1": 0.8309651254678018,
+          "support": 39077
+        },
+        {
+          "class": "flood",
+          "precision": 0.7542372881355932,
+          "recall": 0.483695652173913,
+          "f1": 0.5894039735099338,
+          "support": 184
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.7125488056959118,
+          "recall": 1.0,
+          "f1": 0.8321500716662615,
+          "support": 49639
+        },
+        {
+          "class": "malformed",
+          "precision": 0.9859154929577465,
+          "recall": 0.021354484441732765,
+          "f1": 0.04180352343983278,
+          "support": 3278
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 0.14378848243390077,
+          "f1": 0.25142495250158325,
+          "support": 2761
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.80      0.19      0.31      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.75      0.48      0.59       184\n  legitimate       0.71      1.00      0.83     49639\n   malformed       0.99      0.02      0.04      3278\n     slowite       1.00      0.14      0.25      2761\n\n    accuracy                           0.79     99290\n   macro avg       0.87      0.43      0.48     99290\nweighted avg       0.84      0.79      0.77     99290\n",
+      "model_size": "6 x 33 x 2 stats",
+      "n_train_samples": 231646,
+      "n_test_samples": 99290,
+      "n_features": 33
+    }
+  ],
+  "anomaly_models": [
+    {
+      "name": "Autoencoder (Anomaly Detector)",
+      "category": "dl",
+      "task": "binary_anomaly_detection",
+      "description": "An encoder-decoder network trained ONLY on legitimate MQTT traffic to reconstruct its own input. It never sees a single labeled attack example. At test time, any packet the network reconstructs poorly (high error) is flagged as anomalous. This is the semi-supervised approach this project's survey argues FL-IDS research should move toward, since it doesn't need balanced labeled examples of every attack type \u2014 useful for catching attack types the model has genuinely never seen labeled, i.e. zero-day detection.",
+      "hyperparams": {
+        "architecture": "33->24->12->6 (bottleneck)->12->24->33",
+        "epochs": 30,
+        "optimizer": "Adam(lr=1e-3)",
+        "threshold_rule": "95th percentile of reconstruction error on legitimate training data",
+        "device": "mps"
+      },
+      "threshold": 6.75200717523694e-05,
+      "train_time_sec": 10.664291143417358,
+      "inference_time_sec": 0.1321260929107666,
+      "inference_time_per_sample_ms": 0.0013307089627431425,
+      "accuracy": 0.8242924765837446,
+      "precision": 0.9370572428955297,
+      "recall": 0.6953334273227125,
+      "f1": 0.7982981478484057,
+      "roc_auc": 0.7451404692624948,
+      "confusion_matrix": [
+        [
+          47320,
+          2319
+        ],
+        [
+          15127,
+          34524
+        ]
+      ],
+      "confusion_matrix_labels": [
+        "legitimate",
+        "attack"
+      ],
+      "per_class_detection": {
+        "bruteforce": {
+          "n_samples": 4351,
+          "flagged_as_attack_rate": 0.6177890140197656,
+          "interpretation": "detection rate / recall (should be high)"
+        },
+        "dos": {
+          "n_samples": 39077,
+          "flagged_as_attack_rate": 0.7141796964966605,
+          "interpretation": "detection rate / recall (should be high)"
+        },
+        "flood": {
+          "n_samples": 184,
+          "flagged_as_attack_rate": 0.4945652173913043,
+          "interpretation": "detection rate / recall (should be high)"
+        },
+        "legitimate": {
+          "n_samples": 49639,
+          "flagged_as_attack_rate": 0.04671729889804388,
+          "interpretation": "false-positive rate (should be low)"
+        },
+        "malformed": {
+          "n_samples": 3278,
+          "flagged_as_attack_rate": 0.7297132397803539,
+          "interpretation": "detection rate / recall (should be high)"
+        },
+        "slowite": {
+          "n_samples": 2761,
+          "flagged_as_attack_rate": 0.5233611010503441,
+          "interpretation": "detection rate / recall (should be high)"
+        }
+      },
+      "model_size": "2415 params",
+      "n_train_samples_legitimate_only": 115824,
+      "n_test_samples": 99290,
+      "n_features": 33
+    }
+  ],
+  "sequence_models": [
+    {
+      "name": "1D-CNN (Temporal)",
+      "category": "dl",
+      "description": "The same 1D-CNN idea as the flat-feature version, but now convolving across real TIME: input is 8 consecutive packets from the same TCP/MQTT session (tcp.stream), with the 33 engineered features as channels. This is the architecture's actual home turf -- local patterns across a short packet run, not across unrelated header fields.",
+      "hyperparams": {
+        "window": 8,
+        "architecture": "Conv1d(33->64)->Conv1d(64->64)->GlobalAvgPool->FC(64->32->6)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps",
+        "split": "stream-level (whole flows held out, zero packet overlap)"
+      },
+      "train_time_sec": 14.810137033462524,
+      "inference_time_sec": 0.06581902503967285,
+      "inference_time_per_sample_ms": 0.002657207308828133,
+      "accuracy": 0.9987484860718612,
+      "precision_macro": 0.9883107088989442,
+      "recall_macro": 0.989424648229015,
+      "f1_macro": 0.9884827553180623,
+      "precision_weighted": 0.9988362619355994,
+      "recall_weighted": 0.9987484860718612,
+      "f1_weighted": 0.998752085967269,
+      "confusion_matrix": [
+        [
+          429,
+          0,
+          0,
+          0,
+          29,
+          0
+        ],
+        [
+          0,
+          8506,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          89,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          14998,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          411,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          306
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 1.0,
+          "recall": 0.9366812227074236,
+          "f1": 0.9673055242390078,
+          "support": 458
+        },
+        {
+          "class": "dos",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8506
+        },
+        {
+          "class": "flood",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 89
+        },
+        {
+          "class": "legitimate",
+          "precision": 1.0,
+          "recall": 0.9998666666666667,
+          "f1": 0.9999333288885925,
+          "support": 15000
+        },
+        {
+          "class": "malformed",
+          "precision": 0.9298642533936652,
+          "recall": 1.0,
+          "f1": 0.9636576787807737,
+          "support": 411
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 306
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       1.00      0.94      0.97       458\n         dos       1.00      1.00      1.00      8506\n       flood       1.00      1.00      1.00        89\n  legitimate       1.00      1.00      1.00     15000\n   malformed       0.93      1.00      0.96       411\n     slowite       1.00      1.00      1.00       306\n\n    accuracy                           1.00     24770\n   macro avg       0.99      0.99      0.99     24770\nweighted avg       1.00      1.00      1.00     24770\n",
+      "model_size": "21286 params",
+      "n_train_samples": 32788,
+      "n_test_samples": 24770,
+      "n_features": 33
+    },
+    {
+      "name": "GRU (Temporal)",
+      "category": "dl",
+      "description": "The same GRU idea as the flat-feature version, but now reading 8 consecutive real packets from the same session one at a time (33 features per step), instead of 33 unrelated header fields relabeled as fake timesteps. This is what a recurrent network is actually designed to do: carry state across a genuine sequence of events.",
+      "hyperparams": {
+        "window": 8,
+        "architecture": "GRU(hidden=64, layers=1) -> FC(64->32->6)",
+        "epochs": 40,
+        "optimizer": "Adam(lr=1e-3)",
+        "device": "mps",
+        "split": "stream-level (whole flows held out, zero packet overlap)"
+      },
+      "train_time_sec": 30.10965132713318,
+      "inference_time_sec": 0.16649603843688965,
+      "inference_time_per_sample_ms": 0.00672168100270043,
+      "accuracy": 0.9986273718207509,
+      "precision_macro": 0.9888755405880857,
+      "recall_macro": 0.9886025071097936,
+      "f1_macro": 0.9884039272993558,
+      "precision_weighted": 0.9986996131620012,
+      "recall_weighted": 0.9986273718207509,
+      "f1_weighted": 0.9986281469425587,
+      "confusion_matrix": [
+        [
+          429,
+          3,
+          0,
+          0,
+          26,
+          0
+        ],
+        [
+          0,
+          8506,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          89,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          14997,
+          3,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          1,
+          409,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          306
+        ]
+      ],
+      "class_names": [
+        "bruteforce",
+        "dos",
+        "flood",
+        "legitimate",
+        "malformed",
+        "slowite"
+      ],
+      "per_class": [
+        {
+          "class": "bruteforce",
+          "precision": 1.0,
+          "recall": 0.9366812227074236,
+          "f1": 0.9673055242390078,
+          "support": 458
+        },
+        {
+          "class": "dos",
+          "precision": 0.999529964747356,
+          "recall": 1.0,
+          "f1": 0.9997649271274095,
+          "support": 8506
+        },
+        {
+          "class": "flood",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 89
+        },
+        {
+          "class": "legitimate",
+          "precision": 0.9999333244432591,
+          "recall": 0.9998,
+          "f1": 0.9998666577771852,
+          "support": 15000
+        },
+        {
+          "class": "malformed",
+          "precision": 0.9337899543378996,
+          "recall": 0.9951338199513382,
+          "f1": 0.9634864546525324,
+          "support": 411
+        },
+        {
+          "class": "slowite",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 306
+        }
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       1.00      0.94      0.97       458\n         dos       1.00      1.00      1.00      8506\n       flood       1.00      1.00      1.00        89\n  legitimate       1.00      1.00      1.00     15000\n   malformed       0.93      1.00      0.96       411\n     slowite       1.00      1.00      1.00       306\n\n    accuracy                           1.00     24770\n   macro avg       0.99      0.99      0.99     24770\nweighted avg       1.00      1.00      1.00     24770\n",
+      "model_size": "21286 params",
+      "n_train_samples": 32788,
+      "n_test_samples": 24770,
+      "n_features": 33
+    }
+  ],
+  "sequence_pairs": [
+    {
+      "flat": {
+        "name": "1D-CNN",
+        "category": "dl",
+        "description": "Treats the 33 standardized packet/session features as a 1-dimensional signal and slides learned convolutional filters across neighboring features, looking for local patterns (e.g. a TCP-flag feature next to a length feature behaving a particular way together) before pooling into a fixed-size representation. Common in the MQTT/network-traffic classification literature this project's survey cites. (See the 'DL Home Turf' tab for a follow-up experiment giving this architecture a genuine packet sequence to convolve over, instead of one packet's unrelated header fields.)",
+        "hyperparams": {
+          "architecture": "Conv1d(1->32)->Conv1d(32->64)->GlobalAvgPool->FC(64->32->6)",
+          "epochs": 40,
+          "optimizer": "Adam(lr=1e-3)",
+          "device": "mps"
+        },
+        "train_time_sec": 99.93773579597473,
+        "inference_time_sec": 0.4305989742279053,
+        "inference_time_per_sample_ms": 0.004336780886573726,
+        "accuracy": 0.7311813878537617,
+        "precision_macro": 0.8935841463702761,
+        "recall_macro": 0.5293288482182964,
+        "f1_macro": 0.6206947921920193,
+        "precision_weighted": 0.8152736010424807,
+        "recall_weighted": 0.7311813878537617,
+        "f1_weighted": 0.708749955286021,
+        "confusion_matrix": [
+          [
+            1708,
+            0,
+            0,
+            2604,
+            39,
+            0
+          ],
+          [
+            19,
+            18315,
+            0,
+            20738,
+            5,
+            0
+          ],
+          [
+            1,
+            0,
+            61,
+            121,
+            1,
+            0
+          ],
+          [
+            0,
+            2,
+            0,
+            49630,
+            7,
+            0
+          ],
+          [
+            542,
+            7,
+            0,
+            1652,
+            1077,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            953,
+            0,
+            1808
+          ]
+        ],
+        "class_names": [
+          "bruteforce",
+          "dos",
+          "flood",
+          "legitimate",
+          "malformed",
+          "slowite"
+        ],
+        "per_class": [
+          {
+            "class": "bruteforce",
+            "precision": 0.7524229074889868,
+            "recall": 0.39255343599172604,
+            "f1": 0.5159341489201027,
+            "support": 4351
+          },
+          {
+            "class": "dos",
+            "precision": 0.99950884086444,
+            "recall": 0.4686900222637357,
+            "f1": 0.6381421926447275,
+            "support": 39077
+          },
+          {
+            "class": "flood",
+            "precision": 1.0,
+            "recall": 0.33152173913043476,
+            "f1": 0.49795918367346936,
+            "support": 184
+          },
+          {
+            "class": "legitimate",
+            "precision": 0.655631588681339,
+            "recall": 0.9998186909486493,
+            "f1": 0.7919449165051022,
+            "support": 49639
+          },
+          {
+            "class": "malformed",
+            "precision": 0.953941541186891,
+            "recall": 0.3285539963392312,
+            "f1": 0.48876786929884275,
+            "support": 3278
+          },
+          {
+            "class": "slowite",
+            "precision": 1.0,
+            "recall": 0.6548352046360014,
+            "f1": 0.7914204421098708,
+            "support": 2761
+          }
+        ],
+        "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.75      0.39      0.52      4351\n         dos       1.00      0.47      0.64     39077\n       flood       1.00      0.33      0.50       184\n  legitimate       0.66      1.00      0.79     49639\n   malformed       0.95      0.33      0.49      3278\n     slowite       1.00      0.65      0.79      2761\n\n    accuracy                           0.73     99290\n   macro avg       0.89      0.53      0.62     99290\nweighted avg       0.82      0.73      0.71     99290\n",
+        "model_size": "8806 params",
+        "n_train_samples": 231646,
+        "n_test_samples": 99290,
+        "n_features": 33
+      },
+      "temporal": {
+        "name": "1D-CNN (Temporal)",
+        "category": "dl",
+        "description": "The same 1D-CNN idea as the flat-feature version, but now convolving across real TIME: input is 8 consecutive packets from the same TCP/MQTT session (tcp.stream), with the 33 engineered features as channels. This is the architecture's actual home turf -- local patterns across a short packet run, not across unrelated header fields.",
+        "hyperparams": {
+          "window": 8,
+          "architecture": "Conv1d(33->64)->Conv1d(64->64)->GlobalAvgPool->FC(64->32->6)",
+          "epochs": 40,
+          "optimizer": "Adam(lr=1e-3)",
+          "device": "mps",
+          "split": "stream-level (whole flows held out, zero packet overlap)"
+        },
+        "train_time_sec": 14.810137033462524,
+        "inference_time_sec": 0.06581902503967285,
+        "inference_time_per_sample_ms": 0.002657207308828133,
+        "accuracy": 0.9987484860718612,
+        "precision_macro": 0.9883107088989442,
+        "recall_macro": 0.989424648229015,
+        "f1_macro": 0.9884827553180623,
+        "precision_weighted": 0.9988362619355994,
+        "recall_weighted": 0.9987484860718612,
+        "f1_weighted": 0.998752085967269,
+        "confusion_matrix": [
+          [
+            429,
+            0,
+            0,
+            0,
+            29,
+            0
+          ],
+          [
+            0,
+            8506,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            89,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            14998,
+            2,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            411,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            306
+          ]
+        ],
+        "class_names": [
+          "bruteforce",
+          "dos",
+          "flood",
+          "legitimate",
+          "malformed",
+          "slowite"
+        ],
+        "per_class": [
+          {
+            "class": "bruteforce",
+            "precision": 1.0,
+            "recall": 0.9366812227074236,
+            "f1": 0.9673055242390078,
+            "support": 458
+          },
+          {
+            "class": "dos",
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 8506
+          },
+          {
+            "class": "flood",
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 89
+          },
+          {
+            "class": "legitimate",
+            "precision": 1.0,
+            "recall": 0.9998666666666667,
+            "f1": 0.9999333288885925,
+            "support": 15000
+          },
+          {
+            "class": "malformed",
+            "precision": 0.9298642533936652,
+            "recall": 1.0,
+            "f1": 0.9636576787807737,
+            "support": 411
+          },
+          {
+            "class": "slowite",
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 306
+          }
+        ],
+        "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       1.00      0.94      0.97       458\n         dos       1.00      1.00      1.00      8506\n       flood       1.00      1.00      1.00        89\n  legitimate       1.00      1.00      1.00     15000\n   malformed       0.93      1.00      0.96       411\n     slowite       1.00      1.00      1.00       306\n\n    accuracy                           1.00     24770\n   macro avg       0.99      0.99      0.99     24770\nweighted avg       1.00      1.00      1.00     24770\n",
+        "model_size": "21286 params",
+        "n_train_samples": 32788,
+        "n_test_samples": 24770,
+        "n_features": 33
+      }
+    },
+    {
+      "flat": {
+        "name": "GRU (Recurrent)",
+        "category": "dl",
+        "description": "A Gated Recurrent Unit \u2014 the more efficient sibling of the LSTM, both explicitly named in this project's survey as common IDS architectures. Reads the 33 features one at a time as if they were a short time series, carrying a hidden state forward, then classifies from the final hidden state. The features have no real temporal order here, so this tests whether recurrent processing helps or just adds overhead on data that isn't actually sequential. (See the 'DL Home Turf' tab for a follow-up experiment giving this architecture a genuine packet sequence to read, instead of one packet's unrelated header fields relabeled as fake timesteps.)",
+        "hyperparams": {
+          "architecture": "GRU(hidden=64, layers=1) -> FC(64->32->6)",
+          "epochs": 40,
+          "optimizer": "Adam(lr=1e-3)",
+          "device": "mps"
+        },
+        "train_time_sec": 122.73469090461731,
+        "inference_time_sec": 0.7817211151123047,
+        "inference_time_per_sample_ms": 0.007873110233782905,
+        "accuracy": 0.8496021754456642,
+        "precision_macro": 0.8858675753286365,
+        "recall_macro": 0.7076600842828661,
+        "f1_macro": 0.7680949124238895,
+        "precision_weighted": 0.8743488397376662,
+        "recall_weighted": 0.8496021754456642,
+        "f1_weighted": 0.8438691699814015,
+        "confusion_matrix": [
+          [
+            2208,
+            0,
+            1,
+            1662,
+            480,
+            0
+          ],
+          [
+            29,
+            27865,
+            2,
+            11181,
+            0,
+            0
+          ],
+          [
+            2,
+            0,
+            86,
+            94,
+            2,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            49604,
+            33,
+            2
+          ],
+          [
+            561,
+            12,
+            0,
+            864,
+            1841,
+            0
+          ],
+          [
+            8,
+            0,
+            0,
+            0,
+            0,
+            2753
+          ]
+        ],
+        "class_names": [
+          "bruteforce",
+          "dos",
+          "flood",
+          "legitimate",
+          "malformed",
+          "slowite"
+        ],
+        "per_class": [
+          {
+            "class": "bruteforce",
+            "precision": 0.7863247863247863,
+            "recall": 0.5074695472305217,
+            "f1": 0.6168459282022629,
+            "support": 4351
+          },
+          {
+            "class": "dos",
+            "precision": 0.9995695376116511,
+            "recall": 0.7130793049619981,
+            "f1": 0.8323625175493623,
+            "support": 39077
+          },
+          {
+            "class": "flood",
+            "precision": 0.9662921348314607,
+            "recall": 0.4673913043478261,
+            "f1": 0.63003663003663,
+            "support": 184
+          },
+          {
+            "class": "legitimate",
+            "precision": 0.782335777935494,
+            "recall": 0.9992949092447471,
+            "f1": 0.8776051802837833,
+            "support": 49639
+          },
+          {
+            "class": "malformed",
+            "precision": 0.7814091680814941,
+            "recall": 0.5616229408175717,
+            "f1": 0.6535321263755769,
+            "support": 3278
+          },
+          {
+            "class": "slowite",
+            "precision": 0.9992740471869328,
+            "recall": 0.997102499094531,
+            "f1": 0.9981870920957215,
+            "support": 2761
+          }
+        ],
+        "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       0.79      0.51      0.62      4351\n         dos       1.00      0.71      0.83     39077\n       flood       0.97      0.47      0.63       184\n  legitimate       0.78      1.00      0.88     49639\n   malformed       0.78      0.56      0.65      3278\n     slowite       1.00      1.00      1.00      2761\n\n    accuracy                           0.85     99290\n   macro avg       0.89      0.71      0.77     99290\nweighted avg       0.87      0.85      0.84     99290\n",
+        "model_size": "15142 params",
+        "n_train_samples": 231646,
+        "n_test_samples": 99290,
+        "n_features": 33
+      },
+      "temporal": {
+        "name": "GRU (Temporal)",
+        "category": "dl",
+        "description": "The same GRU idea as the flat-feature version, but now reading 8 consecutive real packets from the same session one at a time (33 features per step), instead of 33 unrelated header fields relabeled as fake timesteps. This is what a recurrent network is actually designed to do: carry state across a genuine sequence of events.",
+        "hyperparams": {
+          "window": 8,
+          "architecture": "GRU(hidden=64, layers=1) -> FC(64->32->6)",
+          "epochs": 40,
+          "optimizer": "Adam(lr=1e-3)",
+          "device": "mps",
+          "split": "stream-level (whole flows held out, zero packet overlap)"
+        },
+        "train_time_sec": 30.10965132713318,
+        "inference_time_sec": 0.16649603843688965,
+        "inference_time_per_sample_ms": 0.00672168100270043,
+        "accuracy": 0.9986273718207509,
+        "precision_macro": 0.9888755405880857,
+        "recall_macro": 0.9886025071097936,
+        "f1_macro": 0.9884039272993558,
+        "precision_weighted": 0.9986996131620012,
+        "recall_weighted": 0.9986273718207509,
+        "f1_weighted": 0.9986281469425587,
+        "confusion_matrix": [
+          [
+            429,
+            3,
+            0,
+            0,
+            26,
+            0
+          ],
+          [
+            0,
+            8506,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            89,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            14997,
+            3,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            1,
+            409,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            306
+          ]
+        ],
+        "class_names": [
+          "bruteforce",
+          "dos",
+          "flood",
+          "legitimate",
+          "malformed",
+          "slowite"
+        ],
+        "per_class": [
+          {
+            "class": "bruteforce",
+            "precision": 1.0,
+            "recall": 0.9366812227074236,
+            "f1": 0.9673055242390078,
+            "support": 458
+          },
+          {
+            "class": "dos",
+            "precision": 0.999529964747356,
+            "recall": 1.0,
+            "f1": 0.9997649271274095,
+            "support": 8506
+          },
+          {
+            "class": "flood",
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 89
+          },
+          {
+            "class": "legitimate",
+            "precision": 0.9999333244432591,
+            "recall": 0.9998,
+            "f1": 0.9998666577771852,
+            "support": 15000
+          },
+          {
+            "class": "malformed",
+            "precision": 0.9337899543378996,
+            "recall": 0.9951338199513382,
+            "f1": 0.9634864546525324,
+            "support": 411
+          },
+          {
+            "class": "slowite",
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 306
+          }
+        ],
+        "classification_report": "              precision    recall  f1-score   support\n\n  bruteforce       1.00      0.94      0.97       458\n         dos       1.00      1.00      1.00      8506\n       flood       1.00      1.00      1.00        89\n  legitimate       1.00      1.00      1.00     15000\n   malformed       0.93      1.00      0.96       411\n     slowite       1.00      1.00      1.00       306\n\n    accuracy                           1.00     24770\n   macro avg       0.99      0.99      0.99     24770\nweighted avg       1.00      1.00      1.00     24770\n",
+        "model_size": "21286 params",
+        "n_train_samples": 32788,
+        "n_test_samples": 24770,
+        "n_features": 33
+      }
+    }
+  ]
+}

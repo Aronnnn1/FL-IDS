@@ -1,0 +1,120 @@
+\section{System Design}
+\label{sec:system}
+\subsection{Overview and threat model}
+FL-IDS runs in two phases, kept separate on purpose so that model quality and network behaviour can be evaluated and debugged independently (Fig.~\ref{fig:arch}). Phase~A is offline federated training. It produces a boosting classifier, a global autoencoder and, for each client, a feature scaler and an anomaly threshold, all saved as one self-describing bundle. All detection and robustness results in this paper come from Phase~A. Phase~B loads that bundle into an emulated SDN, replays real captures, and turns the cascade's output into flow rules.
+
+\begin{figure*}[t]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tikzpicture}[
+  node distance=5mm and 7mm,
+  box/.style={draw, rounded corners=2pt, align=center, font=\footnotesize, minimum height=8mm, inner sep=3pt, fill=white},
+  grp/.style={draw, dashed, rounded corners=3pt, inner sep=5pt},
+  arr/.style={-{Stealth[length=2mm]}, thick}]
+  % Phase A
+  \node[box, fill=blue!8] (cal) {Server calibration set\\(about 5\% of rows, labelled)};
+  \node[box, fill=blue!8, right=of cal] (lgb) {LightGBM\\first-pass classifier};
+  \node[box, right=of lgb] (cli) {Client $c$ local traffic\\(non-IID shard)};
+  \node[box, right=of cli] (keep) {Keep rows the booster\\does not call an attack};
+  \node[box, right=of keep] (ae) {Local autoencoder\\update $\Delta_c$};
+  \node[box, fill=orange!15, below=7mm of ae] (tf) {Trust filter: cosine to median, MAD,\\sign, EMA trust, norm clip};
+  \node[box, fill=orange!15, left=of tf] (tm) {Trimmed mean\\$\rightarrow$ global AE};
+  \draw[arr] (cal) -- (lgb);
+  \draw[arr] (lgb) -- node[above, font=\scriptsize]{model} (cli);
+  \draw[arr] (cli) -- (keep);
+  \draw[arr] (keep) -- (ae);
+  \draw[arr] (ae) -- (tf);
+  \draw[arr] (tf) -- (tm);
+  \draw[arr] (tm.west) -- ++(-8mm,0) |- node[pos=0.25, left, font=\scriptsize, align=center]{broadcast\\each round} (cli.south);
+  \begin{scope}[on background layer]
+    \node[grp, fit=(cal)(lgb)(cli)(keep)(ae)(tf)(tm), label={[font=\footnotesize\bfseries]above left:Phase A: federated training (Flower)}] (pa) {};
+  \end{scope}
+  % Phase B
+  \node[box, below=24mm of cal] (pcap) {Replayed .pcap\\(\texttt{tcpreplay})};
+  \node[box, right=of pcap] (feat) {\texttt{tshark} fields $\rightarrow$\\130 features};
+  \node[box, right=of feat] (casc) {Cascade:\\LightGBM $\rightarrow$ AE};
+  \node[box, right=of casc] (bridge) {Mitigation bridge\\(REST)};
+  \node[box, right=of bridge] (ctl) {\texttt{os-ken} controller\\$\rightarrow$ OVS flow rule};
+  \draw[arr] (pcap) -- (feat);
+  \draw[arr] (feat) -- (casc);
+  \draw[arr] (casc) -- (bridge);
+  \draw[arr] (bridge) -- (ctl);
+  \begin{scope}[on background layer]
+    \node[grp, fit=(pcap)(feat)(casc)(bridge)(ctl), label={[font=\footnotesize\bfseries]below left:Phase B: SDN enforcement (Mininet, OpenFlow 1.3)}] (pb) {};
+  \end{scope}
+  \draw[arr, dotted] ([xshift=95mm]pa.south west) -- node[right, font=\scriptsize]{model bundle} ([xshift=95mm]pb.north west);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{FL-IDS architecture. Phase~A trains the autoencoder federatedly on traffic the boosting stage passes, with a trust filter in front of aggregation. Phase~B loads the resulting bundle and enforces its verdicts as OpenFlow rules.}
+\label{fig:arch}
+\end{figure*}
+
+The federation has a server and $n$ clients. Each client stands for one site and holds only that site's traffic. Client data are non-IID. The server is trusted, and it holds a small labelled calibration set (Section~\ref{sec:booster}). A fraction $f$ of clients is malicious. A malicious client receives the global model like any other, trains on its own data, and then sends the server an arbitrary update. It may also misreport its number of training examples, which matters for example-weighted rules such as FedAvg. We evaluate two concrete attackers: a sign-flipping client, and a white-box client that knows the filter's rules and shapes its update to pass them (Section~\ref{sec:attackers}). Data-poisoning clients that send honestly computed updates on manipulated local data are outside what an update-level filter can detect; we discuss them in Section~\ref{sec:discussion}.
+
+\subsection{Boosting stage}
+\label{sec:booster}
+The first stage is a LightGBM multiclass classifier over all 15 labels. Its training labels come from a server-held calibration set of about 5\% of all rows, chosen as whole connections, class by class (Section~\ref{sec:splits}). Part of this set is held back to score each version of the booster: a fifth by configuration, 20 to 28\% in practice because whole connections are taken. The booster weights each class by $\sqrt{N_{\max}/N_c}$, where $N_c$ is the class's training count, so that rare classes count for more without the instability of full inverse-frequency weights. We chose server-held labels over client-held labels because a supervised model needs labels, and IoT sites in practice rarely have analyst-labelled attack traffic. The cost is that this one component is centrally trained (Section~\ref{sec:discussion}). The server trains the classifier before round~1, so clients never filter with an untrained model. In each round, the serialised model (about 9 to 10~MB) travels to the clients inside the round's fit configuration. It is not averaged like the autoencoder; every client runs the same copy locally and caches its filtering result until the model changes.
+
+The boosting stage reads raw feature values. The autoencoder reads per-client normalised values (Section~\ref{sec:ae}). We separated the two after finding that per-client normalisation destroys a shared tree model. Under strong label skew, a client's own scaler can shift a feature by orders of magnitude, so the split thresholds learned on the calibration set no longer apply. In an early test, the same held-out rows passed through a heavily skewed client's scaler were classified almost entirely wrongly.
+
+\textit{Incremental update.} Every three rounds, each client that passed the trust filter in that round surfaces up to 50 rows its autoencoder flagged, with labels confirmed by an analyst. False alarms come back labelled Normal. The server continues training the booster on the calibration set plus all alerts so far (50 more boosting rounds, via LightGBM's initial-model option). If the alerts contain a class the booster has never seen, the server retrains it from scratch, because continued training cannot learn a new class: its predicted probability is near $10^{-14}$, the softmax Hessian for it is near zero, and the minimum-Hessian constraint then blocks every split. This mechanism relaxes the rule that raw traffic never leaves a client. Up to 50 confirmed alert rows per surviving client per update round are sent to the server. We report it as a design trade-off.
+
+\subsection{Client autoencoder}
+\label{sec:ae}
+Each client trains a dense autoencoder with layers $130\!\to\!32\!\to\!16\!\to\!8\!\to\!16\!\to\!32\!\to\!130$, ReLU between layers and a linear output. It has 9,834 parameters, of which 9,600 are weights and 234 are biases. Training minimises mean squared reconstruction error with Adam~\cite{kingma2015} (learning rate $10^{-3}$, batch size 64, five local epochs per round). A client trains only on the local rows that the current boosting model passes to the second stage: rows predicted Normal, or predicted as an attack with probability below the cascade threshold. The autoencoder therefore models traffic that the supervised stage considers benign or is unsure about.
+
+Inputs are z-scored with each client's own scaler. Global normalisation would leak cross-client distribution statistics and remove the heterogeneity we want to test. We clip z-scores at $\pm10$. Counter-like fields such as \texttt{udp.stream} and \texttt{tcp.seq} can barely vary inside one client's shard. Unclipped, ordinary rows from another part of the capture can then land thousands of standard deviations out and dominate that client's reconstruction error.
+
+Each client calibrates its anomaly threshold $\theta_c$ as the 97th percentile of reconstruction error on a held-out benign validation slice of its own data. It recomputes the threshold every round, because the global model changes every round. By construction, about 3\% of a client's benign validation traffic lies above its threshold. A client whose shard has no benign validation rows gets $\theta_c=\infty$, so its autoencoder never flags. With each update, a client also returns a 50-bin histogram of its reconstruction errors over $[0,10]$ for monitoring.
+
+\subsection{Cascade decision rule}
+Evaluation, the dashboard and the SDN bridge all use one implementation of the cascade. For a row $x$ at client $c$, let $\hat y$ be the booster's predicted class and $\hat p$ its probability, and let $e(x)$ be the autoencoder's reconstruction error on the client-normalised row. With confidence threshold $\gamma=0.7$,
+\begin{equation}
+\mathrm{output}(x)=
+\begin{cases}
+(\hat y,\hat p) & \text{if } \hat y\neq\text{Normal and } \hat p\ge\gamma,\\
+\bigl(\text{anomalous},\ \mathrm{clip}_{[0,1]}\bigl(e(x)/\theta_c-1\bigr)\bigr) & \text{else if } e(x)>\theta_c,\\
+(\text{benign},\cdot) & \text{otherwise.}
+\end{cases}
+\label{eq:cascade}
+\end{equation}
+The second stage outputs \emph{anomalous}, not an attack type. A reconstruction error can say that a row does not look like benign traffic, but not what attack it belongs to.
+
+\subsection{Trust filter and aggregation}
+\label{sec:filter}
+Let $w_t$ be the global autoencoder parameters sent out at the start of round $t$, and $w_i$ the parameters client $i$ returns. The filter works on deltas $\Delta_i=w_i-w_t$. Raw weights are dominated by the shared global model, so the cosine similarity between any two clients' raw weights is close to 1 whatever their behaviour. As a reference direction the server uses the coordinate-wise median $r=\mathrm{med}(\Delta_1,\dots,\Delta_n)$, and for each client it computes $s_i=\cos(\Delta_i,r)$. Client $i$ is excluded from the round if any of three conditions holds:
+\begin{enumerate}
+  \item \textbf{MAD outlier:} $s_i<m-3d$, where $m$ is the median of the round's similarities and $d$ their median absolute deviation~\cite{leys2013};
+  \item \textbf{opposes consensus:} $s_i<0$;
+  \item \textbf{low trust:} $\tau_i<0.5$ after this round's update, where $\tau_i\leftarrow\alpha\,(s_i+1)/2+(1-\alpha)\tau_i$ with $\alpha=0.3$ and $\tau_i=1$ initially.
+\end{enumerate}
+
+\begin{algorithm}[t]
+\caption{One round of trust-filtered aggregation}
+\label{alg:filter}
+\begin{algorithmic}[1]
+\Require global weights $w_t$; client weights $w_1,\dots,w_n$; trust scores $\tau$
+\State $\Delta_i\gets w_i-w_t$ for all $i$
+\State $r\gets$ coordinate-wise median of $\{\Delta_i\}$
+\State $s_i\gets\cos(\Delta_i,r)$;\ $m\gets\mathrm{med}(s)$;\ $d\gets\mathrm{med}(|s-m|)$
+\State $\tau_i\gets 0.3\,(s_i+1)/2+0.7\,\tau_i$
+\State $S\gets\{i: s_i\ge m-3d\ \wedge\ s_i\ge 0\ \wedge\ \tau_i\ge 0.5\}$
+\If{$S=\emptyset$} \State \Return $w_t$ \EndIf
+\State $c\gets 2\cdot\mathrm{med}_j\,\lVert\Delta_j\rVert$
+\State $\tilde\Delta_i\gets\Delta_i\cdot\min(1,\,c/\lVert\Delta_i\rVert)$ for $i\in S$
+\State $k\gets\lfloor 0.15\,|S|\rfloor$
+\State \Return $w_t+\mathrm{TrimmedMean}_k(\{\tilde\Delta_i\}_{i\in S})$
+\end{algorithmic}
+\end{algorithm}
+
+Each rule addresses a specific failure. The MAD threshold is relative to the round: under heavy non-IID skew, honest clients can have low similarity to the median, and a fixed cosine cutoff would either reject them or admit attackers depending on the split. MAD alone is not enough, though. In an earlier version that used only this rule, honest heterogeneity widened the MAD band until attackers with negative similarity fell inside it. The sign rule is the same boundary FLTrust uses when it gives updates with negative cosine to the reference zero weight~\cite{cao2021fltrust}. It is a fixed point, the sign, rather than a tuned value. The trust rule makes a client's history count, the role temporal analysis plays in~\cite{li2021spatial}.
+
+Cosine similarity ignores magnitude. The filter also clips each surviving delta to $2\times$ the round's median norm, $\tilde\Delta_i=\Delta_i\min\bigl(1,\,2\,\mathrm{med}_j\lVert\Delta_j\rVert/\lVert\Delta_i\rVert\bigr)$. The clipped survivors are combined by a coordinate-wise trimmed mean~\cite{yin2018} that drops $\lfloor 0.15|S|\rfloor$ values from each side, where $S$ is the survivor set. The result is added to $w_t$. If no client survives, the round's aggregation is skipped. Example counts reported by clients are ignored throughout. Algorithm~\ref{alg:filter} summarises one round. The filter keeps no state other than the trust scores, and it never sees data. The aggregation runs inside a custom Flower strategy that subclasses FedAvg. Its fit-configuration step records $w_t$ for the delta computation and attaches the current boosting model. Its aggregation step runs Algorithm~\ref{alg:filter} and passes the surviving clients' alerts to the boosting update.
+
+\subsection{SDN enforcement}
+\label{sec:sdn}
+Phase~B rebuilds every model from the Phase~A bundle, never from the current configuration. The bundle holds the booster, the final autoencoder weights, each client's scaler and threshold, the z-score clip, the cascade settings, held-out metrics and provenance (seed, commit, time). Phase~B rejects a bundle whose thresholds, recomputed from the saved weights, do not match the clients' final-round values.
+
+Mininet~\cite{lantz2010} brings up one Open vSwitch~\cite{pfaff2015} switch and one host per FL client. Host $h_{i+1}$ is scored with client $i$'s scaler and threshold. The switch is controlled by an OpenFlow~1.3 controller we built on \texttt{os-ken}, the maintained OpenStack fork of Ryu. A real Edge-IIoTset capture is replayed from a host with \texttt{tcpreplay}. \texttt{tshark} extracts the authors' fields with the corrections of Section~\ref{sec:defects}, and the same code that built the training matrix derives the 130 features, including the connection features, from the capture. To check for training/serving skew~\cite{breck2019}, we compared the live rows from the Backdoor capture with that capture's training rows: 99.8\% of the 24,914 live rows are identical to a training row across all 130 features. The cascade then classifies every row.
+
+The rows are reduced to one verdict per device. If any row is non-benign, the verdict is the most frequent non-benign label, its confidence is the mean confidence of those rows, and its stage is the stage that made most of those calls. Otherwise the verdict is benign. A REST bridge receives \{device, label, confidence, stage\} and asks the controller for an action. Confidence of at least 0.85 installs a drop rule on the device's source address. Confidence of at least 0.5 attaches an OpenFlow meter that rate-limits it. Anything lower is left to monitoring. The controller reads switch state back through OpenFlow multipart statistics requests, so what it reports is what \texttt{ovs-ofctl dump-flows} shows. The topology is written so a switch port can bridge to a physical or virtual NIC, which would put an external device's traffic under the same controller. That path is designed but not yet built.

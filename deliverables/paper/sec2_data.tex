@@ -1,0 +1,93 @@
+\section{Dataset, Defects and Features}
+\label{sec:data}
+\subsection{Edge-IIoTset}
+Edge-IIoTset~\cite{ferrag2022} was captured on a physical IoT and IIoT testbed, and its authors position it for both centralised and federated learning. It ships in two forms, and we use both. The first is \texttt{DNN-EdgeIIoT-dataset.csv}, 2,219,201 packet rows with a selection of \texttt{tshark} fields prepared by the authors and a label, \texttt{Attack\_type}, with 15 values (Normal and 14 attack types). All training and evaluation in this paper uses it. The second is the set of raw packet captures, one per device or attack. We replay the 14 attack captures through the emulated network (Phase~B, Section~\ref{sec:sdn}).
+
+We follow the authors' preprocessing recipe where it does not conflict with the corrections below. Of the CSV's 63 columns we keep 47 as base fields. The other 16 are identifiers, timestamps, raw payload and port fields, and \texttt{Attack\_label}, which is a function of \texttt{Attack\_type}. The seven nominal columns the recipe names are one-hot encoded, which gives 91 base features.
+
+\subsection{Defect 1: placeholder spelling encodes the label}
+\label{sec:defects}
+Where a protocol field does not apply to a packet, the CSV holds a placeholder. That placeholder is spelled \texttt{0} in some source captures and \texttt{0.0} in others, and the spelling follows the label. In \texttt{mqtt.topic}, \texttt{mqtt.conack.flags}, \texttt{mqtt.protoname} and \texttt{dns.qry.name.len}, every Normal row holds \texttt{0} and every attack row holds \texttt{0.0}, with no overlap across 2.2 million rows. Each of these columns alone separates benign from attack traffic with an AUROC of 0.9998 or higher (Table~\ref{tab:auroc}). A model trained on the recipe can therefore learn which capture script wrote a row instead of anything about the traffic.
+
+We noticed the problem when an early leave-one-class-out run gave the autoencoder a detection rate of exactly 100\% on every held-out class, which is not plausible for reconstruction error. We rewrite both spellings to \texttt{0} in all seven nominal columns before encoding and before deduplication, so that rows differing only in spelling are merged. On the final 130-feature matrix, the strongest single feature is the connection's RST count at an AUROC of 0.879 (Table~\ref{tab:auroc}). The top six are all connection or port summaries, which describe behaviour rather than file format. Galal~\cite{galal2026} traces the same artifact to the dataset's construction, in which benign and attack captures were parsed separately and the two branches wrote absent fields differently. We found the leak independently but after that report, and we do not claim it as new.
+
+\begin{table}[t]
+\centering
+\caption{Single-feature AUROC for separating attack from benign rows, before the placeholder fix (raw columns of the released CSV) and after it (the six strongest features of the final 130-feature matrix, 300,000-row sample).}
+\label{tab:auroc}
+\small
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{llr}
+\toprule
+Feature & Data & AUROC \\
+\midrule
+\texttt{mqtt.topic = 0.0} & released CSV & 1.0000 \\
+\texttt{mqtt.conack.flags = 0.0} & released CSV & 1.0000 \\
+\texttt{mqtt.protoname = 0.0} & released CSV & 1.0000 \\
+\texttt{dns.qry.name.len = 0.0} & released CSV & 0.9998 \\
+\midrule
+\texttt{f\_rst} & 130-feature matrix & 0.8789 \\
+\texttt{f\_npkts} & 130-feature matrix & 0.8657 \\
+\texttt{svc\_port} & 130-feature matrix & 0.8350 \\
+\texttt{f\_fin} & 130-feature matrix & 0.8039 \\
+\texttt{f\_pl\_nonzero} & 130-feature matrix & 0.7328 \\
+\texttt{f\_syn} & 130-feature matrix & 0.7108 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsection{Defect 2: column-shifted MITM rows}
+The rows for the MITM attack (ARP spoofing with DNS) have values under the wrong column names. We re-extracted the authors' own MITM capture with their field list and aligned the result row by row with the released CSV. The CSV's \texttt{tcp.seq} column matches our \texttt{udp.time\_delta} with agreement 1.000. Its \texttt{udp.time\_delta} matches \texttt{dns.qry.type} (0.993), and its \texttt{dns.qry.qu} matches \texttt{dns.retransmit\_request\_in} (0.993). A model trained on these rows learns an ARP spoofing attack from a feature vector with no meaningful ARP or TCP values. We replace the 1,214 released MITM rows with 1,229 rows re-extracted from the capture using the same field list and encoding, which leaves 2,219,216 rows. After the repair, MITM traffic extracted live from the replayed capture matches the training rows exactly. The Modbus device capture has the same fault, but none of its rows are in the CSV, so live Modbus traffic is simply out of distribution.
+
+\subsection{Defect 3: \texttt{tshark} version drift}
+Phase~B extracts features from replayed traffic with \texttt{tshark} and the authors' field list. Recent \texttt{tshark} releases (4.x) print booleans as \texttt{True}/\texttt{False} where the authors' output has \texttt{1}/\texttt{0}, and print hex values in short form (\texttt{0x00} instead of \texttt{0x00000000}). Left unhandled, this silently zeroes \texttt{tcp.flags.ack} on every live packet. Among the base features, that was the most informative single feature once the leak was removed. We map both forms back to the authors' spelling. Before the mapping, 6.6\% of the base-feature rows extracted live from the Backdoor capture also occurred among the authors' Backdoor rows. After it, 99.8\% did.
+
+None of the three defects shows up in a test split drawn from the same CSV. The first two inflate or distort any model trained on the released file. The third affects anyone who deploys such a model on live traffic with a current \texttt{tshark}. A fourth problem concerns only the captures: the released Vulnerability-scanner capture is damaged, with a record that claims a packet of 136~MB. Our extraction stops there and uses the 265,827 readable packets before the damage.
+
+\subsection{What the base features cannot separate}
+Correcting the defects does not make the 91 base features sufficient. In the SQL\_injection, XSS, Uploading and Password captures, only 5 to 17\% of packets carry any HTTP content. The rest are content-free TCP handshake and acknowledgement packets to port 80 on the same web server, and they look the same whichever attack produced them. We measured the effect by grouping rows by their exact 91-feature vector and giving each group its majority label, which is the best any classifier using these features can do. Of all rows, 2.31\% share a feature vector with a row of a different class, which caps accuracy at 0.9875 and macro recall at 0.9692. The separating information is in columns the recipe drops: the payload and URI text, and the ports.
+
+\subsection{Feature set}
+\label{sec:features}
+We add 39 features to the 91, giving the 130 that every model in this paper uses (except the base-feature comparisons in Sections~\ref{sec:featstudy} and~\ref{sec:models}). IP addresses, absolute times, ephemeral ports and row order are never features, because each of them identifies the capture file and through it the label. They are used only to group packets into connections.
+\begin{itemize}
+  \item \textbf{Service port} (1 feature): the server side of the connection, taken as the smallest TCP or UDP port below 32,768, or $-1$ for ICMP and ARP. Client ports in the ephemeral range are excluded because their values follow capture time.
+  \item \textbf{Content} (18 features), computed as numbers from three dropped columns, the TCP payload, the full request URI and the HTTP file data: decoded payload length, byte entropy and printable share; an HTTP request flag and the response status code; header and X-header counts; URI length, parameter count and percent-encoding count; file-data length; a count of special characters; and match counts for six keyword groups (SQL syntax, script injection, file upload, login terms, path traversal and command execution, and scanner tool names).
+  \item \textbf{Connection} (20 features). Packets are grouped by IP pair, protocol and port pair, in capture order. A new connection starts after 60~s of idle time or 120~s of activity. The 2,219,216 packets form 392,782 connections. Every packet then carries its connection's packet count, duration and packet rate; SYN, FIN and RST counts; payload sum, maximum and non-empty share; HTTP request count; the maximum status code, X-header count, entropy and URI length; and keyword totals.
+\end{itemize}
+Connection features summarise a whole connection record of up to 120~s, as CICFlowMeter-style datasets do~\cite{sharafaldin2018}. A packet's features therefore include information from later packets of the same connection, so the system labels connection records rather than deciding on each packet as it arrives. The same fact is why we split by connection (Section~\ref{sec:splits}): with a random row split, packets of one connection fall on both sides and share most of their features.
+
+Exact duplicates are removed after the features are computed, leaving 1,985,768 rows in 342,814 connections. Table~\ref{tab:classes} gives the class distribution. Normal traffic is 72.3\% of the rows. MITM (406 rows, all in a single connection) and Fingerprinting (872 rows) together are under 0.1\%.
+
+\begin{table}[t]
+\centering
+\caption{Classes of Edge-IIoTset. ``Released'' counts rows of the released CSV. ``Used'' counts unique rows after the corrections and the 130-feature deduplication; the share is of the used total.}
+\label{tab:classes}
+\small
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lrrr}
+\toprule
+Class & Released & Used & \% \\
+\midrule
+Normal & 1,615,643 & 1,436,597 & 72.34 \\
+DDoS\_UDP & 121,568 & 121,567 & 6.12 \\
+DDoS\_ICMP & 116,436 & 68,758 & 3.46 \\
+SQL\_injection & 51,203 & 50,981 & 2.57 \\
+DDoS\_TCP & 50,062 & 50,062 & 2.52 \\
+Vulnerability\_scanner & 50,110 & 50,044 & 2.52 \\
+Password & 50,153 & 50,033 & 2.52 \\
+DDoS\_HTTP & 49,911 & 49,768 & 2.51 \\
+Uploading & 37,634 & 37,243 & 1.88 \\
+Backdoor & 24,862 & 24,167 & 1.22 \\
+Port\_Scanning & 22,564 & 20,213 & 1.02 \\
+XSS & 15,915 & 15,172 & 0.76 \\
+Ransomware & 10,925 & 9,885 & 0.50 \\
+Fingerprinting & 1,001 & 872 & 0.04 \\
+MITM & 1,214 & 406 & 0.02 \\
+\midrule
+Total & 2,219,201 & 1,985,768 & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}

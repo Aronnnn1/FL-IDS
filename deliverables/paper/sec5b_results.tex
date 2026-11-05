@@ -1,0 +1,74 @@
+\subsection{An adaptive attacker}
+\label{sec:adaptive}
+Table~\ref{tab:stealth} compares the stealth attacker with the sign-flipping one over three seeds. The filter catches the stealth attacker less often: it survives 0.60 to 0.95 of its rounds at 20\% attackers, 0.68 to 0.83 at 30\% and 0.80 to 0.85 at 40\%, against 0.23 to 0.40, 0.50 to 0.62 and 0.60 to 0.64 for sign-flipping. The extra survival does not buy much more damage. The autoencoder-alone recall under stealth attackers is 0.220 to 0.588 at 20\%, 0.316 to 0.427 at 30\% and 0.045 to 0.334 at 40\%; under sign-flipping it is 0.258 to 0.483, 0.245 to 0.490 and 0.074 to 0.297. Eight of the nine seed and fraction pairs differ by less than 0.1 between the two attackers, and the stealth attacker leaves the lower recall in five of the nine. Known-attack recall stays at 0.9908 or above in every run. We did not measure zero-day detection under either attacker, so the harm to the part of the system that matters most for unseen attacks is still open.
+
+\begin{table*}[t]
+\centering
+\caption{Stealth versus sign-flipping attackers, 10 clients, 20 rounds. Each cell lists seeds 42 / 43 / 44.}
+\label{tab:stealth}
+\small
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lccccc}
+\toprule
+ & \multicolumn{2}{c}{Attacker survival} & \multicolumn{2}{c}{AE-alone recall} & Known-attack recall \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-6}
+Attackers & Sign-flip & Stealth & Sign-flip & Stealth & Stealth \\
+\midrule
+20\% & 0.30 / 0.40 / 0.23 & 0.60 / 0.70 / 0.95 & 0.466 / 0.483 / 0.258 & 0.454 / 0.588 / 0.220 & 0.9956 / 0.9961 / 0.9942 \\
+30\% & 0.50 / 0.55 / 0.62 & 0.73 / 0.68 / 0.83 & 0.490 / 0.373 / 0.245 & 0.427 / 0.329 / 0.316 & 0.9961 / 0.9956 / 0.9953 \\
+40\% & 0.60 / 0.64 / 0.61 & 0.80 / 0.80 / 0.85 & 0.297 / 0.139 / 0.074 & 0.334 / 0.160 / 0.045 & 0.9949 / 0.9939 / 0.9908 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table*}
+
+\subsection{Pruning and the z-score clip}
+\label{sec:prune}
+Table~\ref{tab:prunefl} reports pruning during federated training, over three seeds with no attackers. The autoencoder learns around the zeros up to a point. Its recall falls from 0.457, 0.492 and 0.221 at no pruning to 0.439, 0.376 and 0.210 at 50\% sparsity, then to 0.350, 0.369 and 0.168 at 70\%, 0.338, 0.209 and 0.145 at 80\%, and 0.198, 0.059 and 0.092 at 90\%. The cascade's known-attack recall stays at 0.993 or above in every run, because the booster carries it.
+
+\begin{table}[t]
+\centering
+\caption{Pruning during federated training (server re-prunes each round), 10 clients, no attackers. Seeds 42 / 43 / 44.}
+\label{tab:prunefl}
+\small
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{rrlll}
+\toprule
+Sparsity & Non-zero weights & AE-alone recall & Cascade macro-recall & Benign FPR \\
+\midrule
+0\% & 9,600 & 0.457 / 0.492 / 0.221 & 0.996 / 0.996 / 0.994 & 0.118 / 0.041 / 0.035 \\
+50\% & 4,800 & 0.439 / 0.376 / 0.210 & 0.995 / 0.993 / 0.994 & 0.140 / 0.040 / 0.030 \\
+70\% & 2,880 & 0.350 / 0.369 / 0.168 & 0.993 / 0.996 / 0.994 & 0.120 / 0.078 / 0.024 \\
+80\% & 1,920 & 0.338 / 0.209 / 0.145 & 0.993 / 0.994 / 0.994 & 0.145 / 0.058 / 0.025 \\
+90\% & 960 & 0.198 / 0.059 / 0.092 & 0.993 / 0.994 / 0.993 & 0.115 / 0.026 / 0.025 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+Pruning after training is one run (the 10-client, seed-42 bundle, thresholds recalibrated; Table~\ref{tab:prunepost}) and is much worse at the same sparsity. Recall falls from 0.461 to 0.375 at 50\% and to 0.098 at 70\%, and the AUROC of the reconstruction error falls from 0.892 to 0.495, no better than chance. The 9,834-parameter autoencoder is already small, and a sparse encoding only saves space beyond 50\% sparsity, where the model starts to lose recall. Pruning buys little here.
+
+\begin{table}[t]
+\centering
+\caption{Pruning after training (10-client, seed-42 real-run bundle, thresholds recalibrated; one run). Sparse size is relative to the dense model.}
+\label{tab:prunepost}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{rrcccccc}
+\toprule
+Sparsity & Non-zero & Sparse size & AE recall & AE AUROC & Cascade macro-recall & Benign FPR \\
+\midrule
+0\% & 9,600 & 1.98 & 0.461 & 0.892 & 0.996 & 0.1275 \\
+50\% & 4,800 & 1.00 & 0.375 & 0.788 & 0.995 & 0.0814 \\
+70\% & 2,880 & 0.61 & 0.098 & 0.495 & 0.994 & 0.0418 \\
+80\% & 1,920 & 0.41 & 0.110 & 0.451 & 0.995 & 0.0692 \\
+90\% & 960 & 0.22 & 0.092 & 0.461 & 0.995 & 0.0607 \\
+95\% & 480 & 0.12 & 0.093 & 0.460 & 0.995 & 0.0781 \\
+98\% & 192 & 0.06 & 0.094 & 0.467 & 0.995 & 0.0783 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+The z-score clip matters more than a single run suggested. Without it, the final benign validation loss of the autoencoder is 0.242 at seed 42, against 0.129 with the clip. At seeds 43 and 44 the loss without the clip is 117.8 and 102.8, against 0.057 and 0.264 with it. In two of three seeds, then, training without the clip fails outright, because rows from another part of the capture land thousands of standard deviations from a client's statistics and dominate its reconstruction error.

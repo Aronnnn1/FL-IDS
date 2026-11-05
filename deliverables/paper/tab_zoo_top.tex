@@ -1,0 +1,18 @@
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{llccc}
+\toprule
+Model & Family & F1 MQTTset & F1 DataSense & Composite \\
+\midrule
+XGBoost (DART) & boosting & 0.8371 & 0.9618 & 99.9 \\
+XGBoost & boosting & 0.8371 & 0.9618 & 99.9 \\
+Hist Gradient Boosting & boosting & 0.8350 & 0.9585 & 99.5 \\
+LightGBM & boosting & 0.8370 & 0.9614 & 99.5 \\
+CatBoost & boosting & 0.8339 & 0.9523 & 99.2 \\
+Gradient Boosting (sklearn) & boosting & 0.8334 & 0.9553 & 96.5 \\
+K-Nearest Neighbors (k=15, distance-weighted) & instance & 0.8274 & 0.8487 & 92.4 \\
+Explainable Boosting Machine & interpretable & 0.8284 & 0.9555 & 91.9 \\
+K-Nearest Neighbors (k=5) & instance & 0.8188 & 0.8452 & 91.8 \\
+Voting Classifier (soft) & meta & 0.7618 & 0.9210 & 90.5 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}

@@ -1,0 +1,115 @@
+\section{Experimental Setup}
+\label{sec:setup}
+\subsection{Splits by connection}
+\label{sec:splits}
+Every split in the federated system keeps each connection whole. The server's calibration set takes whole connections, class by class, until it holds about 5\% of each class's rows. The remaining pool, all of it, is divided among the clients with a Dirichlet label-skew partition~\cite{hsu2019} with concentration $\alpha=0.3$. For each class, a Dirichlet draw gives each client a target share, and connections in random order go to whichever client is furthest below its target. Each client then sets aside about 15\% of its rows as a test slice and about 15\% of its remaining benign rows as a benign validation slice for threshold calibration, again by whole connections. The rest is its training data. No connection appears in more than one of these sets.
+
+A class with fewer than 20 connections cannot be split this way. Only MITM is affected: its 406 rows form a single connection, so all of it goes to the server's calibration set. The booster learns MITM, but no client holds MITM rows and no test slice contains any. MITM is evaluated only by the zero-day experiment and the Phase~B replay. Twenty-four connections (655 rows) carry two labels and are split by label.
+
+Table~\ref{tab:sizes} gives the resulting sizes. The seed changes the calibration set, the partition and the model initialisation. Because whole connections are chosen, the server set varies between 100,024 and 100,181 rows across seeds. Of it, 71,853 to 79,866 rows train the booster and the rest score it. The clients together hold about 1.89 million rows, and their test slices hold 283,090 to 295,566 rows. Strong skew leaves some clients without benign validation rows. They get an infinite threshold, so their autoencoder never flags.
+
+\begin{table}[t]
+\centering
+\caption{Data sizes and Phase~A wall time of the six real runs. ``Server train'' and ``held back'' are the two parts of the calibration set; ``no benign val.'' counts clients with no benign validation rows.}
+\label{tab:sizes}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{rrrrrrrr}
+\toprule
+Clients & Seed & Server train & Held back & Client rows & Test rows & No ben.\ val. & Phase A (s) \\
+\midrule
+10 & 42 & 79,866 & 20,315 & 1,885,587 & 288,416 & 1 & 1844 \\
+10 & 43 & 72,803 & 27,221 & 1,885,744 & 283,090 & 0 & 1397 \\
+10 & 44 & 71,853 & 28,242 & 1,885,673 & 288,366 & 2 & 1754 \\
+20 & 42 & 79,866 & 20,315 & 1,885,587 & 283,427 & 3 & 1260 \\
+20 & 43 & 72,803 & 27,221 & 1,885,744 & 292,222 & 2 & 1063 \\
+20 & 44 & 71,853 & 28,242 & 1,885,673 & 295,566 & 0 & 1225 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsection{Real runs and in-process experiments}
+Six real runs train the system as a deployed federation would: a Flower server and one operating-system process per client, 20 rounds, no attackers, with 10 and 20 clients and seeds 42, 43 and 44. Each run saves a model bundle, which we score on the clients' test slices. The 10-client, seed-42 bundle also drives Phase~B.
+
+The ablation, poisoning sweep, zero-day, stealth-attacker, pruning and clip experiments take separate training jobs that drive the same client, attacker and aggregation code in one process instead of over gRPC, with 10 clients and 20 rounds on the same full-pool splits. The sweep, ablation, zero-day, stealth-attacker, pruning-during-training and clip experiments all run with three seeds. Pruning after training is a single run on the seed-42 bundle.
+
+\subsection{Attackers}
+\label{sec:attackers}
+A \emph{sign-flipping} client trains honestly for the round and then returns $w_t-5(w_i-w_t)$, its true delta negated and amplified five times. It reports the largest example count of any client, so that FedAvg, which weights updates by reported counts, gives it as much weight as possible. The trust filter and trimmed mean ignore counts. At a malicious fraction $f$, $\mathrm{round}(fn)$ clients are drawn without replacement using the run's seed.
+
+A \emph{stealth} client is a white-box attacker that knows the filter's cosine rule and norm clip. It estimates the consensus direction as the last aggregate update it can observe (this round's global weights minus last round's). Its update keeps a cosine of 0.1 to that direction and spends the rest of its norm budget, 1.5 times its honest norm and so below the $2\times$ clip, on the negative of the part of its honest update that is orthogonal to the consensus. In round~1 it has no estimate and behaves honestly. This is one adaptive strategy, not a bound over all of them.
+
+We do not use label flipping or input corruption as test attackers. The autoencoder never sees labels, and corrupted inputs mostly make a client look like one more heterogeneous client, so neither would test an update-level defence.
+
+\subsection{Variants}
+Every variant uses the same data, partition and seed.
+\begin{itemize}
+  \item \texttt{full\_pipeline}: the trust filter and trimmed mean, the boosting pre-filter for autoencoder training, and the cascade of Eq.~(\ref{eq:cascade}).
+  \item \texttt{plain\_fedavg}: as above, with FedAvg in place of the filter and trimmed mean.
+  \item \texttt{trimmed\_mean\_only}: the trimmed mean without the trust filter.
+  \item \texttt{autoencoder\_only}: the autoencoder trained on all local rows with no boosting pre-filter. Detection is the autoencoder alone.
+  \item \texttt{boosting\_only}: the cascade rule without the second stage, and no FL. A row counts as detected when the booster labels it an attack with probability at least $\gamma$.
+\end{itemize}
+
+\subsection{Metrics}
+About 72\% of the rows are benign, so accuracy mostly tracks the benign false-positive rate, and it even rises when a poisoned autoencoder stops flagging anything. We report the following instead.
+\begin{itemize}
+  \item \textbf{Attack macro-recall:} the share of attack rows flagged (labelled with any attack type, or anomalous), averaged over the attack classes present in the test slices with equal weight. In the federated tests this is 13 classes, because MITM has no test rows.
+  \item \textbf{Attack micro-recall:} the same, pooled over all attack rows.
+  \item \textbf{Packet false-alarm rate:} the share of benign test rows flagged.
+  \item \textbf{Connection false-alarm rate:} the share of benign test connections in which at least half the rows are flagged. We also report the median client's packet rate, and the share of all false-alarm packets that come from the ten largest benign connections.
+  \item \textbf{Autoencoder-alone macro-recall:} attack macro-recall when the autoencoder flags every row by itself. It isolates the federated component, whose damage under poisoning the cascade otherwise hides.
+  \item \textbf{Attacker survival:} the share of attacker-rounds in which an attacker's update passed the filter into aggregation.
+\end{itemize}
+The test set is the union of the clients' test slices, and each row is scored with its own client's scaler and threshold, as in deployment.
+
+\textit{Zero-day protocol.} For each of the 14 attack classes in turn, we remove that class from the calibration set and from every client's data before partitioning, so it is absent even from the scaler statistics. We train, then score every row of the held-out class (from 406 rows for MITM to 121,567 for DDoS\_UDP) as unseen traffic. Each row is assigned to a random client and scored with that client's scaler and threshold. A row counts as detected if the cascade flags it in any way. We report the detection rate per class and its mean over the 14 classes, for the classifier alone, the autoencoder alone and the cascade.
+
+\textit{Pruning.} We prune the autoencoder by global weight magnitude, zeroing the smallest fraction of weight-matrix entries and keeping the biases. During training, the server re-prunes the global model after every aggregation, with the target sparsity ramped linearly over the first ten rounds. After training, we prune the final model of the 10-client, seed-42 real run and recalibrate the thresholds. Reported sizes assume a sparse encoding (float32 values plus int32 indices). Clients still train and send dense updates, so this shrinks the stored model, not the per-round communication.
+
+\subsection{Standalone classifier studies}
+Three studies evaluate the first-stage classifier alone and centrally.
+\begin{itemize}
+  \item \textbf{Feature study.} LightGBM on all rows at the natural class distribution, for each step from the 91 base features to the full 130. Each feature set gets its own deduplication. Each is evaluated on two 80/20 splits: a split stratified by class over individual rows, and the first fold of a five-fold stratified group split with the connection as the group, so that no connection has rows on both sides. We treat the second as the main result. MITM lies wholly on one side of it and is left out of its macro F1. LightGBM uses 63 leaves, learning rate 0.1, feature and bagging fractions of 0.8, leaf regularisation, early stopping (patience 50) on 10\% of the training rows and, in the final configuration, the class weights of Section~\ref{sec:booster}. It ran with four threads, so it is reproducible only to within thread-scheduling noise.
+  \item \textbf{Time-ordered split.} The same final configuration, with each class's earliest 80\% of connections in training and its latest 20\% in test, for seeds 42 to 44. CSV row order is capture order within each class. The CSV records time of day without a date, so this orders by row position, not by a verified clock.
+  \item \textbf{Model selection.} LightGBM against other classifiers on the same split. Section~\ref{sec:models} describes this study in full.
+\end{itemize}
+
+\begin{table}[t]
+\centering
+\caption{Hyperparameters of the federated system (from the run configuration files).}
+\label{tab:hyper}
+\small
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{lll}
+\toprule
+Component & Parameter & Value \\
+\midrule
+Data & clients $n$ / Dirichlet $\alpha$ / seeds & 10 or 20 / 0.3 / 42, 43, 44 \\
+ & test / benign-validation fraction & 0.15 / 0.15 \\
+ & z-score clip / min.\ connections per class & $\pm10$ / 20 \\
+LightGBM & calibration fraction / held-back share & 0.05 / 0.2 \\
+ & boosting rounds / learning rate / leaves & 300 / 0.05 / 31 \\
+ & min.\ leaf Hessian / L2 / class weights & 1.0 / 1.0 / square root \\
+ & update every / extra rounds / alerts per client & 3 rounds / 50 / 50 \\
+Autoencoder & layers & 130--32--16--8--16--32--130 \\
+ & optimiser / lr / batch / local epochs & Adam / $10^{-3}$ / 64 / 5 \\
+ & anomaly percentile & 97 \\
+Cascade & confidence threshold $\gamma$ & 0.7 \\
+FL & rounds & 20 \\
+Trust filter & MAD multiplier / min.\ cosine / min.\ trust & 3.0 / 0.0 / 0.5 \\
+ & EMA $\alpha$ / norm-clip multiplier / trim per side & 0.3 / 2.0 / 0.15 \\
+Attackers & sign-flip amplification / claimed count & 5 / largest client \\
+ & stealth cosine target / norm multiplier & 0.1 / 1.5 \\
+SDN & block / rate-limit confidence & 0.85 / 0.5 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsection{Hyperparameters and implementation}
+Table~\ref{tab:hyper} lists the settings. The cascade threshold, 97th percentile, trim fraction, norm-clip multiplier and SDN thresholds come from the project specification, set in an earlier prototype, and were not tuned on the test data. The LightGBM regularisation was added because training without it overfitted the small calibration set, and its benign false-alarm rate swung widely when a small share of calibration rows changed. In the pipeline, LightGBM runs single-threaded in deterministic mode, because multi-threaded histogram construction did not reproduce exactly across identical runs.
+
+The system is written in Python with PyTorch~\cite{paszke2019} 2.14, Flower~\cite{beutel2020} 1.38, LightGBM 4.7 and \texttt{os-ken} 4.2, with Mininet and Open vSwitch for the network and \texttt{tcpreplay} and \texttt{tshark} for traffic. All experiments ran in an Ubuntu virtual machine with 20 virtual CPUs and 48~GB of memory. A real 20-client run needs about 28~GB, so real runs were never run alongside other jobs. The test suite (247 passed, one skipped) passes in this environment.
